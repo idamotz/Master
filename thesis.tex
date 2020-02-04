@@ -1,0 +1,106 @@
+\documentclass[a4paper,english]{ifimaster}
+
+\usepackage[utf8]{inputenc}
+\usepackage{babel,duomasterforside}
+\usepackage{hyperref}
+\usepackage{minted}
+
+\usepackage[backend=biber,style=authoryear]{biblatex}
+
+\addbibresource{citations.bib}
+
+\title{Master Essay}
+\author{Eirik Halvard Sæther}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\frontmatter{}
+
+\tableofcontents
+
+\mainmatter{}
+
+\chapter{Notes}
+
+\section{Reference examples}%
+\label{sec:reference_examples}
+
+\begin{itemize}
+	\item Precise Version Control of Trees with Line-Based Version Control Systems \parencite{precise-version-control-of-trees}
+	\item A three-way merge for {XML} documents \parencite{lindholm-xml-merge}. See section \ref{sub:_a_three_way_merge_for_xml_documents}
+	\item Fine-grained and accurate source code differencing \parencite{fine-grained-source-code-diff}
+	\item Using versioned trees, change detection and node identity for three-way {XML} merging \parencite{cheng-ethan-xml-merge}
+	\item Generic Diff3 for algebraic datatypes \parencite{generic-diff-for-adt}
+
+
+\end{itemize}
+
+\chapter{Introduction}
+\label{cha:introduction}
+
+Introducing feature models. what they are, why they are useful. One part is allowing different collaborators. Important for autonomy, etc.
+
+Something about diff, three-way merge and working on line granularity. Very inaccurate, not adequate. maybe a small example.
+
+Introduce a method of merging two feature models derived from the same feature model using a three-way merge algorithm inspired from the text-granularity algorithm and other three-way merge algorithms working on tree-structures like XML and ASTs.
+
+These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their ID.
+
+This task includes defining the semantics of feature models, defining what a sound model is. The three-way merge algorithm will assume three sound feature models as input, and compute the edit script between the base and the two derived feature models. The two edit scripts will then be combined to a graph that represents what changes to be done to the base, including possible conflicts and dependencies.
+
+\section{Motivation}
+\label{sec:motivation}
+
+TODO
+
+\section{Objective (with solution requirements)}
+\label{sec:objective_with_solution_requirements_}
+
+TODO
+
+\section{Difficulties/problems/challenges}
+\label{sec:difficulties_problems_challenges}
+
+TODO
+
+\section{Say why other solutions are not adequate (very short)}
+\label{sec:say_why_other_solutions_are_not_adequate_very_short_}
+
+TODO
+
+\section{Describe the solution (very short)}
+\label{sec:describe_the_solution_very_short_}
+
+TODO
+
+\section{Roadmap of the thesis}
+\label{sec:roadmap_of_the_thesis}
+
+TODO
+
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{A Three-way Merge for XML Documents}%
+\label{sub:_a_three_way_merge_for_xml_documents}
+
+Lindholm describes a method of merging XML documents. The algorithm is a three-way merge taking a base XML file, $T_0$, and two files $T_1$ and $T_2$, derived and changed from the base file independently. The XML documents are ordered, labeled trees, and merging the trees takes this into consideration. The algorithm relies on computing \textit{edit scripts} between $T_0$ and $T'$, where $T'$ is either $T_1$ or $T_2$. The edit scripts consist of predefined operations, which are attribute updates and insert, move and delete for XML elements.
+
+One of the important factors of the data structure, is that the nodes are labeled with unique IDs. This makes merging significantly easier.
+
+To study different use-cases (user stories) of XML merging, they manually merged some examples, to see how real world users would handle some tricky cases. Some rules for merging were devised, including:
+
+\begin{itemize}
+	\item Not possible to move a node in $T_1$ that are being updated in $T_2$
+	\item Guards, aka node contexts are there to handle merging changes originating too close to each other. This isn't technically a merge conflict, but a potential semantic issue.
+	\item 
+\end{itemize}
+
+\backmatter{}
+
+\printbibliography{}
+
+\end{document}
