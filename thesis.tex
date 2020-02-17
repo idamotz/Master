@@ -4,8 +4,9 @@
 \usepackage{babel,duomasterforside}
 \usepackage{hyperref}
 \usepackage{minted}
-
 \usepackage[backend=biber,style=authoryear]{biblatex}
+
+\newcommand{\todo}[1]{\textcolor{red}{[[TODO: #1]]}\PackageWarning{TODO:}{#1!}}
 
 \addbibresource{citations.bib}
 
@@ -29,11 +30,12 @@
 \label{sec:reference_examples}
 
 \begin{itemize}
-	\item Precise Version Control of Trees with Line-Based Version Control Systems \parencite{precise-version-control-of-trees}
-	\item A three-way merge for {XML} documents \parencite{lindholm-xml-merge}. See section \ref{sub:_a_three_way_merge_for_xml_documents}
-	\item Fine-grained and accurate source code differencing \parencite{fine-grained-source-code-diff}
-	\item Using versioned trees, change detection and node identity for three-way {XML} merging \parencite{cheng-ethan-xml-merge}
-	\item Generic Diff3 for algebraic datatypes \parencite{generic-diff-for-adt}
+	\item Precise Version Control of Trees with Line-Based Version Control Systems \parencite{cite:precise_version_control_of_trees}
+	\item A three-way merge for {XML} documents \parencite{cite:lindholm_xml_merge}. See section \ref{sub:_a_three_way_merge_for_xml_documents}
+	\item Fine-grained and accurate source code differencing \parencite{cite:fine_grained_source_code_diff}
+	\item Using versioned trees, change detection and node identity for three-way {XML} merging \parencite{cite:cheng_ethan_xml_merge}
+	\item Generic Diff3 for algebraic datatypes \parencite{cite:generic_diff_for_adt}
+	\item A State-of-the-Art Survey on Software Merging \parencite{cite:tom_mens_software_merging_survey}
 
 
 \end{itemize}
@@ -41,15 +43,97 @@
 \chapter{Introduction}
 \label{cha:introduction}
 
+\section{Unstructured Paragraphs}%
+\label{sec:unstructured_paragraphs}
+
+\subsection{Version Control Systems}%
+\label{sub:version_control_systems}
+
+\subsubsection{Why the need for VCS}%
+\label{ssub:why_the_need_for_vcs}
+
+\textit{Software configuration mechanisms} is the discipline of managing the evolution of large and complex software systems (61 in \parencite{cite:tom_mens_software_merging_survey})
+
+\textit{Version control mechanisms} (12 in mens), are used to deal with the evolution of software products. These mechanisms include ways to deal with having multiple, parallel versions of the software simultaneously. Techniques like \textit{software merging} are used to keep consistency and unify different versions by automatically or semi-automatically deriving merged versions of the different parallel versions.
+
+\subsubsection{Two-way vs three-way merging}%
+\label{ssub:two_way_vs_three_way_merging}
+
+When merging different versions of a piece of software, we differentiate between \textit{two-way} and \textit{three-way} merging. Two-way merging merges the two versions without taking a common ancestor into account. Three-way merging on the other hand, uses a common ancestor as a reference point, to know how the different versions were changed. The latter technique is more powerful and produces more accurate merges, because the merge will know extra information. Using two-way merge, if a piece was removed from one version, the two-way merge would not know whether the piece was removed in the first file or added in the second. This is not a problem in three-way merge, since we know from the common ancestor whether there was a deletion or addition. In this thesis, we will focus on three-way merging, since it will produce better results.
+
+\subsubsection{Representations in the merge}%
+\label{ssub:representations_in_the_merge}
+
+Merge tools can be further categorized in how they represent the data they are merging. As proposed in \parencite{cite:tom_mens_software_merging_survey}, a way of categorizing them are \textit{textual}, \textit{syntactic} and \textit{semantic} merging. The most common technique is definitely textual merging, where the software is treated as a flat text file, and merging is done without consideration of the intended structure or semantics of the text file.
+
+\paragraph{Textual merging}%
+\label{par:textual_merging}
+
+Textual merging views the software artifacts as unstructured text files. There exist several granularities of what is considered one unit, but \textit{line based merging} is probably the most common textual merge. Line based merging tecniques computes the difference between files by comparing equality over the lines. This has several implications, like adding a single space after a line is considered a deletion of the old line and addition of the new. This coarse granularity often leads to unneccesary and confusing conflicts. Changing the indentation or other formatting differences often lead to unneccesary conflicts.
+
+To examplify this, consider the two versions of a python file, \ref{lst:code_diff_1} and \ref{lst:code_diff_2}. The second version simply wrapped the content of the function in an if-statement that checks for input sanity. Using a standard textual, line based differencing tool like the unix' \textit{diff}-tool \todo{ref, see tom for specifics}, we are able calculate the difference between the two files. As seen in the result \ref{lst:result_code_diff}, difference between the two are confusing and inaccurate. Conceptually, the difference was that the second version wrapped the block in a if-statement. Due to the coarse grained line based differencing, and the disregard of structure and semantics, the algorithm reported that the whole block was deleted, and the same block wrapped in an if was inserted.
+
+\begin{listing}
+	\begin{minted}[]{python}
+def some_function(n):
+  sum = 0
+  for i in range(0, n):
+    sum += i
+some_function(5)
+
+  \end{minted}
+	\caption{Code diff 1}
+	\label{lst:code_diff_1}
+\end{listing}
+
+\begin{listing}
+	\begin{minted}[]{python}
+def some_function(n):
+  if isinstance(n, int):
+    sum = 0
+    for i in range(0, n):
+      sum += i
+some_function(5)
+  \end{minted}
+	\caption{Code diff 2}
+	\label{lst:code_diff_2}
+\end{listing}
+
+\begin{listing}
+	\begin{minted}{text}
+<   sum = 0
+<   for i in range(0, n):
+<     sum += i
+<   print(sum)
+---
+>   if isinstance(n, int):
+>     sum = 0
+>     for i in range(0, n):
+>       sum += i
+>     print(sum)
+  \end{minted}
+	\caption{Resulting code diff}
+	\label{lst:result_code_diff}
+\end{listing}
+
+As discussed, text-based merge techniques often provide inferiour results, however, they have several advantages.
+
+\subsection{Feature Models}%
+\label{sub:feature_models}
+
 Introducing feature models. what they are, why they are useful. One part is allowing different collaborators. Important for autonomy, etc.
 
 Something about diff, three-way merge and working on line granularity. Very inaccurate, not adequate. maybe a small example.
+
+possible a paragraph about different version control mechanisms and techniques. Pessimistic and optimistic approaches. \parencite{cite:tom_mens_software_merging_survey}
 
 Introduce a method of merging two feature models derived from the same feature model using a three-way merge algorithm inspired from the text-granularity algorithm and other three-way merge algorithms working on tree-structures like XML and ASTs.
 
 These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their ID.
 
 This task includes defining the semantics of feature models, defining what a sound model is. The three-way merge algorithm will assume three sound feature models as input, and compute the edit script between the base and the two derived feature models. The two edit scripts will then be combined to a graph that represents what changes to be done to the base, including possible conflicts and dependencies.
+
+% TODO: continue describing details of merging from mens article
 
 \section{Motivation}
 \label{sec:motivation}
@@ -96,8 +180,16 @@ To study different use-cases (user stories) of XML merging, they manually merged
 \begin{itemize}
 	\item Not possible to move a node in $T_1$ that are being updated in $T_2$
 	\item Guards, aka node contexts are there to handle merging changes originating too close to each other. This isn't technically a merge conflict, but a potential semantic issue.
-	\item 
+	\item Normal stuff. added or removed nodes should be reflected in the merge. parent relation should be updated
 \end{itemize}
+
+% TODO: check reference 2 and 3 in the text, regarding matching/mapping and the tree matching problem
+
+\section{A State-of-the-Art Survey on Software Merging}
+\label{sec:a_state_of_the_art_survey_on_software_merging}
+
+% TODO: read Tom Mens survey on software merging
+
 
 \backmatter{}
 
