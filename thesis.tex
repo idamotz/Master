@@ -31,7 +31,7 @@
 
 \begin{itemize}
 	\item Precise Version Control of Trees with Line-Based Version Control Systems \parencite{cite:precise_version_control_of_trees}
-	\item A three-way merge for {XML} documents \parencite{cite:lindholm_xml_merge}. See section \ref{sub:_a_three_way_merge_for_xml_documents}
+	\item A three-way merge for {XML} documents \parencite{cite:lindholm_xml_merge}. See Section~\ref{sub:_a_three_way_merge_for_xml_documents}
 	\item Fine-grained and accurate source code differencing \parencite{cite:fine_grained_source_code_diff}
 	\item Using versioned trees, change detection and node identity for three-way {XML} merging \parencite{cite:cheng_ethan_xml_merge}
 	\item Generic Diff3 for algebraic datatypes \parencite{cite:generic_diff_for_adt}
@@ -40,7 +40,7 @@
 
 \end{itemize}
 
-\chapter{Introduction}
+\chapter{Introduction}%
 \label{cha:introduction}
 
 \section{Unstructured Paragraphs}%
@@ -69,9 +69,9 @@ Merge tools can be further categorized in how they represent the data they are m
 \paragraph{Textual merging}%
 \label{par:textual_merging}
 
-Textual merging views the software artifacts as unstructured text files. There exist several granularities of what is considered one unit, but \textit{line based merging} is probably the most common textual merge. Line based merging tecniques computes the difference between files by comparing equality over the lines. This has several implications, like adding a single space after a line is considered a deletion of the old line and addition of the new. This coarse granularity often leads to unneccesary and confusing conflicts. Changing the indentation or other formatting differences often lead to unneccesary conflicts.
+Textual merging views the software artifacts as unstructured text files. There exist several granularities of what is considered one unit, but \textit{line based merging} is probably the most common textual merge. Line based merging techniques computes the difference between files by comparing equality over the lines. This has several implications, like adding a single space after a line is considered a deletion of the old line and addition of the new. This coarse granularity often leads to unnecessary and confusing conflicts. Changing the indentation or other formatting differences often lead to unnecessary conflicts.
 
-To examplify this, consider the two versions of a python file, \ref{lst:code_diff_1} and \ref{lst:code_diff_2}. The second version simply wrapped the content of the function in an if-statement that checks for input sanity. Using a standard textual, line based differencing tool like the unix' \textit{diff}-tool \todo{ref, see tom for specifics}, we are able calculate the difference between the two files. As seen in the result \ref{lst:result_code_diff}, difference between the two are confusing and inaccurate. Conceptually, the difference was that the second version wrapped the block in a if-statement. Due to the coarse grained line based differencing, and the disregard of structure and semantics, the algorithm reported that the whole block was deleted, and the same block wrapped in an if was inserted.
+To exemplify this, consider the two versions of a python file, Listing~\ref{lst:code_diff_1} and Listing~\ref{lst:code_diff_2}. The second version simply wrapped the content of the function in an if-statement that checks for input sanity. Using a standard textual, line based differencing tool like the Unix' \textit{diff}-tool \todo{ref, see tom for specifics}, we are able calculate the difference between the two files by calculating the longest common subsequence. As seen in the result Listing~\ref{lst:result_code_diff}, difference between the two are confusing and inaccurate. Conceptually, the difference was that the second version wrapped the block in a if-statement. Due to the coarse grained line based differencing and the disregard of structure and semantics, the algorithm reported that the whole block was deleted, and the same block wrapped in an if was inserted.
 
 \begin{listing}
 	\begin{minted}[]{python}
@@ -116,56 +116,70 @@ some_function(5)
 	\label{lst:result_code_diff}
 \end{listing}
 
-As discussed, text-based merge techniques often provide inferiour results, however, they have several advantages.
+As discussed, text-based merge techniques often provide inferior results, however, they have several advantages. Because of the algorithms focus on generality, accuracy and efficiency, these types of algorithms are widely adopted. The algorithm is general enough to work well for different programming languages, documentation, markup files, configuration files, etc. Some measurements performed on three-way, textual, line-based merge techniques in industrial case studies showed that about 90 percent of the changed files could be merged automatically \todo{ref 49 in mens}. Other tools can complement the merge algorithm in avoiding or resolving conflicts. Formatters can make sure things like indentation and whitespace are uniformly handled, to avoid unnecessary conflicts. Compilers can help in resolving conflicts arising from things like renaming, where one version renames a variables, while another version introduces new lines referencing the old variable.
+
+\paragraph{Syntactic Merging}%
+\label{par:syntactic_merging}
+
+Syntactic merging \todo{ref, 10, mens} differs from textual merging in that it considers the syntax of the artifact it is merging. This makes it more powerful, because depending on the syntactic structure of the artifact, the merger can ignore certain aspects, like whitespace or code comments. Syntactic merge techniques can represent the software artifacts in a better data structure than just flat text files, like a tree or a graph. In example, representing the Python program from Listing~\ref{lst:code_diff_1} and Listing~\ref{lst:code_diff_2} as a parse tree or abstract syntax tree, we can avoid merge conflicts. \todo{maybe a nice drawing or something, with explanation}.
+
+The granularity of the merger is still relevant, because we sometimes want to report a conflict even though the versions can be automatically merged. Consider the following example. $n < x$ is changed to $n \leq x$ in one version, and to $n < x + 1$ in another. Too fine grained granularity may cause this to be merged conflict free as $n \leq x + 1$. The merge can be done automatically and conflict free, but here we want to report a warning or conflict, because the merge might lead to logical errors. 
+
+\paragraph{Semantic Merging}%
+\label{par:semantic_merging}
+
+While syntactic merging is more powerful than its textual counterpart, there are still conflicts that go unnoticed. The syntactical mergers can detect conflicts explicitly encoded in the tree structure of the software artifact, however, there often exist implicit, cross-tree constraints in the software. An example of such a constraint references to a variable. The variable references in the code are often semantically tied to the definition of the variable, where the name and scope implicitly notes the cross tree reference to the definition. 
+
+Consider the following simple program: \texttt{var i; i = 10;}. If one version changes the name of the variable: \texttt{var num; num = 10;}, and another version adds a statement referencing the variable: \texttt{var i; i = 10; print(i)}. Syntactic or textual mergers would not notice the conflict arising due to the implicit cross-tree constraints regarding the variable references, and merge the versions conflict-free with the following, syntactically valid result: \texttt{var num; num = 10; print(i)}
 
 \subsection{Feature Models}%
 \label{sub:feature_models}
 
-Introducing feature models. what they are, why they are useful. One part is allowing different collaborators. Important for autonomy, etc.
+Introducing feature models. What they are, why they are useful. One part is allowing different collaborators. Important for autonomy, etc.
 
-Something about diff, three-way merge and working on line granularity. Very inaccurate, not adequate. maybe a small example.
+Something about diff, three-way merge and working on line granularity. Very inaccurate, not adequate. Maybe a small example.
 
 possible a paragraph about different version control mechanisms and techniques. Pessimistic and optimistic approaches. \parencite{cite:tom_mens_software_merging_survey}
 
 Introduce a method of merging two feature models derived from the same feature model using a three-way merge algorithm inspired from the text-granularity algorithm and other three-way merge algorithms working on tree-structures like XML and ASTs.
 
-These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their ID.
+These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their id.
 
 This task includes defining the semantics of feature models, defining what a sound model is. The three-way merge algorithm will assume three sound feature models as input, and compute the edit script between the base and the two derived feature models. The two edit scripts will then be combined to a graph that represents what changes to be done to the base, including possible conflicts and dependencies.
 
 % TODO: continue describing details of merging from mens article
 
-\section{Motivation}
+\section{Motivation}%
 \label{sec:motivation}
 
 TODO
 
-\section{Objective (with solution requirements)}
+\section{Objective (with solution requirements)}%
 \label{sec:objective_with_solution_requirements_}
 
 TODO
 
-\section{Difficulties/problems/challenges}
+\section{Difficulties/problems/challenges}%
 \label{sec:difficulties_problems_challenges}
 
 TODO
 
-\section{Say why other solutions are not adequate (very short)}
+\section{Say why other solutions are not adequate (very short)}%
 \label{sec:say_why_other_solutions_are_not_adequate_very_short_}
 
 TODO
 
-\section{Describe the solution (very short)}
+\section{Describe the solution (very short)}%
 \label{sec:describe_the_solution_very_short_}
 
 TODO
 
-\section{Roadmap of the thesis}
+\section{Roadmap of the thesis}%
 \label{sec:roadmap_of_the_thesis}
 
 TODO
 
-\section{Related Work}
+\section{Related Work}%
 \label{sec:related_work}
 
 \subsection{A Three-way Merge for XML Documents}%
@@ -180,12 +194,12 @@ To study different use-cases (user stories) of XML merging, they manually merged
 \begin{itemize}
 	\item Not possible to move a node in $T_1$ that are being updated in $T_2$
 	\item Guards, aka node contexts are there to handle merging changes originating too close to each other. This isn't technically a merge conflict, but a potential semantic issue.
-	\item Normal stuff. added or removed nodes should be reflected in the merge. parent relation should be updated
+	\item Normal stuff. Added or removed nodes should be reflected in the merge. Parent relation should be updated
 \end{itemize}
 
 % TODO: check reference 2 and 3 in the text, regarding matching/mapping and the tree matching problem
 
-\section{A State-of-the-Art Survey on Software Merging}
+\section{A State-of-the-Art Survey on Software Merging}%
 \label{sec:a_state_of_the_art_survey_on_software_merging}
 
 % TODO: read Tom Mens survey on software merging
