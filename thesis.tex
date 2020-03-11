@@ -4,7 +4,7 @@
 \usepackage{babel,duomasterforside}
 \usepackage{hyperref}
 \usepackage{minted}
-\usepackage[backend=biber,style=authoryear]{biblatex}
+\usepackage[backend=biber]{biblatex}
 
 \newcommand{\todo}[1]{\textcolor{red}{[[TODO: #1]]}\PackageWarning{TODO:}{#1!}}
 
@@ -30,12 +30,12 @@
 \label{sec:reference_examples}
 
 \begin{itemize}
-	\item Precise Version Control of Trees with Line-Based Version Control Systems \parencite{cite:precise_version_control_of_trees}
-	\item A three-way merge for {XML} documents \parencite{cite:lindholm_xml_merge}. See Section~\ref{sub:_a_three_way_merge_for_xml_documents}
-	\item Fine-grained and accurate source code differencing \parencite{cite:fine_grained_source_code_diff}
-	\item Using versioned trees, change detection and node identity for three-way {XML} merging \parencite{cite:cheng_ethan_xml_merge}
-	\item Generic Diff3 for algebraic datatypes \parencite{cite:generic_diff_for_adt}
-	\item A State-of-the-Art Survey on Software Merging \parencite{cite:tom_mens_software_merging_survey}
+	\item Precise Version Control of Trees with Line-Based Version Control Systems \cite{cite:precise_version_control_of_trees}
+	\item A three-way merge for {XML} documents \cite{cite:lindholm_xml_merge}. See Section~\ref{sub:_a_three_way_merge_for_xml_documents}
+	\item Fine-grained and accurate source code differencing \cite{cite:fine_grained_source_code_diff}
+	\item Using versioned trees, change detection and node identity for three-way {XML} merging \cite{cite:cheng_ethan_xml_merge}
+	\item Generic Diff3 for algebraic datatypes \cite{cite:generic_diff_for_adt}
+	\item A State-of-the-Art Survey on Software Merging \cite{cite:tom_mens_software_merging_survey}
 
 
 \end{itemize}
@@ -49,12 +49,9 @@
 \subsection{Version Control Systems}%
 \label{sub:version_control_systems}
 
-\subsubsection{Why the need for VCS}%
-\label{ssub:why_the_need_for_vcs}
+\textit{Software configuration mechanisms} is the discipline of managing the evolution of large and complex software systems \todo{(61 in \cite{cite:tom_mens_software_merging_survey})} \textit{Version control mechanisms} \todo{(12 in mens)}, are used to deal with the evolution of software products. These mechanisms include ways to deal with having multiple, parallel versions of the software simultaneously. Techniques like \textit{software merging} are used to keep consistency and unify different versions by automatically or semi-automatically deriving merged versions of the different parallel versions.
 
-\textit{Software configuration mechanisms} is the discipline of managing the evolution of large and complex software systems (61 in \parencite{cite:tom_mens_software_merging_survey})
-
-\textit{Version control mechanisms} (12 in mens), are used to deal with the evolution of software products. These mechanisms include ways to deal with having multiple, parallel versions of the software simultaneously. Techniques like \textit{software merging} are used to keep consistency and unify different versions by automatically or semi-automatically deriving merged versions of the different parallel versions.
+Mens \cite{cite:tom_mens_software_merging_survey} categorizes and describes different aspect of version control systems and software merging techniques. Two-way and three-way merging differentiates between how many versions of the artifact you are comparing. Different representations of the merge artifact can be categorized in textual, syntactic, semantic or structural merging. State-based merge techniques uses delta algorithms to compute differences between revisions while change-based techniques keeps track of the exact operations that were performed between the revisions.
 
 \subsubsection{Two-way vs three-way merging}%
 \label{ssub:two_way_vs_three_way_merging}
@@ -64,7 +61,7 @@ When merging different versions of a piece of software, we differentiate between
 \subsubsection{Representations in the merge}%
 \label{ssub:representations_in_the_merge}
 
-Merge tools can be further categorized in how they represent the data they are merging. As proposed in \parencite{cite:tom_mens_software_merging_survey}, a way of categorizing them are \textit{textual}, \textit{syntactic} and \textit{semantic} merging. The most common technique is definitely textual merging, where the software is treated as a flat text file, and merging is done without consideration of the intended structure or semantics of the text file.
+Merge tools can be further categorized in how they represent the data they are merging. As proposed in \cite{cite:tom_mens_software_merging_survey}, a way of categorizing them are \textit{textual}, \textit{syntactic} and \textit{semantic} merging. The most common technique is definitely textual merging, where the software is treated as a flat text file, and merging is done without consideration of the intended structure or semantics of the text file.
 
 \paragraph{Textual merging}%
 \label{par:textual_merging}
@@ -128,9 +125,11 @@ The granularity of the merger is still relevant, because we sometimes want to re
 \paragraph{Semantic Merging}%
 \label{par:semantic_merging}
 
-While syntactic merging is more powerful than its textual counterpart, there are still conflicts that go unnoticed. The syntactical mergers can detect conflicts explicitly encoded in the tree structure of the software artifact, however, there often exist implicit, cross-tree constraints in the software. An example of such a constraint references to a variable. The variable references in the code are often semantically tied to the definition of the variable, where the name and scope implicitly notes the cross tree reference to the definition. 
+While syntactic merging is more powerful than its textual counterpart, there are still conflicts that go unnoticed. The syntactical mergers can detect conflicts explicitly encoded in the tree structure of the software artifact, however, there often exist implicit, cross-tree constraints in the software. An example of such a constraint is references to a variable. The variable references in the code are often semantically tied to the definition of the variable, where the name and scope implicitly notes the cross tree reference to the definition. 
 
-Consider the following simple program: \texttt{var i; i = 10;}. If one version changes the name of the variable: \texttt{var num; num = 10;}, and another version adds a statement referencing the variable: \texttt{var i; i = 10; print(i)}. Syntactic or textual mergers would not notice the conflict arising due to the implicit cross-tree constraints regarding the variable references, and merge the versions conflict-free with the following, syntactically valid result: \texttt{var num; num = 10; print(i)}
+Consider the following simple program: \texttt{var i; i = 10;}. If one version changes the name of the variable: \texttt{var num; num = 10;}, and another version adds a statement referencing the variable: \texttt{var i; i = 10; print(i)}. Syntactic or textual mergers would not notice the conflict arising due to the implicit cross-tree constraints regarding the variable references, and merge the versions conflict-free with the following, syntactically valid result: \texttt{var num; num = 10; print(i)}.
+
+Semantic mergers takes these kinds of conflicts into consideration while merging. Using \textit{Graph-based}  or \textit{context-sensitive} merge techniques, we can model such cross tree constraints, by linking definitions and invocations with edges in the graph. However, in some cases, such \textit{static semantic}  merge techniques are not sufficient. Some changes cannot generally be detected statically, and may need to rely on the runtime semantics.
 
 \subsection{Feature Models}%
 \label{sub:feature_models}
@@ -139,7 +138,7 @@ Introducing feature models. What they are, why they are useful. One part is allo
 
 Something about diff, three-way merge and working on line granularity. Very inaccurate, not adequate. Maybe a small example.
 
-possible a paragraph about different version control mechanisms and techniques. Pessimistic and optimistic approaches. \parencite{cite:tom_mens_software_merging_survey}
+possible a paragraph about different version control mechanisms and techniques. Pessimistic and optimistic approaches. \cite{cite:tom_mens_software_merging_survey}
 
 Introduce a method of merging two feature models derived from the same feature model using a three-way merge algorithm inspired from the text-granularity algorithm and other three-way merge algorithms working on tree-structures like XML and ASTs.
 
