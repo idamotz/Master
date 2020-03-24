@@ -7,6 +7,14 @@
 \usepackage[backend=biber]{biblatex}
 
 \newcommand{\todo}[1]{\textcolor{red}{[[TODO: #1]]}\PackageWarning{TODO:}{#1!}}
+\newcommand{\Fb}{$F_b$}
+\newcommand{\FOne}{$F_1$}
+\newcommand{\FTwo}{$F_2$}
+\newcommand{\Fd}{$F_d$}
+\newcommand{\Fm}{$F_m$}
+\newcommand{\Es}{$\varepsilon$}
+\newcommand{\EsOne}{$\varepsilon_1$}
+\newcommand{\EsTwo}{$\varepsilon_2$}
 
 \addbibresource{citations.bib}
 
@@ -151,12 +159,12 @@ As discussed, text-based merge techniques often provide inferior results, howeve
 
 Syntactic merging \todo{ref, 10, mens} differs from textual merging in that it considers the syntax of the artifact it is merging. This makes it more powerful, because depending on the syntactic structure of the artifact, the merger can ignore certain aspects, like whitespace or code comments. Syntactic merge techniques can represent the software artifacts in a better data structure than just flat text files, like a tree or a graph. In example, representing the Python program from Listing~\ref{lst:code_diff_1} and Listing~\ref{lst:code_diff_2} as a parse tree or abstract syntax tree, we can avoid merge conflicts. \todo{maybe a nice drawing or something, with explanation}.
 
-The granularity of the merger is still relevant, because we sometimes want to report a conflict even though the versions can be automatically merged. Consider the following example. $n < x$ is changed to $n \leq x$ in one version, and to $n < x + 1$ in another. Too fine grained granularity may cause this to be merged conflict free as $n \leq x + 1$. The merge can be done automatically and conflict free, but here we want to report a warning or conflict, because the merge might lead to logical errors. 
+The granularity of the merger is still relevant, because we sometimes want to report a conflict even though the versions can be automatically merged. Consider the following example. $n < x$ is changed to $n \leq x$ in one version, and to $n < x + 1$ in another. Too fine grained granularity may cause this to be merged conflict free as $n \leq x + 1$. The merge can be done automatically and conflict free, but here we want to report a warning or conflict, because the merge might lead to logical errors.
 
 \subsubsection{Semantic Merging}%
 \label{ssub:semantic_merging}
 
-While syntactic merging is more powerful than its textual counterpart, there are still conflicts that go unnoticed. The syntactical mergers can detect conflicts explicitly encoded in the tree structure of the software artifact, however, there often exist implicit, cross-tree constraints in the software. An example of such a constraint is references to a variable. The variable references in the code are often semantically tied to the definition of the variable, where the name and scope implicitly notes the cross tree reference to the definition. 
+While syntactic merging is more powerful than its textual counterpart, there are still conflicts that go unnoticed. The syntactical mergers can detect conflicts explicitly encoded in the tree structure of the software artifact, however, there often exist implicit, cross-tree constraints in the software. An example of such a constraint is references to a variable. The variable references in the code are often semantically tied to the definition of the variable, where the name and scope implicitly notes the cross tree reference to the definition.
 
 Consider the following simple program: \texttt{var i; i = 10;}. If one version changes the name of the variable: \texttt{var num; num = 10;}, and another version adds a statement referencing the variable: \texttt{var i; i = 10; print(i)}. Syntactic or textual mergers would not notice the conflict arising due to the implicit cross-tree constraints regarding the variable references, and merge the versions conflict-free with the following, syntactically valid result: \texttt{var num; num = 10; print(i)}.
 
@@ -207,6 +215,13 @@ To study different use-cases (user stories) of XML merging, they manually merged
 \chapter{Solution}%
 \label{cha:solution}
 
+\section{Notation}%
+\label{sec:notation}
+
+Throughout this thesis, I will use the following variable naming convention. Let \Fb{} be the initial base feature model, while \FOne{} and \FTwo{} be two different feature models, derived from model \Fb{}. To note either of the two derived ones, we use the notation $F_d$. We call the resulting feature model after the merge algorithm is performed \Fm{}.
+
+The edit script, which is the calculated list of operations to go from \Fb{} to one of the derived models \Fd{}, we note as \Es{}. If we need to be specific to which of the derived models were computed, we note this with \EsOne{} and \EsTwo{}.
+
 \section{Feature model semantics}%
 \label{sec:feature_model_semantics}
 
@@ -215,10 +230,27 @@ Definitions of feature models, groups, etc. Taken from the paper stuff \todo{wri
 \section{Change detection}%
 \label{sec:change_detection}
 
-Define an algorithm or method for computing the difference between a base feature model B and derived model F. This eliminates the need to exc\todo{continue here ...}
+One step of computing \Fm{} from \Fb{}, \FOne{} and \FTwo{}, is computing the two edit scripts \EsOne{} and \EsTwo{}. The edit scripts are computed by a directed delta algorithm \cite{cite:tom_mens_software_merging_survey}. The delta algorithm has three distinct phases. (1) The algorithm will compute the difference between \Fb{} and \Fd{}, and produce a set of operations (See the operation table \ref{tab:list_of_operations}) needed to get from the base to the derived model. (2) The necessary operations and dependencies between the operations are modeled in a dependency graph. This is due to certain operations needing to be performed before others, i.e. every child has to be removed before you can remove the parent. (3) A topological sorting is performed on the graph to compute an ordered list of operations. When performing the operations in order starting with \Fb{}, the resulting feature model will be equal to the actual derived one. This eliminates the need to track and log the operations when they are being performed by a user.
 
 
-
+\begin{table}[htpb]
+	\centering
+	\caption{List of operations}
+	\label{tab:list_of_operations}
+	\begin{tabular}{c}
+		\todo{make as table}
+	\end{tabular}
+	\begin{itemize}
+		\item Move feature to group
+		\item Move group to feature
+		\item Change feature
+		\item Change group
+		\item Delete feature
+		\item Delete group
+		\item Add feature
+		\item Add group
+	\end{itemize}
+\end{table}
 
 \backmatter{}
 
