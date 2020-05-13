@@ -230,7 +230,7 @@ Definitions of feature models, groups, etc. Taken from the paper stuff \todo{wri
 \section{Change detection}%
 \label{sec:change_detection}
 
-One step of computing \Fm{} from \Fb{}, \FOne{} and \FTwo{}, is computing the two edit scripts \EsOne{} and \EsTwo{}. The edit scripts are computed by a directed delta algorithm \cite{cite:tom_mens_software_merging_survey}. The delta algorithm has three distinct phases. (1) The algorithm will compute the difference between \Fb{} and \Fd{}, and produce a set of operations (See the operation table \ref{tab:list_of_operations}) needed to get from the base to the derived model. (2) The necessary operations and dependencies between the operations are modeled in a dependency graph. This is due to certain operations needing to be performed before others, i.e. every child has to be removed before you can remove the parent. (3) A topological sorting is performed on the graph to compute an ordered list of operations. When performing the operations in order starting with \Fb{}, the resulting feature model will be equal to the actual derived one. This eliminates the need to track and log the operations when they are being performed by a user.
+One step of computing \Fm{} from \Fb{}, \FOne{} and \FTwo{}, is computing the two edit scripts \EsOne{} and \EsTwo{}. The edit scripts are computed by a directed delta algorithm \cite{cite:tom_mens_software_merging_survey}. The delta algorithm has three distinct phases. (1) The algorithm will compute the difference between \Fb{} and \Fd{}, and produce a set of operations (See the operation table \ref{tab:list_of_operations}) needed to get from the base to the derived model. (2) The necessary operations and dependencies between the operations are modeled in a dependency graph. This is due to certain operations needing to be performed before others, i.e. every child has to be removed before you can remove the parent. (3) A topological sorting is performed on the graph to compute an ordered list of operations. When performing the operations in order starting with \Fb{}, the resulting feature model will be equal to the actual derived one. This eliminates the need to track and log the operations when they are being performed by a user. \todo{not actually what is going to happen I think}
 
 
 \begin{table}[htpb]
@@ -241,16 +241,24 @@ One step of computing \Fm{} from \Fb{}, \FOne{} and \FTwo{}, is computing the tw
 		\todo{make as table}
 	\end{tabular}
 	\begin{itemize}
-		\item Move feature to group
-		\item Move group to feature
-		\item Change feature
-		\item Change group
-		\item Delete feature
-		\item Delete group
 		\item Add feature
 		\item Add group
+		\item Move feature to group
+		\item Move group to feature
+		\item Delete feature
+		\item Delete group
+		\item Change feature
+		\item Change group
 	\end{itemize}
 \end{table}
+
+\subsection{Dependencies between merge changes}%
+\label{sub:dependencies_between_merge_changes}
+
+\subsubsection{Cycle Detection}%
+\label{ssub:cycle_detection}
+
+Based on the assumption that the base \Fb{}, and the derived feature models, \FOne{} and \FTwo{} are valid and sound feature models, we know that they contain no cycles. However, when synthesising the merged model, cycles can occur if both edit scripts contain move operations. If \EsOne{} contains \texttt{MoveFeature(Fid, Gid)}, and \EsTwo{} contains \texttt{MoveFeature(Fid', Gid')}, we need to ensure that integrating the changes doesn't produce any cycles. If \texttt{Fid} is moved to \texttt{Gid}, problems can occur if \texttt{Fid'} now becomes the new ancestor of \texttt{Fid} and \texttt{Gid'} is a subgroup of \texttt{Fid}.
 
 \backmatter{}
 
