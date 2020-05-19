@@ -32,58 +32,74 @@
 
 \mainmatter{}
 
-\chapter{Notes}
-
-\section{Reference examples}%
-\label{sec:reference_examples}
-
-\begin{itemize}
-	\item Precise Version Control of Trees with Line-Based Version Control Systems \cite{cite:precise_version_control_of_trees}
-	\item A three-way merge for {XML} documents \cite{cite:lindholm_xml_merge}. See Section~\ref{sub:_a_three_way_merge_for_xml_documents}
-	\item Fine-grained and accurate source code differencing \cite{cite:fine_grained_source_code_diff}
-	\item Using versioned trees, change detection and node identity for three-way {XML} merging \cite{cite:cheng_ethan_xml_merge}
-	\item Generic Diff3 for algebraic datatypes \cite{cite:generic_diff_for_adt}
-	\item A State-of-the-Art Survey on Software Merging \cite{cite:tom_mens_software_merging_survey}
-
-
-\end{itemize}
-
 \chapter{Introduction}%
 \label{cha:introduction}
+
+Software engineering methodologies for highly-variable software systems lack support for planning long-term evolution of software. Problems related to the long term evolution planning are more easily detected when you have tools that explicitly model the long term evolution of the software product line. Modelling the evolution of the software product line often involves multiple engineers changing and evolving the plan. Therefor, creating tools for evolution planning requires synchronization techniques for allowing collaborators to merge their partial plans. Naively integrating the changes may yield inconsistencies and conflicts, so we investigate different merging strategies to ensure a sound, well formed plan is produced after the merge.
 
 \section{Motivation}%
 \label{sec:motivation}
 
-Feature models are designed to help engineers cope with the long term evolution of software. Designing the software is a iterative, dynamic process, which is subject to change. Having several engineers working in parallel on the same feature model can be beneficial. This requires good tools for handling several engineers working, changing and synchronizing the feature model.
+Feature models are designed to help engineers cope with the long term evolution of software. Designing the software is a iterative and dynamic process, which is subject to change. Having several engineers working in parallel on the same feature model can be beneficial. This requires good tools for handling several engineers working, changing and synchronizing the feature model.
 
-\section{Objective (with solution requirements)}%
-\label{sec:objective_with_solution_requirements_}
+\todo{fix better introduction and motivation, somehow}
+
+\section{Objective}%
+\label{sec:objective}
 
 To allow several engineers working in parallel, the goal of this thesis is to design and implement a method of synchronizing and merging the changes from different collaborators on the same feature model. Since the changes from the collaborators were devised from a common feature model, the algorithm should take this common ancestor into consideration when merging, to produce quality results. The algorithm should always produce a syntactically and semantically valid feature model, to ensure a sound, valid feature model as a result. In cases where the merging of the different revisions are not trivial, the method should give ways of resolving conflicts by consulting the user.
 
-\section{Difficulties/problems/challenges}%
-\label{sec:difficulties_problems_challenges}
-
-TODO
-
-\section{Say why other solutions are not adequate (very short)}%
-\label{sec:say_why_other_solutions_are_not_adequate_very_short_}
-
-\todo{maybe ref linholm or json merger, how this is not good enough as well. also use textual/syntacic/etc}
-While there are several tools to handle three-way merging, they do not produce adequate results to solve the problem. Tools such as diff \todo{github, unix, ref} are one of the most used tools for the task, due to their generality and efficiency. However, several of the more implicit semantic requirements of feature models could go unnoticed in the merge result, producing a invalid feature model without the algorithm giving any warnings. There are also several cases where other, more general algorithms would produce a conflict. When you move a feature to another part of the tree, and then modify the name, etc, general algorithms would not know if you deleted a feature and created a new, or if you moved and changed the same feature. However, due to the well defined semantics of feature models, we know that every feature has a unique identifier, which can be leveraged by the merge algorithm.
-
-\section{Describe the solution (very short)}%
-\label{sec:describe_the_solution_very_short_}
-
-TODO
-
-\section{Roadmap of the thesis}%
-\label{sec:roadmap_of_the_thesis}
-
-TODO
-
 \chapter{Background}%
 \label{cha:introduction}
+
+\section{Software product lines}%
+\label{sec:software_product_lines}
+
+A software product line (SPL) is a family of closely related software systems. These systems will often have several features in common, as well as variations that makes each piece of software unique. SPLs are used to make highly configurable systems, where each product in the SPL, called a \textit{variant}, is defined by the combination of features chosen.
+
+Software product line engineering is a discipline for efficiently developing such families of software systems. Instead of maintaining potentially hundreds of different software artifacts, these engineering methods have ways of capitalizing on the similarities and differences between each variant. The number of variants are subject to combinatorial explosion, with additions of new features may multiply the amount. Adding new features or fixing bugs can go from updating each variants code base to just updating in one place.
+
+\section{Feature Models}%
+\label{sec:feature_models}
+
+All possible variants of a software product line can be defined in terms of a \textit{feature model}. A feature model is a tree structure of features and groups. Features can be manditory or optional, and will contain zero or more groups. Each group has a set of features. A group (of features) can have different types. In example, in an \texttt{AND} group, all the feature has to be chosen.
+
+% Example feature model
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=0.8\linewidth]{illustrations/example.pdf}
+	\caption{Example feature model}%
+	\label{fig:example1}
+\end{figure}
+
+A visual representation of a feature model can be seen in Figure~\ref{fig:example1}. The small dot above \texttt{Infotainment System} indicates that the feature is mandatory, where as the white dot above \texttt{Comfort Systems} represents an optional feature. Each feature (except the root) is either implicitly or explicitly in a group. The \texttt{Infotainment System} feature is implicitly in a singleton group below \texttt{Car}. The features \texttt{Android Auto} and \texttt{Apple Car Play} are in a \texttt{XOR} group, indicated by the arch between the features. This represents that each valid variant has to chose between one of the two (but not both).
+
+\section{Evolution planning}%
+\label{sec:evolution_planning}
+
+Feature models let engineers capture all variants of the current software product line, but sometimes it can be beneficial to model future or past versions as well. Planning for the long term evolution of the product line can important in managing the complexity that comes with large software systems.
+
+\textit{Evolution plans} lets us model a sequence of feature models, which represents the current and all planned future versions of the feature model. Each feature model represents the product line in a point in time, which could have varying validity, from a week from now to a year. Since the next feature model is derived from the previous one, we can represent the evolution plan as an initial feature model, as well as a sequence of \textit{points}, where each point is a set of operations to perform on the previous feature model to achieve the current one. The operations vary from changing, adding or deleting features or groups from the feature model.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=0.8\linewidth]{illustrations/initial.pdf}
+	\begin{tabular}{l}
+		\textbf{At time 1:}                                           \\ \hline
+		add an XOR group to Infotainment System.                      \\
+		add feature Android Auto to the Infotainment System XOR group \\
+		add feature Car Play to the Infotainment System XOR group     \\
+		\\
+		\textbf{At time 2:}                                           \\ \hline
+		add feature Comfort Systems to the Car AND group              \\
+		add an AND group to Comfort Systems                           \\
+		add feature Parking Pilot to the Comfort Systems AND group
+	\end{tabular}
+	\caption{An example evolution plan}%
+	\label{fig:exampleplan}
+\end{figure}
+
+An example of an evolution plan can be seen in Figure~\ref{fig:exampleplan}. The initial feature model contains three features, and two points have been added. At time 1, a group and two features has been added, an at time 2, another group an two features has been added. The evolution plan can derive three feature models, the initial, and the two at time 1 and 2. When performing all the operations, you will get a feature model that is equal to the one in Figure~\ref{fig:example1}
 
 \section{Version Control Systems}%
 \label{sec:version_control_systems}
@@ -170,50 +186,48 @@ Consider the following simple program: \texttt{var i; i = 10;}. If one version c
 
 Semantic mergers takes these kinds of conflicts into consideration while merging. Using \textit{Graph-based}  or \textit{context-sensitive} merge techniques, we can model such cross tree constraints, by linking definitions and invocations with edges in the graph. However, in some cases, such \textit{static semantic}  merge techniques are not sufficient. Some changes cannot generally be detected statically, and may need to rely on the runtime semantics.
 
-\section{Feature Models}%
-\label{sec:feature_models}
-
-Introducing feature models. What they are, why they are useful. One part is allowing different collaborators. Important for autonomy, etc.
-
-Something about diff, three-way merge and working on line granularity. Very inaccurate, not adequate. Maybe a small example.
-
-possible a paragraph about different version control mechanisms and techniques. Pessimistic and optimistic approaches. \cite{cite:tom_mens_software_merging_survey}
-
-Introduce a method of merging two feature models derived from the same feature model using a three-way merge algorithm inspired from the text-granularity algorithm and other three-way merge algorithms working on tree-structures like XML and ASTs.
-
-These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their id.
-
-This task includes defining the semantics of feature models, defining what a sound model is. The three-way merge algorithm will assume three sound feature models as input, and compute the edit script between the base and the two derived feature models. The two edit scripts will then be combined to a graph that represents what changes to be done to the base, including possible conflicts and dependencies.
-
-% TODO: continue describing details of merging from mens article
-
-\section{Related Work}%
-\label{sec:related_work}
-
-\subsection{A Three-way Merge for XML Documents}%
-\label{sub:_a_three_way_merge_for_xml_documents}
-
-Lindholm describes a method of merging XML documents. The algorithm is a three-way merge taking a base XML file, $T_0$, and two files $T_1$ and $T_2$, derived and changed from the base file independently. The XML documents are ordered, labeled trees, and merging the trees takes this into consideration. The algorithm relies on computing \textit{edit scripts} between $T_0$ and $T'$, where $T'$ is either $T_1$ or $T_2$. The edit scripts consist of predefined operations, which are attribute updates and insert, move and delete for XML elements.
-
-One of the important factors of the data structure, is that the nodes are labeled with unique IDs. This makes merging significantly easier.
-
-To study different use-cases (user stories) of XML merging, they manually merged some examples, to see how real world users would handle some tricky cases. Some rules for merging were devised, including:
-
-\begin{itemize}
-	\item Not possible to move a node in $T_1$ that are being updated in $T_2$
-	\item Guards, aka node contexts are there to handle merging changes originating too close to each other. This isn't technically a merge conflict, but a potential semantic issue.
-	\item Normal stuff. Added or removed nodes should be reflected in the merge. Parent relation should be updated
-\end{itemize}
-
-% TODO: check reference 2 and 3 in the text, regarding matching/mapping and the tree matching problem
-
 \section{A State-of-the-Art Survey on Software Merging}%
 \label{sec:a_state_of_the_art_survey_on_software_merging}
 
 % TODO: read Tom Mens survey on software merging
 
-\chapter{Solution}%
+\chapter{A sound merging strategy for temporal feature models}%
 \label{cha:solution}
+
+\section{Say why other solutions are not adequate (very short)}%
+\label{sec:say_why_other_solutions_are_not_adequate_very_short_}
+
+\todo{maybe ref linholm or json merger, how this is not good enough as well. also use textual/syntactic/etc}
+While there are several tools to handle three-way merging, they do not produce adequate results to solve the problem. Tools such as diff \todo{github, unix, ref} are one of the most used tools for the task, due to their generality and efficiency. However, several of the more implicit semantic requirements of feature models could go unnoticed in the merge result, producing a invalid feature model without the algorithm giving any warnings. There are also several cases where other, more general algorithms would produce a conflict. When you move a feature to another part of the tree, and then modify the name, etc, general algorithms would not know if you deleted a feature and created a new, or if you moved and changed the same feature. However, due to the well defined semantics of feature models, we know that every feature has a unique identifier, which can be leveraged by the merge algorithm.
+
+\section{Difficulties/problems/challenges}%
+\label{sec:difficulties_problems_challenges}
+
+Plan merging not trivial, and different merging techniques and evolution plan representations will have advantages and disadvantages in terms of complexity and accuracy.
+
+\subsection{Feature model representations}%
+\label{sub:feature_model_representations}
+
+Since a feature model is a tree structure consisting of features and groups, it would be natural to represent this as a standard (mutually) recursive tree structure of features and groups. However, since we know that each feature and group are uniquely identified by an id, we can define the feature model as a map from identifier to feature. This is beneficial for merging, for example when we are moving a feature. Instead of traversing the tree several times, where we can simply update the parent of one of the mappings.
+
+\subsection{Evolution plan representations}%
+\label{sub:evolution_plan_representations}
+
+An evolution plan is simply just a list of feature models, with each feature model associated with a time point. Each feature model acts as a snapshot of what the intended product line should look like at the specified time point. In this representation, the operations performed between each step is implicit.
+
+Evolution plans could also be represented by explicitly deriving the operations between the each adjacent feature model. This can be modelled as an initial feature model, and a list of \textit{points}, where each point consists of a time point and a list of operations. The points represents what changes are intended to take place during a certain time point. The feature model for each time point can then be calculated by applying the operations to the feature model.
+
+Another approach is modelling everything with validities. Instead having add and remove features operations at different time points, each feature can be encoded with a start and (optional) end time. Each feature and group can have an interval of existence, which can be utilized by a merge algorithm.
+
+\subsection{Merging strategies}%
+\label{sub:merging_strategies}
+
+How the evolution plan is represented will affect how the merge is performed.
+
+\todo{say something about incremental merging. problems there}
+
+\todo{say something about simultaneous. plan can be seen as a whole. May result in more accurate results/conflicts where a feature is removed at different time points in the two plans. problems there might include ensuring a well formed evolution plan}
+
 
 \section{Notation}%
 \label{sec:notation}
@@ -259,6 +273,41 @@ One step of computing \Fm{} from \Fb{}, \FOne{} and \FTwo{}, is computing the tw
 \label{ssub:cycle_detection}
 
 Based on the assumption that the base \Fb{}, and the derived feature models, \FOne{} and \FTwo{} are valid and sound feature models, we know that they contain no cycles. However, when synthesising the merged model, cycles can occur if both edit scripts contain move operations. If \EsOne{} contains \texttt{MoveFeature(Fid, Gid)}, and \EsTwo{} contains \texttt{MoveFeature(Fid', Gid')}, we need to ensure that integrating the changes doesn't produce any cycles. If \texttt{Fid} is moved to \texttt{Gid}, problems can occur if \texttt{Fid'} now becomes the new ancestor of \texttt{Fid} and \texttt{Gid'} is a subgroup of \texttt{Fid}.
+
+\chapter{Roadmap}%
+\label{cha:roadmap}
+
+\chapter{Unused (will be removed)}%
+\label{cha:unused_will_be_removed_}
+
+\section{Related Work}%
+\label{sec:related_work}
+
+\subsection{A Three-way Merge for XML Documents}%
+\label{sub:_a_three_way_merge_for_xml_documents}
+
+Lindholm describes a method of merging XML documents. The algorithm is a three-way merge taking a base XML file, $T_0$, and two files $T_1$ and $T_2$, derived and changed from the base file independently. The XML documents are ordered, labeled trees, and merging the trees takes this into consideration. The algorithm relies on computing \textit{edit scripts} between $T_0$ and $T'$, where $T'$ is either $T_1$ or $T_2$. The edit scripts consist of predefined operations, which are attribute updates and insert, move and delete for XML elements.
+
+One of the important factors of the data structure, is that the nodes are labeled with unique IDs. This makes merging significantly easier.
+
+To study different use-cases (user stories) of XML merging, they manually merged some examples, to see how real world users would handle some tricky cases. Some rules for merging were devised, including:
+
+\begin{itemize}
+	\item Not possible to move a node in $T_1$ that are being updated in $T_2$
+	\item Guards, aka node contexts are there to handle merging changes originating too close to each other. This isn't technically a merge conflict, but a potential semantic issue.
+	\item Normal stuff. Added or removed nodes should be reflected in the merge. Parent relation should be updated
+\end{itemize}
+
+% TODO: check reference 2 and 3 in the text, regarding matching/mapping and the tree matching problem
+
+possible a paragraph about different version control mechanisms and techniques. Pessimistic and optimistic approaches. \cite{cite:tom_mens_software_merging_survey}
+
+Introduce a method of merging two feature models derived from the same feature model using a three-way merge algorithm inspired from the text-granularity algorithm and other three-way merge algorithms working on tree-structures like XML and ASTs.
+
+These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their id.
+
+This task includes defining the semantics of feature models, defining what a sound model is. The three-way merge algorithm will assume three sound feature models as input, and compute the edit script between the base and the two derived feature models. The two edit scripts will then be combined to a graph that represents what changes to be done to the base, including possible conflicts and dependencies.
+
 
 \backmatter{}
 
