@@ -50,7 +50,7 @@ Feature models are designed to help engineers cope with the long term evolution 
 To allow several engineers working in parallel, the goal of this thesis is to design and implement a method of synchronizing and merging the changes from different collaborators on the same feature model. Since the changes from the collaborators were devised from a common feature model, the algorithm should take this common ancestor into consideration when merging, to produce quality results. The algorithm should always produce a syntactically and semantically valid feature model, to ensure a sound, valid feature model as a result. In cases where the merging of the different revisions are not trivial, the method should give ways of resolving conflicts by consulting the user.
 
 \chapter{Background}%
-\label{cha:introduction}
+\label{cha:background}
 
 \section{Software product lines}%
 \label{sec:software_product_lines}
@@ -104,22 +104,17 @@ An example of an evolution plan can be seen in Figure~\ref{fig:exampleplan}. The
 \section{Version Control Systems}%
 \label{sec:version_control_systems}
 
-\textit{Software configuration mechanisms} is the discipline of managing the evolution of large and complex software systems \todo{(61 in \cite{cite:tom_mens_software_merging_survey})} \textit{Version control mechanisms} \todo{(12 in mens)}, are used to deal with the evolution of software products. These mechanisms include ways to deal with having multiple, parallel versions of the software simultaneously. Techniques like \textit{software merging} are used to keep consistency and unify different versions by automatically or semi-automatically deriving merged versions of the different parallel versions.
+\textit{Software configuration mechanisms} is the discipline of managing the evolution of large and complex software systems \todo{(61 in~\cite{cite:tom_mens_software_merging_survey})} \textit{Version control mechanisms} \todo{(12 in mens)}, are used to deal with the evolution of software products. These mechanisms include ways to deal with having multiple, parallel versions of the software simultaneously. Techniques like \textit{software merging} are used to keep consistency and unify different versions by automatically or semi-automatically deriving merged versions of the different parallel versions.
 
-Mens \cite{cite:tom_mens_software_merging_survey} categorizes and describes different aspect of version control systems and software merging techniques. Two-way and three-way merging differentiates between how many versions of the artifact you are comparing. Different representations of the merge artifact can be categorized in textual, syntactic, semantic or structural merging. State-based merge techniques uses delta algorithms to compute differences between revisions while change-based techniques keeps track of the exact operations that were performed between the revisions.
+Mens~\cite{cite:tom_mens_software_merging_survey} categorizes and describes different aspect of version control systems and software merging techniques. Two-way and three-way merging differentiates between how many versions of the artifact you are comparing. Different representations of the merge artifact can be categorized in textual, syntactic, semantic or structural merging. State-based merge techniques uses delta algorithms to compute differences between revisions while change-based techniques keeps track of the exact operations that were performed between the revisions.
 
 \subsection{Two-way vs three-way merging}%
 \label{sub:two_way_vs_three_way_merging}
 
 When merging different versions of a piece of software, we differentiate between \textit{two-way} and \textit{three-way} merging. Two-way merging merges the two versions without taking a common ancestor into account. Three-way merging on the other hand, uses a common ancestor as a reference point, to know how the different versions were changed. The latter technique is more powerful and produces more accurate merges, because the merge will know extra information. Using two-way merge, if a piece was removed from one version, the two-way merge would not know whether the piece was removed in the first file or added in the second. This is not a problem in three-way merge, since we know from the common ancestor whether there was a deletion or addition. In this thesis, we will focus on three-way merging, since it will produce better results.
 
-\subsection{Representations in the merge}%
-\label{sub:representations_in_the_merge}
-
-Merge tools can be further categorized in how they represent the data they are merging. As proposed in~\cite{cite:tom_mens_software_merging_survey}, a way of categorizing them are \textit{textual}, \textit{syntactic} and \textit{semantic} merging. The most common technique is definitely textual merging, where the software is treated as a flat text file, and merging is done without consideration of the intended structure or semantics of the text file.
-
-\subsubsection{Textual merging}%
-\label{ssub:textual_merging}
+\subsection{Textual merging}%
+\label{sub:textual_merging}
 
 Textual merging views the software artifacts as unstructured text files. There exist several granularities of what is considered one unit, but \textit{line based merging} is probably the most common textual merge. Line based merging techniques computes the difference between files by comparing equality over the lines. This has several implications, like adding a single space after a line is considered a deletion of the old line and addition of the new. This coarse granularity often leads to unnecessary and confusing conflicts. Changing the indentation or other formatting differences often lead to unnecessary conflicts.
 
@@ -131,6 +126,7 @@ def some_function(n):
   sum = 0
   for i in range(0, n):
     sum += i
+  print(sum)
 some_function(5)
 
   \end{minted}
@@ -145,6 +141,7 @@ def some_function(n):
     sum = 0
     for i in range(0, n):
       sum += i
+    print(sum)
 some_function(5)
   \end{minted}
 	\caption{Code diff 2}
@@ -170,40 +167,69 @@ some_function(5)
 
 As discussed, text-based merge techniques often provide inferior results, however, they have several advantages. Because of the algorithms focus on generality, accuracy and efficiency, these types of algorithms are widely adopted. The algorithm is general enough to work well for different programming languages, documentation, markup files, configuration files, etc. Some measurements performed on three-way, textual, line-based merge techniques in industrial case studies showed that about 90 percent of the changed files could be merged automatically \todo{ref 49 in mens}. Other tools can complement the merge algorithm in avoiding or resolving conflicts. Formatters can make sure things like indentation and whitespace are uniformly handled, to avoid unnecessary conflicts. Compilers can help in resolving conflicts arising from things like renaming, where one version renames a variables, while another version introduces new lines referencing the old variable.
 
-\subsubsection{Syntactic Merging}%
-\label{ssub:syntactic_merging}
+\subsection{Syntactic Merging}%
+\label{sub:syntactic_merging}
 
 Syntactic merging \todo{ref, 10, mens} differs from textual merging in that it considers the syntax of the artifact it is merging. This makes it more powerful, because depending on the syntactic structure of the artifact, the merger can ignore certain aspects, like whitespace or code comments. Syntactic merge techniques can represent the software artifacts in a better data structure than just flat text files, like a tree or a graph. In example, representing the Python program from Listing~\ref{lst:code_diff_1} and Listing~\ref{lst:code_diff_2} as a parse tree or abstract syntax tree, we can avoid merge conflicts. \todo{maybe a nice drawing or something, with explanation}.
 
 The granularity of the merger is still relevant, because we sometimes want to report a conflict even though the versions can be automatically merged. Consider the following example. $n < x$ is changed to $n \leq x$ in one version, and to $n < x + 1$ in another. Too fine grained granularity may cause this to be merged conflict free as $n \leq x + 1$. The merge can be done automatically and conflict free, but here we want to report a warning or conflict, because the merge might lead to logical errors.
 
-\subsubsection{Semantic Merging}%
-\label{ssub:semantic_merging}
+\subsection{Semantic Merging}%
+\label{sub:semantic_merging}
 
 While syntactic merging is more powerful than its textual counterpart, there are still conflicts that go unnoticed. The syntactical mergers can detect conflicts explicitly encoded in the tree structure of the software artifact, however, there often exist implicit, cross-tree constraints in the software. An example of such a constraint is references to a variable. The variable references in the code are often semantically tied to the definition of the variable, where the name and scope implicitly notes the cross tree reference to the definition.
 
 Consider the following simple program: \texttt{var i; i = 10;}. If one version changes the name of the variable: \texttt{var num; num = 10;}, and another version adds a statement referencing the variable: \texttt{var i; i = 10; print(i)}. Syntactic or textual mergers would not notice the conflict arising due to the implicit cross-tree constraints regarding the variable references, and merge the versions conflict-free with the following, syntactically valid result: \texttt{var num; num = 10; print(i)}.
 
-Semantic mergers takes these kinds of conflicts into consideration while merging. Using \textit{Graph-based}  or \textit{context-sensitive} merge techniques, we can model such cross tree constraints, by linking definitions and invocations with edges in the graph. However, in some cases, such \textit{static semantic}  merge techniques are not sufficient. Some changes cannot generally be detected statically, and may need to rely on the runtime semantics.
+Semantic mergers takes these kinds of conflicts into consideration while merging. Using \textit{Graph-based}  or \textit{context-sensitive} merge techniques, we can model such cross tree constraints, by linking definitions and invocations with edges in the graph. However, in some cases, such \textit{static semantic} merge techniques are not sufficient. Some changes cannot generally be detected statically, and may need to rely on the runtime semantics.
 
-\section{A State-of-the-Art Survey on Software Merging}%
-\label{sec:a_state_of_the_art_survey_on_software_merging}
-
-% TODO: read Tom Mens survey on software merging
-
-\chapter{A sound merging strategy for temporal feature models}%
+\chapter{A sound merging strategy for evolution plans}%
 \label{cha:solution}
 
-\section{Say why other solutions are not adequate (very short)}%
-\label{sec:say_why_other_solutions_are_not_adequate_very_short_}
+\section{Goal of the thesis}%
+\label{sec:goal_of_the_thesis}
 
-\todo{maybe ref linholm or json merger, how this is not good enough as well. also use textual/syntactic/etc}
-While there are several tools to handle three-way merging, they do not produce adequate results to solve the problem. Tools such as diff \todo{github, unix, ref} are one of the most used tools for the task, due to their generality and efficiency. However, several of the more implicit semantic requirements of feature models could go unnoticed in the merge result, producing a invalid feature model without the algorithm giving any warnings. There are also several cases where other, more general algorithms would produce a conflict. When you move a feature to another part of the tree, and then modify the name, etc, general algorithms would not know if you deleted a feature and created a new, or if you moved and changed the same feature. However, due to the well defined semantics of feature models, we know that every feature has a unique identifier, which can be leveraged by the merge algorithm.
+As described in Section~\ref{sec:evolution_planning}, having tools that help model the long term evolution of SPLs can help manage the complexity and difficulty in development. Especially in larger systems, several persons and teams often work independently on the same software product line, but on different assets. Tools that help evolution planning would benefit from having ways of merging and synchronizing different versions of the evolution plan.
 
-\section{Difficulties/problems/challenges}%
-\label{sec:difficulties_problems_challenges}
+This thesis will focus on developing a three-way merging technique (see Section~\ref{sub:two_way_vs_three_way_merging}) for merging two evolution plans in respect to a common previous evolution plan which the two versions were derived from. In some cases, the changes made to the evolution plan are disjoint, which will result in a conflict free merge. In other cases, naively merging the two plans might result in an unsound and invalid evolution plan. The merge algorithm should detect these cases, and report what cases caused inconsistencies. While detecting conflicts is good, it would be even better if the algorithm provided ways of fixing the conflicts. This can be done in many ways, but a good technique for conflict fixing should have a good balance between usability, complexity and accuracy. But most importantly, the algorithm should result in a sound, well formed evolution plan.
 
-Plan merging not trivial, and different merging techniques and evolution plan representations will have advantages and disadvantages in terms of complexity and accuracy.
+\section{Why existing solutions are not adequate}%
+\label{sec:why_existing_solutions_are_not_adequate}
+
+While there are several tools to handle three-way merging, they do not produce adequate results to solve the problem. Tools such as diff \todo{github, unix, ref} are one of the most used tools for the task, due to their generality and efficiency. However, due to the algorithm being just a line based, textual merger (see Section~\ref{sub:textual_merging}), much of the structure will get lost in the result, leading to an invalid evolution plan.
+
+One could also consider a syntactic/structural merger (Section~\ref{sub:syntactic_merging}, which would take the structure of the software artifact into consideration. There exist several syntactic mergers already, like the three-way XML merger proposed by Lindholm~\cite{cite:lindholm_xml_merge}. One could try to encode the evolution plans in an XML structure, and merge the results. This would eliminate a lot of the structural merge problems that occur using textual mergers like unix diff. 
+
+However, several of the more implicit semantic requirements of evolution plans could go unnoticed in the merge result, producing a invalid evolution plan without the algorithm giving any warnings. This could happen if each version moves a node to a descendant of the other node, creating a cycle. Feature models also have requirements like features in groups with type \texttt{XOR} or \texttt{OR} cannot be mandatory, which can easily be violated when merging the changed plans. There are also several other potential issues when merging the evolution plans.
+
+While detecting the conflicts is one issue, dealing with them is another. Merging the results can lead to conflicting operations which would need to be dealt with. The algorithm should deal with this in a usable, clear manner. Customizing and tailoring the algorithm would potentially help deal with this.
+
+Merging evolution plans is no trivial task, because the structure and semantics will have to be carefully considered in the merge. To ensure the merge results in a sound evolution plan, we cannot rely on existing algorithms.
+
+\section{Difficulties and potential solutions}%
+\label{sec:difficulties_and_potential_solutions}
+
+suitable Representation for FM and EP
+
+things to consider. granularity, easy to understand for user.
+
+cascading warnings?
+incrementally produce merged plan. this lets engineer make sure semantics and core of the plan is still good.
+globally merge would make this more difficult in complexity and usability. Possibly also too hard. 
+Potentially identify when things have to be in place, (dependencies between operations, etc)
+fikse og ordne warnings mens man går fremover. noen paradokser kan potensielt utsettes til slutt?
+dead operations. sletting av noder som er borte.
+potensielle problemer med inkrementell. node slettes i 1 og 2, den første vil bli prioritert.
+analysere gjennom først? trickery er det uansett.
+ting som er vanskelig og byr på problemer skriver vi om i difficulties
+
+When you move a feature to another part of the tree, and then modify the name, general algorithms would not know if you deleted a feature and created a new, or if you moved and changed the same feature. However, due to the well defined semantics of feature models, we know that every feature has a unique identifier, which can be leveraged by the merge algorithm.
+
+
+\section{Difficulties and challenges}%
+\label{sec:difficulties_challenges}
+
+Evolution plan merging is not trivial, and different merging techniques and evolution plan representations will have advantages and disadvantages in terms of usability, complexity and accuracy.
 
 \subsection{Feature model representations}%
 \label{sub:feature_model_representations}
@@ -307,6 +333,11 @@ Introduce a method of merging two feature models derived from the same feature m
 These solutions are not adequate, because we want to create an algorithm that ensures soundness and takes the semantics of feature models into account when merging. This task is not trivial, and the use cases of the developers will need to be considered when deciding which conflicts to automatically merge, warn the user, etc. The algorithm will utilize properties about feature models when merging, like the fact that the nodes are unordered, and each node is uniquely identified by their id.
 
 This task includes defining the semantics of feature models, defining what a sound model is. The three-way merge algorithm will assume three sound feature models as input, and compute the edit script between the base and the two derived feature models. The two edit scripts will then be combined to a graph that represents what changes to be done to the base, including possible conflicts and dependencies.
+
+\section{A State-of-the-Art Survey on Software Merging}%
+\label{sec:a_state_of_the_art_survey_on_software_merging}
+
+% TODO: read Tom Mens survey on software merging
 
 
 \backmatter{}
