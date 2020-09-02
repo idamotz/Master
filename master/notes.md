@@ -1,4 +1,6 @@
 ## TODOs:
+Lage feature model evolution plans i haskell
+
 Deal with subtrees and add/remove move operations. The remove move operation is especially tricky. This is wrinkling my brain
 
 ## What to check on ADD operation to plan
@@ -97,5 +99,8 @@ Ancestor must not be moved to its own subtree in the future. / for any move that
 ## Useful mappings
 
 Names -> validities
+
+"Car" -> [(0, 2), (4, ∞)] [Valid 0 2, From 4]
+data Validity = Valid Int Int | From Int
 FeatureID -> validities of feature, parent group, ftype, name, child group IDs
 GroupID -> validities of group, parent feature, gtype, child feature IDs
