@@ -26,7 +26,17 @@ If changed to optional, no need to check anything. If changed to mandatory, chec
 
 If type is mandatory, check that new parent group has type AND until it is moved again/removed or ∞. Check that parent group is not removed during new parent group validity. If previous parent group has type OR/XOR, check that it still has enough children (during the new validity?).
 
-Check that the feature is not one of the new parent group's ancestors. Also check more stuff and find out which validities are relevant.
+Subtree paradoxes:
+Check that the feature is not an ancestor of the target. This only needs to be checked for this time point. 
+
+The feature to be moved: f1
+The target group: g1
+Ancestors of the target: a
+
+Check that no new ancestor of f1 is moved to a subfeature of f1 in the future. This until f1's next move or forever, since we already know this is sound (soundness assumption for original plan). 
+
+Maybe not all ancestors need to be checked. We already know that there are no moves from the old ancestors of f1 to a subgroup of f1. Thus we only need to check the *new* ancestors. Let t1 be the smallest subtree containing both f1 and g1. The ancestors that need to be checked are the ancestors of f1/g1 in t1.
+What if one of these ancestors is moved? If they are moved to the subtree of f1 while they are still f1's ancestors, then there is a paradox. If one of them is moved to a different subtree, then new ancestors need to be considered as well. Basically we need a way to identify all problematic ancestors of f1, and see if they are in f1's subtree at any point. This seems pretty complex and may increase worst case a lot:(
 
 #### Change feature name
 
@@ -104,3 +114,4 @@ Names -> validities
 data Validity = Valid Int Int | From Int
 FeatureID -> validities of feature, parent group, ftype, name, child group IDs
 GroupID -> validities of group, parent feature, gtype, child feature IDs
+
