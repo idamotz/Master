@@ -1,1 +1,3 @@
 *.zip
+evolution_plan_examples
+!/evolution_plan_examples/**/*.maude
