@@ -1,0 +1,44 @@
+load featuremodel-checker.maude
+
+mod DWINPUT is including FEATUREMODEL-CHECKER . protecting STRING + NAT .
+  subsorts String < FeatureID GroupID Name .
+  subsort Nat < TimePoint .
+  op model : -> FeatureModel .
+  op plan : -> Plans .
+  op log : -> Log .
+  op init : -> TimeConfiguration .
+  eq init = currentTime: 0 C: model # done # log plan: plan .
+eq model = FM("_c23b24b1-0b7d-454f-ad60-b645d788f092" ,
+["_c23b24b1-0b7d-454f-ad60-b645d788f092" -> f("RootFeature", noParent, noG, MANDATORY)]) .
+
+eq plan = at 2 do
+renameFeature("_c23b24b1-0b7d-454f-ad60-b645d788f092", "MinePump")
+addGroup("_c23b24b1-0b7d-454f-ad60-b645d788f092", "_ad440439-84df-4222-a983-ccf68d3afa1e", AND)
+addFeature("_d6330e50-67da-4d18-bade-0b18c5ec7a88", "Water Regulation", "_ad440439-84df-4222-a983-ccf68d3afa1e", OPTIONAL)
+addFeature("_5ac851b0-5758-4fba-87aa-db7c7992c221", "Methane Detection", "_ad440439-84df-4222-a983-ccf68d3afa1e", OPTIONAL)
+addFeature("_b8602c5a-711d-46c2-9352-bde5b45e7d77", "Command", "_ad440439-84df-4222-a983-ccf68d3afa1e", OPTIONAL)
+addGroup("_d6330e50-67da-4d18-bade-0b18c5ec7a88", "_b7834f65-b903-444a-9b01-454922bb0525", AND)
+addFeature("_13300820-7874-4b85-9b14-1b5b02666290", "Low", "_b7834f65-b903-444a-9b01-454922bb0525", OPTIONAL)
+addFeature("_d813792e-bd06-4470-8e59-a5d7520da839", "Normal", "_b7834f65-b903-444a-9b01-454922bb0525", OPTIONAL)
+addFeature("_b946cd9c-a4d3-4a72-a909-bb853356f992", "High", "_b7834f65-b903-444a-9b01-454922bb0525", OPTIONAL)
+changeFeatureType("_b946cd9c-a4d3-4a72-a909-bb853356f992", MANDATORY)
+changeFeatureType("_d6330e50-67da-4d18-bade-0b18c5ec7a88", MANDATORY)
+;
+;;
+
+at 4 do
+addFeature("_a11a4bed-4409-4e2f-afe8-f8e5335d609b", "AirCheck", "_ad440439-84df-4222-a983-ccf68d3afa1e", OPTIONAL)
+addGroup("_b946cd9c-a4d3-4a72-a909-bb853356f992", "_ff01706e-028e-45ca-a368-9b1aa87b117b", AND)
+addFeature("_a17615c3-699e-44ec-9fc8-e3dea2ff64d4", "NewFeature1", "_ff01706e-028e-45ca-a368-9b1aa87b117b", OPTIONAL)
+;
+;;
+
+at 6 do
+addGroup("_a11a4bed-4409-4e2f-afe8-f8e5335d609b", "_6c9d4708-1916-4a7c-9c1b-7d4b689afe5a", AND)
+addFeature("_3f682ae3-f43c-4724-89d3-27809e5a0197", "Air Exchange", "_6c9d4708-1916-4a7c-9c1b-7d4b689afe5a", OPTIONAL)
+; .
+
+endm
+
+rew init .
+quit

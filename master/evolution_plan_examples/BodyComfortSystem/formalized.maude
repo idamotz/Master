@@ -1,0 +1,115 @@
+load featuremodel-checker.maude
+
+mod DWINPUT is including FEATUREMODEL-CHECKER . protecting STRING + NAT .
+  subsorts String < FeatureID GroupID Name .
+  subsort Nat < TimePoint .
+  op model : -> FeatureModel .
+  op plan : -> Plans .
+  op log : -> Log .
+  op init : -> TimeConfiguration .
+  eq init = currentTime: 0 C: model # done # log plan: plan .
+eq model = FM("_c94e06eb-cf5c-42a3-a36b-f2afa822c590" ,
+["_c94e06eb-cf5c-42a3-a36b-f2afa822c590" -> f("RootFeature", noParent, noG, MANDATORY)]) .
+
+eq plan = at 2 do
+renameFeature("_c94e06eb-cf5c-42a3-a36b-f2afa822c590", "Body Comfort System")
+addGroup("_c94e06eb-cf5c-42a3-a36b-f2afa822c590", "_c80bfe93-3918-40cc-a501-62628447e4aa", AND)
+addFeature("_e95671d9-4c42-4189-a8bc-21cf4706847a", "Human Machine Interface", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+addFeature("_2e9a29af-c6ea-474e-9d22-666b489fed5b", "Door System", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+addFeature("_db5c7070-ffd9-48c3-a600-bfedd59fe46e", "Security", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+addGroup("_e95671d9-4c42-4189-a8bc-21cf4706847a", "_2c720cce-3df9-48ac-80a2-7eac92c8351a", AND)
+addFeature("_a5879c9f-a062-40ed-8753-171499238feb", "StatusLED", "_2c720cce-3df9-48ac-80a2-7eac92c8351a", OPTIONAL)
+addGroup("_a5879c9f-a062-40ed-8753-171499238feb", "_d4855437-dd32-4780-ac99-360fc269f69e", AND)
+addFeature("_4c387a34-bbfb-45c6-8a10-7d4e2f3007a8", "LED Finger Protection", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_f81bb180-277b-49b7-a194-2a267af33e22", "LED Power Window", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_90d35310-b622-4ddf-9dfc-8049ea712c97", "LED Exterior Mirror", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_2dd2ec6f-9bfd-451e-92cc-ab005392b2cc", "LED Alarm System", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_83dff87e-87ef-49b4-a5ee-3bcd56c14a86", "LED Central Locking System", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_13dd3522-85db-41af-b493-a366939df606", "LED Heatable", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+changeGroupType("_d4855437-dd32-4780-ac99-360fc269f69e", OR)
+changeFeatureType("_2e9a29af-c6ea-474e-9d22-666b489fed5b", MANDATORY)
+changeFeatureType("_e95671d9-4c42-4189-a8bc-21cf4706847a", MANDATORY)
+addGroup("_2e9a29af-c6ea-474e-9d22-666b489fed5b", "_3da570a0-5b08-4a92-9990-ec92fd4d9164", AND)
+addFeature("_72cb95e5-93d6-4847-8a54-666efbf109de", "Exterior Mirror", "_3da570a0-5b08-4a92-9990-ec92fd4d9164", OPTIONAL)
+changeFeatureType("_72cb95e5-93d6-4847-8a54-666efbf109de", MANDATORY)
+addGroup("_72cb95e5-93d6-4847-8a54-666efbf109de", "_e4ce9234-c797-48c8-b33e-3dd45eee3e9e", AND)
+addFeature("_72e011db-cd7e-4ab7-9301-a1f395440e0d", "Electric", "_e4ce9234-c797-48c8-b33e-3dd45eee3e9e", OPTIONAL)
+addFeature("_be2d18fe-d7d7-41fd-b0b3-99b881424fb5", "Heatable", "_e4ce9234-c797-48c8-b33e-3dd45eee3e9e", OPTIONAL)
+changeFeatureType("_72e011db-cd7e-4ab7-9301-a1f395440e0d", MANDATORY)
+addFeature("_396e15de-f7d0-45eb-b3aa-244d0b7a3c8f", "Power Window", "_3da570a0-5b08-4a92-9990-ec92fd4d9164", OPTIONAL)
+changeFeatureType("_396e15de-f7d0-45eb-b3aa-244d0b7a3c8f", MANDATORY)
+addGroup("_396e15de-f7d0-45eb-b3aa-244d0b7a3c8f", "_e1d8b003-ad52-487e-9dae-04549162304c", AND)
+addFeature("_76d763ea-2e4d-4706-abf8-7ee318c81ed9", "Manual Power Window", "_e1d8b003-ad52-487e-9dae-04549162304c", OPTIONAL)
+addFeature("_dcfccd60-1a5f-40af-8659-f2b5d870be0b", "Automatic Power Window", "_e1d8b003-ad52-487e-9dae-04549162304c", OPTIONAL)
+changeGroupType("_e1d8b003-ad52-487e-9dae-04549162304c", ALTERNATIVE)
+addGroup("_396e15de-f7d0-45eb-b3aa-244d0b7a3c8f", "_11d7370d-b834-4468-a31b-4c393e41a402", AND)
+addFeature("_59b71d1a-8d7b-4d23-ae17-60d4307a4dca", "Finger Protection", "_11d7370d-b834-4468-a31b-4c393e41a402", OPTIONAL)
+changeFeatureType("_59b71d1a-8d7b-4d23-ae17-60d4307a4dca", MANDATORY)
+addGroup("_db5c7070-ffd9-48c3-a600-bfedd59fe46e", "_8894ae9c-ad12-4f99-baa6-7c7db90f2c76", AND)
+addFeature("_8b509c75-6db0-402d-949e-d713fd746eb8", "Central Locking System", "_8894ae9c-ad12-4f99-baa6-7c7db90f2c76", OPTIONAL)
+addFeature("_0b3c7d46-3628-4de6-a194-7b8c469daadd", "Remote Control Key", "_8894ae9c-ad12-4f99-baa6-7c7db90f2c76", OPTIONAL)
+addFeature("_9d1ff2fc-d224-4e44-869f-b329e70bc5d6", "Alarm System", "_8894ae9c-ad12-4f99-baa6-7c7db90f2c76", OPTIONAL)
+addGroup("_8b509c75-6db0-402d-949e-d713fd746eb8", "_96946c25-ba2e-40fc-8fbd-7bb2ff7f3b0f", AND)
+addFeature("_f6928968-4406-451d-ae1c-20bb35923381", "Automatic Locking", "_96946c25-ba2e-40fc-8fbd-7bb2ff7f3b0f", OPTIONAL)
+addGroup("_0b3c7d46-3628-4de6-a194-7b8c469daadd", "_6586f0dc-c1b4-49bb-9b84-3118447a43ca", AND)
+addFeature("_c24d04be-658a-461c-9019-0b57cd08f7d4", "Control Automatic Power Window", "_6586f0dc-c1b4-49bb-9b84-3118447a43ca", OPTIONAL)
+addFeature("_73529671-5768-44dc-a7dd-5b11b8bd0d35", "Safety Function", "_6586f0dc-c1b4-49bb-9b84-3118447a43ca", OPTIONAL)
+addFeature("_a20a17ec-9932-4137-ac96-ab6265fecc45", "Adjust Exterior Mirror", "_6586f0dc-c1b4-49bb-9b84-3118447a43ca", OPTIONAL)
+addFeature("_e0a55c9e-112c-486c-90c5-fda7b089d0b8", "Control Alarm System", "_6586f0dc-c1b4-49bb-9b84-3118447a43ca", OPTIONAL)
+addGroup("_9d1ff2fc-d224-4e44-869f-b329e70bc5d6", "_cf706448-a07a-481d-a75b-55e8903449e3", AND)
+addFeature("_9c944f24-ef15-472f-bd56-15bfd8a0732a", "Interior Monitoring", "_cf706448-a07a-481d-a75b-55e8903449e3", OPTIONAL)
+;
+;;
+
+at 4 do
+addFeature("_a95b1c58-94df-4213-a1b1-f7751b57226b", "Wiper", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+addGroup("_a95b1c58-94df-4213-a1b1-f7751b57226b", "_3bc6f26f-8a96-4309-b22e-670b0e4bc614", AND)
+addFeature("_17c419e3-55f5-4049-a91a-57fd907f0050", "Clean", "_3bc6f26f-8a96-4309-b22e-670b0e4bc614", OPTIONAL)
+addFeature("_49d4fe41-45aa-4812-a897-a82989cb6d7c", "Sensor", "_3bc6f26f-8a96-4309-b22e-670b0e4bc614", OPTIONAL)
+addFeature("_4f52dac8-cf5b-46ad-b069-2445cbc9597b", "Frost Protection", "_3bc6f26f-8a96-4309-b22e-670b0e4bc614", OPTIONAL)
+addFeature("_76758c6a-9297-4dd5-8965-ccc0b7b1d115", "Permanent", "_3bc6f26f-8a96-4309-b22e-670b0e4bc614", OPTIONAL)
+addFeature("_ed1c0b94-1845-4f16-b977-f9069d10c4f6", "Blade", "_3bc6f26f-8a96-4309-b22e-670b0e4bc614", OPTIONAL)
+changeFeatureType("_a95b1c58-94df-4213-a1b1-f7751b57226b", MANDATORY)
+changeFeatureType("_49d4fe41-45aa-4812-a897-a82989cb6d7c", MANDATORY)
+changeFeatureType("_ed1c0b94-1845-4f16-b977-f9069d10c4f6", MANDATORY)
+addGroup("_49d4fe41-45aa-4812-a897-a82989cb6d7c", "_9686f7dd-4066-4517-81e2-855db80efea0", AND)
+addFeature("_956ab71e-8dfc-411b-b371-732d47b120c9", "LQ Sensor", "_9686f7dd-4066-4517-81e2-855db80efea0", OPTIONAL)
+addFeature("_53b3960d-f7fa-4c6e-8a07-4a6b5bfea643", "HQ Sensor", "_9686f7dd-4066-4517-81e2-855db80efea0", OPTIONAL)
+changeGroupType("_9686f7dd-4066-4517-81e2-855db80efea0", ALTERNATIVE)
+addGroup("_ed1c0b94-1845-4f16-b977-f9069d10c4f6", "_151e765b-4892-4b58-8f0e-1cbb66843c36", AND)
+addFeature("_d5d339f4-d31d-4531-a83d-c23e635f2da5", "LQ Blade", "_151e765b-4892-4b58-8f0e-1cbb66843c36", OPTIONAL)
+addFeature("_537d9d14-0b37-4319-b8f7-ae2c2b947ef3", "HQ Blade", "_151e765b-4892-4b58-8f0e-1cbb66843c36", OPTIONAL)
+addGroup("_76758c6a-9297-4dd5-8965-ccc0b7b1d115", "_ffe615bf-69a3-461a-84ec-59b254acfeef", AND)
+addFeature("_8e577551-b03e-442b-a5ff-66d21e19f024", "Intensity", "_ffe615bf-69a3-461a-84ec-59b254acfeef", OPTIONAL)
+addGroup("_4f52dac8-cf5b-46ad-b069-2445cbc9597b", "_32b79206-8aa9-4411-b3bb-5402854dd354", AND)
+addFeature("_f93e79a2-827b-4cfd-9d50-5f8151729694", "Clean Protection", "_32b79206-8aa9-4411-b3bb-5402854dd354", OPTIONAL)
+addFeature("_ff986b99-6180-43f2-9174-33e523faca37", "Sensor Protection", "_32b79206-8aa9-4411-b3bb-5402854dd354", OPTIONAL)
+addFeature("_74237993-a3ea-4393-a710-6cab4d4f7a15", "Permanent Protection", "_32b79206-8aa9-4411-b3bb-5402854dd354", OPTIONAL)
+changeFeatureType("_ff986b99-6180-43f2-9174-33e523faca37", MANDATORY)
+addFeature("_72486d9f-b1c7-41c5-9ff2-f76a8736562b", "LED Wiper", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_adc3119f-60a9-4301-9c48-d55a5b8757e2", "LED Frost Protection", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addFeature("_4eeb9920-ee6d-4d1a-8d79-a60474f82227", "LED Clean", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+;
+;;
+
+at 6 do
+addFeature("_fe27e07c-8f01-464b-9545-48899fadb220", "Seat", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+;
+;;
+
+at 8 do
+addFeature("_d5a860cd-e33f-4554-a9b8-192f966fca37", "Heatable Windows", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+addFeature("_90abc5b6-d653-44e0-a35b-6bd55874d415", "LED Window Heatable", "_d4855437-dd32-4780-ac99-360fc269f69e", OPTIONAL)
+addGroup("_f6928968-4406-451d-ae1c-20bb35923381", "_c9474b94-8a17-4e18-929b-f7161aa387cb", AND)
+addFeature("_a7591121-0314-4146-86c8-77c1188b8a73", "NewFeature1", "_c9474b94-8a17-4e18-929b-f7161aa387cb", OPTIONAL)
+;
+;;
+
+at 10 do
+addFeature("_8bc63752-0708-4894-9017-7d0dd4e7519c", "Automatic Headlights", "_c80bfe93-3918-40cc-a501-62628447e4aa", OPTIONAL)
+; .
+
+endm
+
+rew init .
+quit
