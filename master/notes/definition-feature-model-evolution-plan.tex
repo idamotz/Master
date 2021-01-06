@@ -1,0 +1,95 @@
+
+\subsection{Feature model evolution plan}
+\label{sub:feature-model-evolution-plan}
+A feature model evolution plan is defined as a triple $(\names, \features, \groups)$ where \names, \features, and \groups{} are all maps.
+
+\subsubsection{Maps}
+\label{subsub:maps}
+In general, a map is a set of entries on the form $\mapping{k}{v}$. Looking up a value at the key $k$ in map \map{map} looks like this:
+\[
+  \map{map}[k]
+\]
+
+This query would give us $v$ if $\mapping{k}{v} \in \map{map}$. If we wish to assign a value $v'$ to key $k$, this is the syntax:
+
+\[
+  \assign{\map{map}[k]}{v'}
+\]
+
+This also works if $k$ is not already in the map. We assume $O(1)$ for lookup and insertion.
+
+\subsubsection{Intervals}
+\label{subsub:intervals}
+To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. The intervals are always used to give information about when something is true in the feature model. This will be further explained in subsections \ref{subsub:mapping-names}, \ref{subsub:mapping-features}. \todo{group map subsection.}
+
+\subsubsection{Interval maps}
+\label{subsub:interval-maps}
+An interval map is a map where the key is an interval (section \vref{subsub:intervals}). To look up a value, one can either give an interval or a time point. For instance, if an interval map \map{i} contains the entry $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $v$ (assuming that $t_1 < t_2 < \ldots < t_5$):
+
+\begin{figure}[h]
+  \begin{align*}
+    & \map{i}[t_1] \\
+    & \map{i}[t_3] \\
+    & \map{i}[\interval{t_1}{t_5}] \\
+    & \map{i}[\interval{t_2}{t_4}]
+  \end{align*}
+  \caption{Interval map example}
+  \label{ex:interval-map}
+\end{figure}
+
+Notice that all the time points are contained within the interval. If we looked up $\map{i}[t_5]$, we would not match this interval, since it's right-open. The ability to look up subintervals and single time points makes interval maps different from the maps described in section \ref{subsub:maps}. \todo{deal with insertion, changing time points etc. What about interval maps with overlaps, e.g. child groups/features?? }
+
+\subsubsection{Mapping names}
+\label{subsub:mapping-names}
+
+The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $mapping{\interval{t_\text{start}}{t_\text{end}}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the feature model evolution plan. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". 
+
+\subsubsection{Mapping features}
+\label{subsub:mapping-features}
+
+\todo{Find a fitting name/symbol for \textit{feature intervals}}
+
+The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature intervals}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
+A feature has a name, a type, a parent group, and zero or more child groups. 
+These can all be defined in terms of intervals (\todo{rephrase}) and collected into a 5-tuple $(\map{existence},\, \map{names},\, \map{types},\, \map{parentGroups},\, \map{childGroups})$, where \map{existence} is an interval set (or an interval map with constant values), \map{names} is an interval map with name values, \map{types} is a map with the feature's variation types, \map{parentGroups} is a map with group ID values, and childGroups is an interval map with group ID values, the interval keys possibly overlapping. 
+
+\subsubsection{Mapping groups}
+\label{subsub:mapping-groups}
+
+\todo{Find a fitting name/symbol for \textit{group intervals}}
+
+The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group intervals}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple $(\map{existence},\, \map{types} ,\, \map{parentFeatures},\, \map{childFeatures})$, where \map{existence} is an interval set (or an interval map with constant values), \map{types} is a map with the group's types, \map{parentFeatures} is a map with feature IDs, and \map{childFeatures} is a map with feature ID values, the interval keys possibly overlapping. 
+
+\subsubsection{Example evolution plan}
+I've created a small example (see Figure \vref{ex:washing-machine}) containing three features and one group, describing a feature model evolution plan for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. I say that the example is small, but written out it looks huge. This is because there is a lot of redundancy, which is necessary for scoping etc. \todo{rewrite this, the language is too informal}
+
+\begin{figure}
+  \begin{align*}
+    ( \{ \; & \mapping{\text{Washing Machine}}{\intervalmapping{t_0}{\forever}{0}} \\
+       ,\; & \mapping{\text{Washer}}{\intervalmapping{t_0}{\forever}{1}} \\
+       ,\; & \mapping{\text{Dryer}}{\intervalmapping{t_5}{\forever}{2}}\; \} \\
+       ,\{\; & \mapping{0}{(\{\interval{t_0}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\text{Washing Machine}}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\textbf{mandatory}}\} ,\, \\
+             &  \emptyset ,\, \\ 
+             & \{\intervalmapping{t_0}{\forever}{10}\})} \\
+             ,\, & \mapping{1}{(\{\interval{t_0}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\text{Washer}}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\textbf{mandatory}}\} ,\, \\
+             &  \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
+             & \emptyset)} \\
+             ,\, & \mapping{2}{(\{\interval{t_5}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_5}{\forever}{\text{Dryer}}\} ,\, \\
+             & \{\intervalmapping{t_5}{\forever}{\textbf{optional}}\} ,\, \\
+             &  \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
+             & \emptyset)} \}\\
+    ,\; \{ \; & \mapping{10}{(\{\interval{t_0}{\forever}\} ,\, \\
+              & \{\intervalmapping{t_0}{\forever}{\textbf{AND}}\} ,\, \\
+              & \{\intervalmapping{t_0}{\forever}{0}\} ,\, \\
+              & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} )}\\
+    \}&)\\
+  \end{align*}
+  \caption{Small feature model evolution plan}
+  \label{ex:washing-machine}
+\end{figure}
+

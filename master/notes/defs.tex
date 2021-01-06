@@ -1,0 +1,48 @@
+\usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, xcolor, varioref}
+
+\usepackage{hyperref}
+
+%%------------------------------------------------------------------------
+%% DEFINITION HELPERS
+%%------------------------------------------------------------------------
+
+\def\forever{\infty}
+
+\newcommand{\alt}{~~|~~}
+\newcommand{\comp}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\inlinexp}[1]{
+{\footnotesize
+ \[\begin{array}{l}
+ #1
+ \end{array}\]}}
+
+\newcommand{\inlinexpa}[2]{
+{\footnotesize
+ \[\begin{array}{#1}
+ #2
+ \end{array}\]}}
+
+\newcommand{\infr}  [3] [] {\infer[\sc{#1}]{#3}{#2}}
+\newcommand{\iand}        {\qquad}
+
+\newcommand{\features}{\map{features}}
+\newcommand{\groups}{\map{groups}}
+\newcommand{\names}{\map{names}}
+\newcommand{\map}[1]{\textsc{#1}}
+\newcommand{\name}{\textbf{name}}
+\newcommand{\interval}[2]{[#1,\, #2)}
+\newcommand{\mapping}[2]{[\,#1 \mapsto #2\,]}
+\newcommand{\intervalmapping}[3]{\mapping{\interval{#1}{#2}}{#3}}
+
+\newcommand{\assign}[2]{#1 \leftarrow #2}
+\newcommand{\var}[1]{\texttt{#1}}
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+
+%%------------------------------------------------------------------------
+%% REDUCTION RELATION MACROS
+%%------------------------------------------------------------------------
+
+\newcommand{\subst} [3] {#3 [#2 / #1]}
+\newcommand{\dstep} [2] {#1 ~\Downarrow~ #2}
