@@ -1,4 +1,4 @@
-\usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, xcolor, varioref}
+\usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, xcolor, varioref, minted, caption, mathtools}
 
 \usepackage{hyperref}
 
@@ -27,7 +27,7 @@
 \newcommand{\iand}        {\qquad}
 
 \newcommand{\features}{\map{features}}
-\newcommand{\groups}{\map{groups}}
+\newcommand{\groups}{\map{groups}{}}
 \newcommand{\names}{\map{names}}
 \newcommand{\map}[1]{\textsc{#1}}
 \newcommand{\name}{\textbf{name}}
@@ -41,8 +41,27 @@
 \newcommand{\todo}[1]{{\color{red}TODO: #1}}
 
 %%------------------------------------------------------------------------
-%% REDUCTION RELATION MACROS
+%% SOS rules
 %%------------------------------------------------------------------------
 
-\newcommand{\subst} [3] {#3 [#2 / #1]}
-\newcommand{\dstep} [2] {#1 ~\Downarrow~ #2}
+\newcommand{\transition}{\longrightarrow}
+
+\newcommand{\ntyperule}[3]{
+  \begin{array}{c}
+    \textsc{\scriptsize ({#1})} \\
+    #2 \\[0pt]
+    \hline\\[-8pt]
+    #3
+  \end{array}}
+
+\newcommand{\ntypeaxiom}[2]{
+  \begin{array}{c}
+    \textsc{\scriptsize ({#1})} \\
+    #2
+  \end{array}}
+
+\newcommand{\nredrule}[2]{
+  \begin{array}{c}
+    \textsc{\scriptsize ({#1})} \\
+    #2
+  \end{array}}
