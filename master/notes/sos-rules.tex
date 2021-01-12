@@ -1,0 +1,71 @@
+\section{SOS rules}
+\label{sec:sos-rules}
+
+
+\subsection{Add feature rules}
+We split the ADD-FEATURE rule into two cases: One where the feature already exists at some point in the plan, and another where it does not (Figure \vref{rule:add-feature-fresh}). If the feature ID has not yet been used in the plan, then we check that the name is not in use during the interval where the new feature exists. Furthermore, we check that the parent group exists continuously during the same interval. For all the types the parent group has during that interval, we verify that the type is compatible with the type of the new feature using a function \texttt{compatibleTypes} (see Figure \vref{fun:compatible-types}). 
+
+\begin{figure}[h]
+  \begin{minted}{haskell}
+    compatibleTypes(AND, _) = True
+    compatibleTypes(_, optional) = False
+    compatibleTypes(_, _) = True
+  \end{minted}
+  \caption{\label{fun:compatible-types}}
+\end{figure}
+
+\begin{figure}[t]
+    \renewcommand{\arraystretch}{0.9}
+    $$\begin{array}{c}
+      \ntyperule{Add-Feature-Fresh}
+      {\\
+        \features{}[\var{fid}] = \bot \\
+        \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset\\
+        \groups{}[\var{parentGroupID}] = (\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren})\\
+        \interval{t_n}{t_m} \in \map{GroupExistence} \\
+        \forall \var{gt}_{\in \map{GroupTypes}\interval{t_n}{t_m}} \ldotp \var{compatibleTypes}(\var{gt}, \var{type}) \\
+        \names{}' = \assign{\names[\var{name}]\interval{t_n}{t_m}}{\var{fid}}\\
+        \features{}' = \\
+        \assign{\features[\var{fid}]}
+        {(\{\interval{t_n}{t_m}\}, 
+        \{\intervalmapping{t_n}{t_m}{\var{name}}\}, 
+        \{\intervalmapping{t_n}{t_m}{\var{type}}\},  \\
+        \{\intervalmapping{t_n}{t_m}{\var{parentGroupID}}\}, \emptyset)}\\
+        \map{GroupChilren}' = \map{GroupChildren} \cup \{\intervalmapping{t_n}{t_m}{\var{fid}}\}\\
+        \groups{}' =
+        \assign{\groups{}[\var{groupID}]}{(\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren}')}
+      }
+      {(\names{}, \features{}, \groups{})\\
+      :\textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \\
+      \transition\\
+    (\names{}', \features{}', \groups{}')}
+    \end{array}$$
+    \\\\
+    \renewcommand{\arraystretch}{0.9}
+    $$\begin{array}{c}
+      \ntyperule{Re-Add-Feature}
+      {\\
+        \features{}[\var{fid}] = (\map{FeatExistence}, \map{FeatNames},\\
+        \map{FeatTypes}, \map{FeatParents}, \map{FeatChildren})\\
+        \map{FeatExistence}[\interval{t_n}{t_m} = \emptyset\\
+        \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset\\
+        \groups{}[\var{parentGroupID}] = (\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren})\\
+        \interval{t_n}{t_m} \in \map{GroupExistence} \\
+        \forall \var{gt}_{\in \map{GroupTypes}\interval{t_n}{t_m}} \ldotp \var{compatibleTypes}(\var{gt}, \var{type}) \\
+        \names{}' = \assign{\names[\var{name}]\interval{t_n}{t_m}}{\var{fid}}\\
+        \features{}' = \assign{\features[\var{fid}]}{(\map{FeatExistence} \cup \{\interval{t_n}{t_m}\}, \\
+        \assign{\map{FeatNames}\interval{t_n}{t_m}}{\var{name}}, \\
+        \assign{\map{FeatTypes}\interval{t_n}{t_m}}{\var{type}}, \\
+        \assign{\map{FeatParents}\interval{t_n}{t_m}}{\var{parentGroupID}}, \\
+      \map{FeatChildren})}\\
+        \map{GroupChilren}' = \map{GroupChildren} \cup \{\intervalmapping{t_n}{t_m}{\var{fid}}\}\\
+        \groups{}' = 
+        \assign{\groups{}[\var{groupID}]}{(\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren}')}
+      }
+      {(\names{}, \features{}, \groups{})\\
+      :\textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \\
+      \transition\\
+    (\names{}', \features{}', \groups{}')}
+    \end{array}$$
+    \caption{\label{rule:add-feature-fresh}}
+\end{figure}
