@@ -1,10 +1,16 @@
 \usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, xcolor, varioref, minted, caption, mathtools}
 
+\usepackage{stix}
 \usepackage{hyperref}
+
+\newcommand{\todo}[1]{{\color{red}TODO: #1}}
 
 %%------------------------------------------------------------------------
 %% DEFINITION HELPERS
 %%------------------------------------------------------------------------
+
+% When a line break should be allowed following a comma
+\newcommand{\comma}{, \allowbreak}
 
 \def\forever{\infty}
 
@@ -29,22 +35,30 @@
 \newcommand{\features}{\map{features}}
 \newcommand{\groups}{\map{groups}{}}
 \newcommand{\names}{\map{names}}
+
+%%------------------------------------------------------------------------
+%% MAPS
+%%------------------------------------------------------------------------
+
 \newcommand{\map}[1]{\textsc{#1}}
 \newcommand{\name}{\textbf{name}}
-\newcommand{\interval}[2]{[#1,\, #2)}
-\newcommand{\mapping}[2]{[\,#1 \mapsto #2\,]}
+\newcommand{\interval}[2]{\left[ #1,\, #2 \right)}
+\newcommand{\mapping}[2]{\left[ \,#1 \mapsto #2\, \right]}
 \newcommand{\intervalmapping}[3]{\mapping{\interval{#1}{#2}}{#3}}
+\newcommand{\lookup}[2]{#1 \left[ #2 \right]}
 
 \newcommand{\assign}[2]{#1 \leftarrow #2}
 \newcommand{\var}[1]{\texttt{#1}}
-
-\newcommand{\todo}[1]{{\color{red}TODO: #1}}
+\newcommand{\inn}{\isindot}
+\newcommand{\innr}{\, \widehat{\in} \;}
+\newcommand{\notinnr}{\widehat{\notin}}
 
 %%------------------------------------------------------------------------
 %% SOS rules
 %%------------------------------------------------------------------------
 
 \newcommand{\transition}{\longrightarrow}
+\newcommand{\sossize}{\footnotesize}
 
 \newcommand{\ntyperule}[3]{
   \begin{array}{c}

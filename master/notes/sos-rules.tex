@@ -2,70 +2,77 @@
 \label{sec:sos-rules}
 
 
-\subsection{Add feature rules}
-We split the ADD-FEATURE rule into two cases: One where the feature already exists at some point in the plan, and another where it does not (Figure \vref{rule:add-feature-fresh}). If the feature ID has not yet been used in the plan, then we check that the name is not in use during the interval where the new feature exists. Furthermore, we check that the parent group exists continuously during the same interval. For all the types the parent group has during that interval, we verify that the type is compatible with the type of the new feature using a function \texttt{compatibleTypes} (see Figure \vref{fun:compatible-types}). 
+\subsection{Add feature rule}
 
 \begin{figure}[h]
-  \begin{minted}{haskell}
-    compatibleTypes(AND, _) = True
-    compatibleTypes(_, optional) = False
-    compatibleTypes(_, _) = True
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Add-Feature}
+      {\\
+        \features{}[\var{fid}] = (F_e,\, F_n,\, F_t,\, F_p,\, F_c) \\
+        \groups{}[\var{parentGroupID}] = (G_e,\, G_t , \, G_p,\, G_c)\\
+        \interval{t_n}{t_m} \not \innr F_e \qquad
+        \interval{t_n}{t_m} \inn G_e \qquad
+        \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset \\
+        \forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
+      }
+      {
+        (\names{}, \features{}, \groups{})\\
+        :\textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \\
+      \transition\\
+        (\assign{\names{}[\var{name}]\interval{t_n}{t_m}}{\var{fid}}\\
+        \assign{\features{}[\var{fid}]}
+        {\var{setFeatureAttributes}(\features{}[\var{fid}], \interval{t_n}{t_m}, 
+        \var{name}, \var{type}, \var{parentGroupID})},\\
+        \assign{\groups{}[\var{parentGroupID]}}
+        {\var{addChildFeature}(\groups{}[\var{parentGroupID}], \interval{t_n}{t_m}, \var{fid})})
+    }
+    \end{array}$$
+    \caption{\label{rule:add-feature}}
+\end{figure}
+
+Figure \vref{rule:add-feature}  describes the semantics of the \textbf{addFeature} operation. 
+To add a feature during the interval $\interval{t_n}{t_m}$, its ID cannot exist exist during the interval ($\interval{t_n}{t_m} \not \innr F_e$). The parent feature must exist ($\interval{t_n}{t_m} \inn G_e$), and the types it has during the interval must be compatible with the type of the 
+added feature ($\forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must be available during the interval ($\names{}[\var{name}]\interval{t_n}{t_m} = \emptyset$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. 
+
+To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (Figure \vref{fun:compatible-types}), $\var{setFeatureAttributes}$ (Figure \vref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (Figure \vref{fun:add-child-feature}). 
+
+\begin{figure}[h]
+  \begin{minted}{text}
+compatibleTypes(AND, _) = True
+compatibleTypes(_, optional) = False
+compatibleTypes(_, _) = True
   \end{minted}
   \caption{\label{fun:compatible-types}}
 \end{figure}
 
-\begin{figure}[t]
-    \renewcommand{\arraystretch}{0.9}
-    $$\begin{array}{c}
-      \ntyperule{Add-Feature-Fresh}
-      {\\
-        \features{}[\var{fid}] = \bot \\
-        \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset\\
-        \groups{}[\var{parentGroupID}] = (\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren})\\
-        \interval{t_n}{t_m} \in \map{GroupExistence} \\
-        \forall \var{gt}_{\in \map{GroupTypes}\interval{t_n}{t_m}} \ldotp \var{compatibleTypes}(\var{gt}, \var{type}) \\
-        \names{}' = \assign{\names[\var{name}]\interval{t_n}{t_m}}{\var{fid}}\\
-        \features{}' = \\
-        \assign{\features[\var{fid}]}
-        {(\{\interval{t_n}{t_m}\}, 
-        \{\intervalmapping{t_n}{t_m}{\var{name}}\}, 
-        \{\intervalmapping{t_n}{t_m}{\var{type}}\},  \\
-        \{\intervalmapping{t_n}{t_m}{\var{parentGroupID}}\}, \emptyset)}\\
-        \map{GroupChilren}' = \map{GroupChildren} \cup \{\intervalmapping{t_n}{t_m}{\var{fid}}\}\\
-        \groups{}' =
-        \assign{\groups{}[\var{groupID}]}{(\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren}')}
-      }
-      {(\names{}, \features{}, \groups{})\\
-      :\textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \\
-      \transition\\
-    (\names{}', \features{}', \groups{}')}
-    \end{array}$$
-    \\\\
-    \renewcommand{\arraystretch}{0.9}
-    $$\begin{array}{c}
-      \ntyperule{Re-Add-Feature}
-      {\\
-        \features{}[\var{fid}] = (\map{FeatExistence}, \map{FeatNames},\\
-        \map{FeatTypes}, \map{FeatParents}, \map{FeatChildren})\\
-        \map{FeatExistence}[\interval{t_n}{t_m} = \emptyset\\
-        \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset\\
-        \groups{}[\var{parentGroupID}] = (\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren})\\
-        \interval{t_n}{t_m} \in \map{GroupExistence} \\
-        \forall \var{gt}_{\in \map{GroupTypes}\interval{t_n}{t_m}} \ldotp \var{compatibleTypes}(\var{gt}, \var{type}) \\
-        \names{}' = \assign{\names[\var{name}]\interval{t_n}{t_m}}{\var{fid}}\\
-        \features{}' = \assign{\features[\var{fid}]}{(\map{FeatExistence} \cup \{\interval{t_n}{t_m}\}, \\
-        \assign{\map{FeatNames}\interval{t_n}{t_m}}{\var{name}}, \\
-        \assign{\map{FeatTypes}\interval{t_n}{t_m}}{\var{type}}, \\
-        \assign{\map{FeatParents}\interval{t_n}{t_m}}{\var{parentGroupID}}, \\
-      \map{FeatChildren})}\\
-        \map{GroupChilren}' = \map{GroupChildren} \cup \{\intervalmapping{t_n}{t_m}{\var{fid}}\}\\
-        \groups{}' = 
-        \assign{\groups{}[\var{groupID}]}{(\map{GroupExistence},\, \map{GroupTypes} ,\\ \map{GroupParents},\, \map{GroupChildren}')}
-      }
-      {(\names{}, \features{}, \groups{})\\
-      :\textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \\
-      \transition\\
-    (\names{}', \features{}', \groups{}')}
-    \end{array}$$
-    \caption{\label{rule:add-feature-fresh}}
+\begin{figure}[h]
+  \begin{minted}[escapeinside=||]{text}
+setFeatureAttributes(|$(F_e, F_n, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, name, type, parentGroupID)
+  = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
+    , |$F_n$|[|$\interval{t_{start}}{t_{end}}$|] |$\leftarrow$| name
+    , |$F_t$|[|$\interval{t_{start}}{t_{end}}$|] |$\leftarrow$| type
+    , |$F_p$|[|$\interval{t_{start}}{t_{end}}$|] |$\leftarrow$| parentGroupID
+    , |$F_c$| |$)$|
+     \end{minted}
+  \caption{\label{fun:set-feature-attributes}}
+\end{figure}
+
+\begin{figure}[h]
+  \begin{minted}[escapeinside=||]{text}
+addChildFeature(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, fid)
+  = |$($| |$G_e, G_t, G_p$|
+    , |$G_c \cup \intervalmapping{t_{start}}{t_{end}}{\var{fid}}$| |$)$|
+  \end{minted}
+  \caption{\label{fun:add-child-feature}}
+\end{figure}
+
+
+\todo{Find a way to express that there are no intervals in $F_e$ overlapping $\interval{t_n}{t_m}$}
+
+
+
+\begin{figure}
+  
+  \caption{\label{rule:add-group}}
 \end{figure}

@@ -49,4 +49,20 @@ End the day with something left to say (but put a note to remember what it is) $
 
 End the day with something I enjoy. 
 
+## 12. januar
+### Har gjort
+Har ført inn to SOS-regler i LaTeX. Det er absolutt ikke pent, men jeg tror det er relativt riktig hvis man bøyer reglene for maps som jeg selv har laget:). Måtte endre semantikken for interval maps, fordi det gir mest mening å kunne slå opp hvilke verdier som eksisterer innen et intervall, heller enn å anta at man får ut én eller 0 verdier.
 
+### Står igjen
+Tips fra Lars: Trekke ut hårete ting fra reglene, dvs. feks å opprette en ny feature i modellen kan være en ekstern operasjon definert for strukturen. 
+Default-map: La verdien man får ut når key ikke finnes være en brukbar ting. Så slipper man feks å dele opp fresh-add og re-add i to regler. 
+For å få det pent: Ta bort let-greiene fra over streken. Hvis det ikke er plass under, revurder om syntaksen kan gjøres penere. 
+
+Resten av reglene må finnes på og føres inn, og jeg må skrive en god del sider og lese masse for å komme i mål. Hadde også håpet å få implementert noe, men vet ikke helt om det lar seg gjøre. Det hadde også hjulpet veldig på motivasjonen, som akkurat nå er på bunn.
+
+Helt spesifikt finnes det også et par store problemer som jeg må løse eller skrive at jeg velger å ignorere. Det finnes ingen måte å utvide, redusere eller flytte tiden en feature (eller noe annet) finnes i planen. Det finnes gode grunner til å ha det, så jeg synes det er ganske problematisk. Kanskje det hjelper å se det fra meta-perspektivet igjen? For eksempel vil MOVE remove kunne endre høyresiden av et intervall, og MOVE add vil endre venstresiden. For å flytte hele intervallet må man gjøre to operasjoner, og det kan føre til store problemer. Altså vil ikke meta-perspektivet løse problemet fullstendig, men det kan hjelpe meg med å klargjøre hva jeg selv mener burde være mulig å endre på.  
+Noe annet som jeg må ta stilling til på et tidspunkt, er om jeg vil introdusere batch operations. Dette vil da hovedsakelig gjelde i tilfellet når: 
+
+  - to operasjoner påvirker samme ting 
+  - å sjekke hver av dem isolert vil føre til paradoks
+  - sammen fører de ikke til paradoks

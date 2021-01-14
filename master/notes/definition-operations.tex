@@ -5,7 +5,7 @@ We define \emph{operations} to alter the feature model evolution plan. A softwar
 
 \begin{itemize}
   \item \textbf{addFeature(featureID, parentGroupID, name, featureType)} from $t_n$ to $t_m$\\
-    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval \interval{$t_n$}{$t_m$}. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \textbf{mandatory}, then the parent group must have type \textbf{AND}.
+    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \textbf{mandatory}, then the parent group must have type \textbf{AND}.
   \item \textbf{addGroup(groupID, parentFeatureID, groupType)} from $t_n$ to $t_m$\\
     Adds group with id \var{groupID} and type \var{groupType} to the feature with id \var{parentFeatureID} during the interval \interval{$t_n$}{$t_m$}. The group ID must be fresh, and the parent feature must exist during the interval. 
   \item \textbf{removeFeature(featureID)} at time $t_n$\\

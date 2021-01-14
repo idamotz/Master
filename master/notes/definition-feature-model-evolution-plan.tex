@@ -1,3 +1,4 @@
+\todo{Look at default maps}
 
 \subsection{Feature model evolution plan}
 \label{sub:feature-model-evolution-plan}
@@ -5,15 +6,16 @@ A feature model evolution plan is defined as a triple $(\names, \features, \grou
 
 \subsubsection{Maps}
 \label{subsub:maps}
+
 In general, a map is a set of entries on the form $\mapping{k}{v}$. Looking up a value at the key $k$ in map \map{map} looks like this:
 \[
-  \map{map}[k]
+  \lookup{\map{map}}{k}
 \]
 
 This query would give us $v$ if $\mapping{k}{v} \in \map{map}$. If we wish to assign a value $v'$ to key $k$, this is the syntax:
 
 \[
-  \assign{\map{map}[k]}{v'}
+\assign{\lookup{\map{map}}{k}}{v'}
 \]
 
 This also works if $k$ is not already in the map. We assume $O(1)$ for lookup and insertion.
@@ -28,21 +30,27 @@ An interval map is a map where the key is an interval (section \vref{subsub:inte
 
 \begin{figure}[h]
   \begin{align*}
-    & \map{i}[t_1] \\
-    & \map{i}[t_3] \\
-    & \map{i}[\interval{t_1}{t_5}] \\
-    & \map{i}[\interval{t_2}{t_4}]
+    & \lookup{\map{i}}{t_1} \\
+    & \lookup{\map{i}}{t_3} \\
+    & \lookup{\map{i}}{\interval{t_1}{t_5}} \\
+    & \lookup{\map{i}}{\interval{t_2}{t_4}}
   \end{align*}
   \caption{Interval map example}
   \label{ex:interval-map}
 \end{figure}
 
-\todo{enclosingInterval function; find out which keys contain an interval}
+\todo{enclosingInterval function; find out which keys contain an interval}\\
+
+\subsubsection{Interval sets}
+\label{subsub:interval-sets}
+An interval set is a set of intervals with a few custom operators. Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar operator $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the operator $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ overlap iff there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
+
+Notice that $\in \; \subseteq \; \inn \; \subseteq \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$.
 
 \subsubsection{Mapping names}
 \label{subsub:mapping-names}
 
-The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the feature model evolution plan. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". 
+The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the feature model evolution plan. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$.
 
 \subsubsection{Mapping features}
 \label{subsub:mapping-features}
@@ -51,14 +59,18 @@ The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map
 
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature intervals}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
 A feature has a name, a type, a parent group, and zero or more child groups. 
-These can all be defined in terms of intervals (\todo{rephrase}) and collected into a 5-tuple $(\map{existence},\, \map{names},\, \map{types},\, \map{parentGroups},\, \map{childGroups})$, where \map{existence} is an interval set (or an interval map with constant values), \map{names} is an interval map with name values, \map{types} is a map with the feature's variation types, \map{parentGroups} is a map with group ID values, and childGroups is an interval map with group ID values, the interval keys possibly overlapping. 
+These can all be defined in terms of intervals (\todo{rephrase}) and collected into a 5-tuple $(\map{existence} \comma \, \map{names} \comma \, \map{types} \comma \, \map{parentGroups} \comma \, \map{childGroups})$, where \map{existence} is an interval set (or an interval map with constant values), \map{names} is an interval map with name values, \map{types} is a map with the feature's variation types, \map{parentGroups} is a map with group ID values, and childGroups is an interval map with group ID values, the interval keys possibly overlapping. 
+
+Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
 \subsubsection{Mapping groups}
 \label{subsub:mapping-groups}
 
 \todo{Find a fitting name/symbol for \textit{group intervals}}
 
-The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group intervals}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple $(\map{existence},\, \map{types} ,\, \map{parentFeatures},\, \map{childFeatures})$, where \map{existence} is an interval set (or an interval map with constant values), \map{types} is a map with the group's types, \map{parentFeatures} is a map with feature IDs, and \map{childFeatures} is a map with feature ID values, the interval keys possibly overlapping. 
+The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group intervals}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple $(\map{existence} \comma \, \map{types}  \comma \, \map{parentFeatures} \comma \, \map{childFeatures})$, where \map{existence} is an interval set (or an interval map with constant values), \map{types} is a map with the group's types, \map{parentFeatures} is a map with feature IDs, and \map{childFeatures} is a map with feature ID values, the interval keys possibly overlapping.
+
+Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
 \subsubsection{Example evolution plan}
 I've created a small example (see Figure \vref{ex:washing-machine}) containing three features and one group, describing a feature model evolution plan for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. I say that the example is small, but written out it looks huge. This is because there is a lot of redundancy, which is necessary for scoping etc. \todo{rewrite this, the language is too informal}
