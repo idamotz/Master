@@ -1,9 +1,10 @@
-\usepackage{amsmath, listings, bcprules, amsthm, amssymb, xspace, xcolor, varioref, minted, caption, mathtools}
+\usepackage{amsmath, listings, amsthm, amssymb, xspace, xcolor, varioref, minted, caption, mathtools}
 
-\usepackage{stix}
 \usepackage{hyperref}
+\usepackage{interval}
 
 \newcommand{\todo}[1]{{\color{red}TODO: #1}}
+\synctex=1
 
 %%------------------------------------------------------------------------
 %% DEFINITION HELPERS
@@ -40,18 +41,25 @@
 %% MAPS
 %%------------------------------------------------------------------------
 
+\intervalconfig{soft open fences,
+                open right,
+                scaled}
+
 \newcommand{\map}[1]{\textsc{#1}}
 \newcommand{\name}{\textbf{name}}
-\newcommand{\interval}[2]{\left[ #1,\, #2 \right)}
-\newcommand{\mapping}[2]{\left[ \,#1 \mapsto #2\, \right]}
+\newcommand{\mapping}[2]{[ \,#1 \mapsto #2\, ]}
 \newcommand{\intervalmapping}[3]{\mapping{\interval{#1}{#2}}{#3}}
 \newcommand{\lookup}[2]{#1 \left[ #2 \right]}
 
-\newcommand{\assign}[2]{#1 \leftarrow #2}
+\newcommand{\assign}{\leftarrow}
+\newcommand{\addassign}{\xleftarrow{\cup}}
 \newcommand{\var}[1]{\texttt{#1}}
-\newcommand{\inn}{\isindot}
-\newcommand{\innr}{\, \widehat{\in} \;}
-\newcommand{\notinnr}{\widehat{\notin}}
+\newcommand{\inn}{\in_\leq}
+\newcommand{\innr}{\in_{\leq\!\!\!\!\geq}}
+\newcommand{\notinnr}{\notin_{\leq\!\!\!\!\geq}}
+
+\newcommand{\removekey}{\setminus}
+\newcommand{\removekeyvalue}[1]{\setminus^{#1}}
 
 %%------------------------------------------------------------------------
 %% SOS rules
@@ -59,10 +67,11 @@
 
 \newcommand{\transition}{\longrightarrow}
 \newcommand{\sossize}{\footnotesize}
+\newcommand{\shove}{\  \triangleright \ }
 
 \newcommand{\ntyperule}[3]{
   \begin{array}{c}
-    \textsc{\scriptsize ({#1})} \\
+    \textbf{\textsc{({#1})}} \\
     #2 \\[0pt]
     \hline\\[-8pt]
     #3
@@ -79,3 +88,5 @@
     \textsc{\scriptsize ({#1})} \\
     #2
   \end{array}}
+
+\newcommand{\qqquad}{\qquad \quad}

@@ -16,29 +16,31 @@ Which parts of the feature model may be affected within the time scope?
 We define the \textit{minimal} scope for each operation.
 \begin{itemize}
 
-  \item \textbf{addFeature(featureID, parentGroupID, name, featureType)} from $t_n$ to $t_m$\\
-    When we add a feature from $t_n$ to $t_m$, it is quite obvious that the scope in time will be \interval{$t_n$}{$t_m$}, since this is the interval in which the feature will exist. The spatial scope must be only the parent group: If the group type changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. But what about the name? If we only stored name information inside features, we would have to check every feature in the whole interval for this change. However, since we store information about names in a separate map, we can look up the name and check that it is not in use during the interval.
-  \item \textbf{addGroup(groupID, parentFeatureID, groupType)} from $t_n$ to $t_m$\\
+  \item \textbf{addFeature}(\var{featureID}, \var{parentGroupID}, \var{name}, \var{featureType}) from $t_n$ to $t_m$\\
+    \todo{Give an argument why the parent group is the spatial scope of this rule}
+    When we add a feature from $t_n$ to $t_m$, it is quite obvious that the scope in time will be $\interval{t_n}{t_m}$, since this is the interval in which the feature will exist. The spatial scope must be only the parent group: If the group type changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. But what about the name? If we only stored name information inside features, we would have to check every feature in the whole interval for this change. However, since we store information about names in a separate map, we can look up the name and check that it is not in use during the interval. \todo{Consider moving last part to data structure definitions}
+  \item \textbf{addGroup}(\var{groupID}, \var{parentFeatureID}, \var{groupType}) from $t_n$ to $t_m$\\
     The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the parent feature, for which the only conflicting event is removal -- the types of a group and its parent never conflict.
-  \item \textbf{removeFeature(featureID)} at $t_n$\\
-    If the original interval containing $t_n$ in which the feature exists inside the feature model is \interval{$t_m$}{$t_k$}, then the temporal scope is $\interval{t_n}{t_k}$; since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.\\
+  \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\
+    \todo{Explain why the temporal scope is the way it is}
+    If the original interval containing $t_n$ in which the feature exists inside the feature model is $\interval{t_m}{t_k}$, then the temporal scope is $\interval{t_n}{t_k}$ - from the feature is removed until it would have been removed anyway \todo{rephrase}. Since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.\\
     The spatial scope must be the feature's subtree. If the feature has or will have a child group during the interval, then it cannot be removed. Otherwise, there are no conflicts.
-  \item \textbf{removeGroup(groupID)} at $t_n$\\
+  \item \textbf{removeGroup}(\var{groupID}) at $t_n$\\
     Extremely similar to \textbf{removeFeature}. 
-  \item \textbf{moveFeature(featureID, targetGroupID)} at $t_n$\\
-  If $t_m$ is the time at which the feature is next moved, the temporal scope is $t_n, t_m$, since this operation only affects the plan within this interval.\\
-  The spatial scope is discussed in more detail in the \textbf{move feature algo}. This scope is the largest and hardest to define, because we have to detect cycles. The scope is defined by the feature and its ancestors, as well as target group and its ancestors, which may change during the intervals. It is not necessary to look at all ancestors, only the ones which \textbf{feature} and \textbf{targetGroup} do not have in common. As usual, conflicting types and removal must be considered in addition to cycles.
-  \item \textbf{moveGroup(groupID, targetFeatureID)} at $t_n$\\
+  \item \textbf{moveFeature}(\var{featureID}, \var{targetGroupID}) at $t_n$\\
+  If $t_m$ is the time at which the feature is next moved in the original plan, the temporal scope is $\interval{t_n}{t_m}$, since this operation only affects the plan within this interval.\\
+  The spatial scope is discussed in more detail in the \textbf{move feature algo}. This scope is the largest and hardest to define, because we have to detect cycles. The scope is defined by the feature and its ancestors, as well as target group and its ancestors, which may change during the intervals. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common. As usual, conflicting types and removal must be considered in addition to cycles.
+  \item \textbf{moveGroup}(\var{groupID}, \var{targetFeatureID}) at $t_n$\\
     See moveFeature. Very similar.
-  \item \textbf{changeFeatureVariationType(featureID, newType)} at $t_n$\\
+  \item \textbf{changeFeatureVariationType}(\var{featureID}, \var{newType}) at $t_n$\\
     Temporal scope: $\interval{t_n}{t_m}$ if $t_m$ is the next time point at which the feature's type changes or when feature is (next) removed.\\
     Spatial scope: The only possibly conflicting thing in the feature model is the parent group's type. At no point must the feature have type `mandatory` and the parent group have type `alternative` or `or`. Thus, the spatial scope is the parent group.\\
-  \item \textbf{changeGroupVariationType(groupID, newType)} at $t_n$
+  \item \textbf{changeGroupVariationType}(\var{groupID}, \var{newType}) at $t_n$
     Temporal scope: Same as previous.\\
     The spatial scope are the group's child features; the possible conflict is the same as with changeFeatureType.\\
-  \item \textbf{changeFeatureName(featureID, name)} at $t_n$
+  \item \textbf{changeFeatureName}(\var{featureID}, \var{name}) at $t_n$
     Temporal scope: Same as previous.\\
     Spatial scope: The name. If it already exists within the feature model during the interval, then the change is invalid. 
 \end{itemize}
 
-\todo{deal with batch operations/reverting a change}: It is currently impossible to \emph{extend} an interval; If a feature exists during $\interval{t_3}{t_5}$, it is impossible to change the plan such that it exists during $\interval{t_3}{t_6}$ instead. Don't really know how to fix that, except maybe adding an operation. In Figure \vref{ex:washing-machine}, if we try to change the name of feature 1 to Dryer at $t_2$, intending to change it back before Dryer is added, then these semantics will reject the first change, as two features will have the name Dryer during $\interval{t_5, \infty}$. The paradox would be righted once we add that the name will change back to Washer at $t_4$. There are workarounds for this, for instance changing the name of feature 2 to some temporary placeholder, making the changes to feature 1, and then changing feature 2 back. This, however, seems too cumbersome. Hopefully this use case is not common enough that most users will suffer for it, but it is definitely an example of the semantics being too strict. 
+\todo{deal with batch operations/reverting a change}: It is currently impossible to \emph{extend} an interval; If a feature exists during $\interval{t_3}{t_5}$, it is impossible to change the plan such that it exists during $\interval{t_3}{t_6}$ instead. Don't really know how to fix that, except maybe adding an operation. In Figure \vref{ex:washing-machine}, if we try to change the name of feature 1 to Dryer at $t_2$, intending to change it back before Dryer is added, then these semantics will reject the first change, as two features will have the name Dryer during $\interval{t_5}{\infty}$. The paradox would be righted once we add that the name will change back to Washer at $t_4$. There are workarounds for this, for instance changing the name of feature 2 to some temporary placeholder, making the changes to feature 1, and then changing feature 2 back. This, however, seems too cumbersome. Hopefully this use case is not common enough that most users will suffer for it, but it is definitely an example of the semantics being too strict. 

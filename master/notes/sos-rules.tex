@@ -1,31 +1,34 @@
 \section{SOS rules}
 \label{sec:sos-rules}
+\todo{Consider having two rules for each operation; one for validating and one for updating. Alternatively use functions on the right-hand side of $\transition$.}
 
+\todo{Explain how to read the rules}
 
 \subsection{Add feature rule}
+\label{sub:add-feature-rule}
 
 \begin{figure}[h]
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Add-Feature}
       {\\
-        \features{}[\var{fid}] = (F_e,\, F_n,\, F_t,\, F_p,\, F_c) \\
-        \groups{}[\var{parentGroupID}] = (G_e,\, G_t , \, G_p,\, G_c)\\
         \interval{t_n}{t_m} \not \innr F_e \qquad
         \interval{t_n}{t_m} \inn G_e \qquad
         \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset \\
+        \features{}[\var{fid}] = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right) \\
+        \groups{}[\var{parentGroupID}] = \left(G_e,\, G_t , \, G_p,\, G_c \right)\\
         \forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
       }
       {
-        (\names{}, \features{}, \groups{})\\
-        :\textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \\
-      \transition\\
-        (\assign{\names{}[\var{name}]\interval{t_n}{t_m}}{\var{fid}}\\
-        \assign{\features{}[\var{fid}]}
-        {\var{setFeatureAttributes}(\features{}[\var{fid}], \interval{t_n}{t_m}, 
-        \var{name}, \var{type}, \var{parentGroupID})},\\
-        \assign{\groups{}[\var{parentGroupID]}}
-        {\var{addChildFeature}(\groups{}[\var{parentGroupID}], \interval{t_n}{t_m}, \var{fid})})
+        \textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \shove \\
+         (\names{}, \features{}, \groups{})\\
+        \transition\\
+        (\names{}[\var{name}]\interval{t_n}{t_m} \assign \var{fid},  \\
+        {\features{}[\var{fid}]} \assign 
+        \var{setFeatureAttributes}(\features{}[\var{fid}], \interval{t_n}{t_m}, 
+        \var{name}, \var{type}, \var{parentGroupID}),\\
+        {\groups{}[\var{parentGroupID]}} \assign 
+        \var{addChildFeature}(\groups{}[\var{parentGroupID}], \interval{t_n}{t_m}, \var{fid}))
     }
     \end{array}$$
     \caption{\label{rule:add-feature}}
@@ -50,9 +53,9 @@ compatibleTypes(_, _) = True
   \begin{minted}[escapeinside=||]{text}
 setFeatureAttributes(|$(F_e, F_n, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, name, type, parentGroupID)
   = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
-    , |$F_n$|[|$\interval{t_{start}}{t_{end}}$|] |$\leftarrow$| name
-    , |$F_t$|[|$\interval{t_{start}}{t_{end}}$|] |$\leftarrow$| type
-    , |$F_p$|[|$\interval{t_{start}}{t_{end}}$|] |$\leftarrow$| parentGroupID
+    , |$F_n$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| name
+    , |$F_t$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| type
+    , |$F_p$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| parentGroupID
     , |$F_c$| |$)$|
      \end{minted}
   \caption{\label{fun:set-feature-attributes}}
@@ -61,18 +64,57 @@ setFeatureAttributes(|$(F_e, F_n, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{en
 \begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
 addChildFeature(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, fid)
-  = |$($| |$G_e, G_t, G_p$|
-    , |$G_c \cup \intervalmapping{t_{start}}{t_{end}}{\var{fid}}$| |$)$|
+  = |$\left(G_e, G_t, G_p , G_c \interval{t_{start}}{t_{end}} \addassign \var{fid}\right)$|
   \end{minted}
   \caption{\label{fun:add-child-feature}}
 \end{figure}
 
 
-\todo{Find a way to express that there are no intervals in $F_e$ overlapping $\interval{t_n}{t_m}$}
+\subsection{Add group rule}
+\label{sub:add-group-rule}
+The rule in figure \vref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval $\interval{t_n}{t_m}$. The group must not already exist in the plan during the interval $\interval{t_n}{t_m} \notinnr G_e$, and the parent feature must exist for the duration of the interval $\interval{t_n}{t_m} \inn F_e$. The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map.
 
-
-
-\begin{figure}
-  
+\begin{figure}[!h]
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Add-Group}
+      {\\
+        \interval{t_n}{t_m} \notinnr G_e \qquad \interval{t_n}{t_m} \inn F_e \\
+        \lookup{\groups{}}{\var{groupID}} = (G_e,\, G_t,\, G_p,\, G_c ) \\
+        \lookup{\features{}}{\var{parentFeatureID}} = (F_e,\, F_n,\, F_t,\, F_p,\, F_c ) 
+      }
+      {
+        \textbf{addGroup}( \var{groupID}, \var{type}, \var{parentFeatureID} ) \text{ at } \interval{t_n}{t_m} \shove \\
+        ( \names{}, \features{}, \groups{} ) \\
+        \transition \\
+        (\names{}, \\
+        \lookup{\features{}}{\var{parentFeatureID}} \assign (F_e,\, F_n,\, F_t,\, F_p ,\, F_c \cup \intervalmapping{t_n}{t_m}{\var{groupID}} ), \\ 
+      {\lookup{\groups{}}{\var{groupID}}} \assign 
+             \var{setGroupAttributes}( \lookup{\groups{}}{\var{groupID}}, \var{type}, \var{parentFeatureID} )  )
+      }
+    \end{array}$$
   \caption{\label{rule:add-group}}
 \end{figure}
+
+\begin{figure}[ht]
+  \begin{minted}[escapeinside=||]{text}
+setGroupAttributes(|$(F_e, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, type, parentFeatureID)
+  = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
+    , |$F_n$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| name
+    , |$F_t$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| type
+    , |$F_p$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| parentFeatureID
+    , |$F_c$| |$)$|
+     \end{minted}
+  \caption{\label{fun:set-group-attributes}}
+\end{figure}
+
+\todo{create \var{addChildGroup} function}
+
+\begin{figure}[ht]
+  \begin{minted}[escapeinside=||]{text}
+addChildGroup|$\left(\left(F_e, F_n, F_t, F_p, F_c \right), \,\interval{t_{start}}{t_{end}}, \, \var{gid}\right)$|
+  = |$\left(F_e,\, F_n,\, F_t,\, F_p,\, F_c \interval{t_{start}}{t_{end}} \addassign \var{gid}\right)$|
+  \end{minted}
+  \caption{\label{fun:add-child-group}}
+\end{figure}
+

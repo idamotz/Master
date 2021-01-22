@@ -66,3 +66,24 @@ Noe annet som jeg må ta stilling til på et tidspunkt, er om jeg vil introduser
   - to operasjoner påvirker samme ting 
   - å sjekke hver av dem isolert vil føre til paradoks
   - sammen fører de ikke til paradoks
+
+## Meeting 21 January
+
+- Have to make sure that the concept is properly explained; that plans happen in the _future_, and that I'm analysing _modifications_ and not the plans themselves.
+- Use examples (make sure to make illustrations, not just syntactic representations)
+- Create a small example each time I introduce a concept (for scoping in particular). Maybe one with a paradox and one without a paradox?
+- Storytelling is important
+- Should implement, nice to have a proof of concept
+- Make explicit that this is soundness of _modifications_, not plans (in contrast to previous work)!
+- Prioritize semantics and proof until February
+- Spend March implementing
+
+## 21. januar notater
+Clamp interval (when removing child features etc)
+
+Goal: change $\{[[t_m, t_n] \mapsto \{\texttt{childFeatureID}\} \cup rest]\}$ to
+$\{[[t_m, t_n) \mapsto rest] \cup \{[[t_m, t_k) \mapsto  \{\texttt{childFeatureID}\}\}$
+
+1. Find mapping containing time point and child feature
+2. Remove mapping/remove child feature from value set
+3. Insert child feature at $[t_m, t_k)$
