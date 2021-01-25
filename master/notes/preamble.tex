@@ -37,6 +37,13 @@
 \newcommand{\groups}{\map{groups}{}}
 \newcommand{\names}{\map{names}}
 
+
+%%------------------------------------------------------------------------
+%% INTERVALS
+%%------------------------------------------------------------------------
+
+\newcommand{\clamp}[3]{\left\langle #1 \right\rangle^{#3}_{#2}}
+
 %%------------------------------------------------------------------------
 %% MAPS
 %%------------------------------------------------------------------------
@@ -58,8 +65,11 @@
 \newcommand{\innr}{\in_{\leq\!\!\!\!\geq}}
 \newcommand{\notinnr}{\notin_{\leq\!\!\!\!\geq}}
 
-\newcommand{\removekey}{\setminus}
-\newcommand{\removekeyvalue}[1]{\setminus^{#1}}
+\newcommand{\remove}{\setminus}
+\newcommand{\removevalue}[1]{\remove^{#1}}
+
+\newcommand{\containing}[2]{{\lookup{#1}{#2}}_{\leq}}
+\newcommand{\containingvalue}[3]{{\lookup{#1}{#2}^{#3}_{\leq}}}
 
 %%------------------------------------------------------------------------
 %% SOS rules
@@ -71,7 +81,7 @@
 
 \newcommand{\ntyperule}[3]{
   \begin{array}{c}
-    \textbf{\textsc{({#1})}} \\
+    \textsc{\textbf{({#1})}} \\
     #2 \\[0pt]
     \hline\\[-8pt]
     #3

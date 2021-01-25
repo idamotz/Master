@@ -7,28 +7,28 @@
 \subsection{Add feature rule}
 \label{sub:add-feature-rule}
 
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Add-Feature}
       {\\
         \interval{t_n}{t_m} \not \innr F_e \qquad
         \interval{t_n}{t_m} \inn G_e \qquad
-        \names{}[\var{name}]\interval{t_n}{t_m} = \emptyset \\
-        \features{}[\var{fid}] = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right) \\
-        \groups{}[\var{parentGroupID}] = \left(G_e,\, G_t , \, G_p,\, G_c \right)\\
+        \lookup{\names{}}{\var{name}}\interval{t_n}{t_m} = \emptyset \\
+        \lookup{\features{}}{\var{fid}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right) \\
+        \lookup{\groups{}}{\var{parentGroupID}} = \left(G_e,\, G_t , \, G_p,\, G_c \right)\\
         \forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
       }
       {
         \textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \shove \\
          (\names{}, \features{}, \groups{})\\
         \transition\\
-        (\names{}[\var{name}]\interval{t_n}{t_m} \assign \var{fid},  \\
-        {\features{}[\var{fid}]} \assign 
-        \var{setFeatureAttributes}(\features{}[\var{fid}], \interval{t_n}{t_m}, 
+        (\lookup{\names{}}{\var{name}}\interval{t_n}{t_m} \assign \var{fid},  \\
+        {\lookup{\features{}}{\var{fid}}} \assign 
+        \var{setFeatureAttributes}(\lookup{\features{}}{\var{fid}}, \interval{t_n}{t_m}, 
         \var{name}, \var{type}, \var{parentGroupID}),\\
-        {\groups{}[\var{parentGroupID]}} \assign 
-        \var{addChildFeature}(\groups{}[\var{parentGroupID}], \interval{t_n}{t_m}, \var{fid}))
+        {\lookup{\groups{}}{\var{parentGroupID}}} \assign 
+        \var{addChildFeature}(\lookup{\groups{}}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{fid}))
     }
     \end{array}$$
     \caption{\label{rule:add-feature}}
@@ -36,11 +36,11 @@
 
 Figure \vref{rule:add-feature}  describes the semantics of the \textbf{addFeature} operation. 
 To add a feature during the interval $\interval{t_n}{t_m}$, its ID cannot exist exist during the interval ($\interval{t_n}{t_m} \not \innr F_e$). The parent feature must exist ($\interval{t_n}{t_m} \inn G_e$), and the types it has during the interval must be compatible with the type of the 
-added feature ($\forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must be available during the interval ($\names{}[\var{name}]\interval{t_n}{t_m} = \emptyset$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. 
+added feature ($\forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must be available during the interval ($\lookup{\names{}}{\var{name}}\interval{t_n}{t_m} = \emptyset$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. 
 
 To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (Figure \vref{fun:compatible-types}), $\var{setFeatureAttributes}$ (Figure \vref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (Figure \vref{fun:add-child-feature}). 
 
-\begin{figure}[h]
+\begin{figure}
   \begin{minted}{text}
 compatibleTypes(AND, _) = True
 compatibleTypes(_, optional) = False
@@ -49,19 +49,19 @@ compatibleTypes(_, _) = True
   \caption{\label{fun:compatible-types}}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
   \begin{minted}[escapeinside=||]{text}
 setFeatureAttributes(|$(F_e, F_n, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, name, type, parentGroupID)
   = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
-    , |$F_n$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| name
-    , |$F_t$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| type
-    , |$F_p$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| parentGroupID
-    , |$F_c$| |$)$|
+    , |$F_n \interval{t_{start}}{t_{end}}$|] |$\assign$| name
+    , |$F_t \interval{t_{start}}{t_{end}}$|] |$\assign$| type
+    , |$F_p \interval{t_{start}}{t_{end}}$|] |$\assign$| parentGroupID
+    , |$F_c \ )$|
      \end{minted}
   \caption{\label{fun:set-feature-attributes}}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
   \begin{minted}[escapeinside=||]{text}
 addChildFeature(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, fid)
   = |$\left(G_e, G_t, G_p , G_c \interval{t_{start}}{t_{end}} \addassign \var{fid}\right)$|
@@ -74,7 +74,7 @@ addChildFeature(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, fid
 \label{sub:add-group-rule}
 The rule in figure \vref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval $\interval{t_n}{t_m}$. The group must not already exist in the plan during the interval $\interval{t_n}{t_m} \notinnr G_e$, and the parent feature must exist for the duration of the interval $\interval{t_n}{t_m} \inn F_e$. The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map.
 
-\begin{figure}[!h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Add-Group}
@@ -96,21 +96,20 @@ The rule in figure \vref{rule:add-group} describes the conditions which must be 
   \caption{\label{rule:add-group}}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}
   \begin{minted}[escapeinside=||]{text}
-setGroupAttributes(|$(F_e, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, type, parentFeatureID)
-  = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
-    , |$F_n$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| name
-    , |$F_t$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| type
-    , |$F_p$|[|$\interval{t_{start}}{t_{end}}$|] |$\assign$| parentFeatureID
-    , |$F_c$| |$)$|
+setGroupAttributes(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, type, parentFeatureID)
+  = |$($| |$G_e \cup \interval{t_{start}}{t_{end}}$|
+    , |$G_t \interval{t_{start}}{t_{end}}$| |$\assign$| type
+    , |$G_p \interval{t_{start}}{t_{end}}$| |$\assign$| parentFeatureID
+    , |$G_c )$|
      \end{minted}
   \caption{\label{fun:set-group-attributes}}
 \end{figure}
 
 \todo{create \var{addChildGroup} function}
 
-\begin{figure}[ht]
+\begin{figure}
   \begin{minted}[escapeinside=||]{text}
 addChildGroup|$\left(\left(F_e, F_n, F_t, F_p, F_c \right), \,\interval{t_{start}}{t_{end}}, \, \var{gid}\right)$|
   = |$\left(F_e,\, F_n,\, F_t,\, F_p,\, F_c \interval{t_{start}}{t_{end}} \addassign \var{gid}\right)$|
@@ -118,3 +117,197 @@ addChildGroup|$\left(\left(F_e, F_n, F_t, F_p, F_c \right), \,\interval{t_{start
   \caption{\label{fun:add-child-group}}
 \end{figure}
 
+\subsection{Remove feature rule}
+Figure \vref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{featureID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ map $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($F_c \interval{t_{n}}{t_{e_2}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the temporal feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$. 
+\\
+\todo{Describe how time points can be viewed as intervals covering a single point in time}
+
+\begin{figure}
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Remove-Feature}
+      {\\
+        \containing{F_e}{t_n} = \big\{\interval{t_{e_1}}{t_{e_2}}\big\} \qquad
+        F_c \interval{t_{n}}{t_{e_2}} = \emptyset \\
+        F_n \interval{t_n}{t_{e_2}} = \{\var{name}\} \qquad
+        F_t \interval{t_n}{t_{e_2}} = \{\var{type}\} \qquad
+        F_p \interval{t_n}{t_{e_2}} = \{\var{parentGoupID}\} \\
+        \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right) \\
+        \lookup{\groups{}}{\var{parentGroupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
+      }
+      {
+        \textbf{removeFeature}\left( \var{featureID}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        \big(\lookup{\names{}}{\var{name}} \assign \var{clampInterval}(\lookup{\names{}}{\var{name}}, t_n),\\
+        \lookup{\features{}}{\var{featureID}} \assign \var{clampFeature}(\lookup{\features{}}{\var{featureID}}, t_n) ,\\
+        \lookup{\groups{}}{\var{parentGroupID}} \assign \left( G_e,\, G_t,\, G_p,\, \var{clampIntervalValue}(G_c, t_n, \var{featureID})\right)\big)
+      }
+    \end{array}$$
+  \caption{\label{rule:remove-feature}}
+\end{figure}
+
+\begin{figure}
+  \begin{minted}[escapeinside=||]{text}
+clampInterval|$\left( \map{map}, \, t_c \right)$|
+  = let |$\left\{\interval{t_{start}}{t_{end}}\right\} \assign \containing{\map{map}}{t_c}$|
+        |$\{v\} \assign \lookup{\map{map}}{t_c}$|
+        |$\map{map}' \assign \map{map} \remove \interval{t_{start}}{t_{end}}$|
+     in |$\map{map}' \interval{t_{start}}{t_c} \assign v$|
+  \end{minted}
+  \caption{\label{fun:clamp-interval}}
+\end{figure}
+
+\begin{figure}
+  \begin{minted}[escapeinside=||]{text}
+clampIntervalValue|$\left( \map{map}, \, t_c ,\, v\right)$|
+  = let |$\left\{\interval{t_{start}}{t_{end}}\right\} \assign \containingvalue{\map{map}}{t_c}{v}$|
+        |$\map{map}' \assign \map{map} \removevalue{v} \interval{t_{start}}{t_{end}}$|
+     in |$\map{map}' \interval{t_{start}}{t_c} \addassign v$|
+  \end{minted}
+  \caption{\label{fun:clamp-interval-value}}
+\end{figure}
+
+\begin{figure}
+  \begin{minted}[escapeinside=||]{text}
+clampSetInterval|$\left( \map{IS}, \, t_c \right)$|
+  = let |$\left\{\interval{t_{start}}{t_{end}}\right\} \assign \containing{\map{IS}}{t_c}$|
+        |$\map{IS}' \assign \map{IS} \remove \interval{t_{start}}{t_{end}}$|
+     in |$\map{IS}' \cup \{\interval{t_{start}}{t_c}\}$|
+  \end{minted}
+  \caption{\label{fun:clamp-interval-set}}
+\end{figure}
+
+\begin{figure}
+  \begin{minted}[escapeinside=||]{text}
+clampFeature|$\left((F_e, F_n, F_t, F_p, F_c), \, t_c \right)$|
+  = |$(\var{clampSetInterval}(F_e, t_c)  $|
+    |$, \var{clampInterval}(F_n, t_c)$|
+    |$, \var{clampInterval}(F_t, t_c)$|
+    |$, \var{clampInterval}(F_p, t_c)$|
+    |$, F_c)$|
+  \end{minted}
+  \caption{\label{fun:clamp-feature}}
+\end{figure}
+
+\subsection{Remove group rule}
+\label{sub:remove-group-rule}
+\todo{explain}
+
+\begin{figure}
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Remove-Group}
+      {\\
+        \containing{G_e}{t_n} = \big\{\interval{t_{e_1}}{t_{e_2}}\big\} \qquad
+        G_c \interval{t_{n}}{t_{e_2}} = \emptyset \\
+        G_t \interval{t_n}{t_{e_2}} = \{\var{type}\} \qquad
+        G_p \interval{t_n}{t_{e_2}} = \{\var{parentFeatureID}\} \\
+        \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right) \\
+        \lookup{\features{}}{\var{parentFeatureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
+      }
+      {
+        \textbf{removeGroup}\left( \var{groupID}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        \big(\lookup{\names{}}{\var{name}} \assign \var{clampInterval}(\lookup{\names{}}{\var{name}}, t_n),\\
+          \lookup{\features{}}{\var{parentFeatureID}} \assign \left(F_e, \, F_n, \, F_t, \, F_p, \, \var{clampIntervalValue}(F_c, t_n, \var{groupID})\right) ,\\
+        \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}(\lookup{\groups{}}{\var{groupID}}, t_n) \big)
+      }
+    \end{array}$$
+  \caption{\label{rule:remove-group}}
+\end{figure}
+
+
+\begin{figure}
+  \begin{minted}[escapeinside=||]{text}
+clampGroup|$\left((G_e, G_t, G_p, G_c), \, t_c \right)$|
+  = |$(\var{clampSetInterval}(G_e)  $|
+    |$, \var{clampInterval}(G_t, t_c)$|
+    |$, \var{clampInterval}(G_p, t_c)$|
+    |$, G_c)$|
+  \end{minted}
+  \caption{\label{fun:clamp-group}}
+\end{figure}
+
+\subsection{Move feature rule}
+\label{sub:move-feature-rule}
+
+\todo{This is hard}
+
+\subsection{Move group rule}
+\label{sub:move-group-rule}
+
+\todo{This is hard}
+
+\subsection{Change feature variation type rule}
+\label{sub:change-feature-variation-type-rule}
+\todo{A lot missing (well-formed parent group types}
+
+\begin{figure}
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Change-Feature-Variation-Type}
+      {\\
+        \containing{F_t}{t_n} = \{\interval{t_{t_1}}{t_{t_2}}\}
+        \\
+        F_p \interval{t_n}{t_{t_2}} = \var{parentGroupIDs} \\
+        \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
+      }
+      {
+        \textbf{changeFeatureVariationType}\left( \var{featureID}, \var{type}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        (\names{}, \features{}, \groups{})
+      }
+    \end{array}$$
+  \caption{\label{rule:change-feature-varation-type}}
+\end{figure}
+
+\subsection{Change group variation type rule}
+\label{sub:change-group-variation-type-rule}
+\todo{A lot missing (well-formed child feature types}
+
+\begin{figure}
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Change-Group-Variation-Type}
+      {\\
+        t_n \inn G_e\\
+        \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
+      }
+      {
+        \textbf{changeGroupVariationType}\left( \var{groupID}, \var{type}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        (\names{}, \features{}, \\
+        \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, \var{clampInterval}(G_t, t_n) \interval{t_n}{t_{t_2}} \assign \var{type},\, G_p,\, G_c \right))
+      }
+    \end{array}$$
+  \caption{\label{rule:change-group-varation-type}}
+\end{figure}
+
+\subsection{Change feature name}
+\label{sub:change-feature-name}
+
+\begin{figure}
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Change-Feature-Name}
+      {\\
+        \lookup{F_n}{t_n} = \{\var{oldName}\} \qquad
+        \containing{F_n}{t_n} = \{\interval{t_{n_1}}{t_{n_2}}\} \\
+        \lookup{\names{}}{\var{name}}\interval{t_n}{t_{n_2}} = \emptyset \\
+        \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
+      }
+      {
+        \textbf{changeFeatureName}\left( \var{featureID}, \var{name}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        (\lookup{\left(\lookup{\names{}}{\var{name}}\interval{t_n}{t_{n_2}} \assign \var{featureID}\right)}{\var{oldName}} \assign \var{clampInterval}(\lookup{\names}{\var{oldName}}, t_n), \\
+        \lookup{\features{}}{\var{featureID}} \assign \left( F_e,\, \var{clampInterval}(F_n, t_n)\interval{t_n}{t_{n_2}} \assign \var{name},\, F_t,\, F_p,\, F_c \right), \\
+        \groups{})
+      }
+    \end{array}$$
+  \caption{\label{rule:change-feature-name}}
+\end{figure}
