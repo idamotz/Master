@@ -249,19 +249,33 @@ clampGroup|$\left((G_e, G_t, G_p, G_c), \, t_c \right)$|
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Variation-Type}
       {\\
-        \containing{F_t}{t_n} = \{\interval{t_{t_1}}{t_{t_2}}\}
+        \containing{F_t}{t_n} = \{\interval{t_{t_1}}{t_{t_2}}\} % Temporal scope = [t_n, t_t_2)
         \\
-        F_p \interval{t_n}{t_{t_2}} = \var{parentGroupIDs} \\
+        \forall \interval{t_{p_1}}{t_{p_2}}_{\in \overlapping{F_p}{t_n}{t_{t_2}}} % for all parent intervals overlapping the temporal scope
+        \forall p_{\in F_p \interval{t_{p_1}}{t_{p_2}}} % for all parent groups (always exactly one) in the parent interval
+        \forall t_{\in \, \var{getTypes}\left(p, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)}
+        \big(\var{compatibleTypes}(t, \var{type})\big)\\
         \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
       }
       {
         \textbf{changeFeatureVariationType}\left( \var{featureID}, \var{type}\right) \text{ at } t_n \shove \\
         (\names{}, \features{}, \groups{}) \\
         \transition \\
-        (\names{}, \features{}, \groups{})
+        (\names{}, \\
+        \lookup{\features{}}{\var{featureID}} \assign \left( F_e,\, F_n,\, 
+        \var{clampInterval}(F_t, t_n)\interval{t_n}{t_{t_2}} \assign \var{type},\, F_p,\, F_c \right),
+        \\ \groups{})
       }
     \end{array}$$
   \caption{\label{rule:change-feature-varation-type}}
+\end{figure}
+
+\begin{figure}
+  \begin{minted}[escapeinside=||]{text}
+getTypes|$\left((G_e, G_t, G_p, G_c), \, \interval{t_n}{t_m} \right) = G_t \interval{t_n}{t_m}$|
+getTypes|$\left((F_e, F_n, F_t, F_p, F_c), \, \interval{t_n}{t_m} \right) = G_t \interval{t_n}{t_m}$|
+  \end{minted}
+  \caption{\label{get-types}}
 \end{figure}
 
 \subsection{Change group variation type rule}
@@ -273,7 +287,12 @@ clampGroup|$\left((G_e, G_t, G_p, G_c), \, t_c \right)$|
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Group-Variation-Type}
       {\\
-        t_n \inn G_e\\
+        \containing{G_t}{t_n} = \{\interval{t_{t_1}}{t_{t_2}}\} % Temporal scope = [t_n, t_t_2)
+        \\
+        \forall \interval{t_{c_1}}{t_{c_2}}_{\in \overlapping{G_c}{t_n}{t_{t_2}}} % for all parent intervals overlapping the temporal scope
+        \forall c_{\in \, \bigcup G_c \interval{t_{c_1}}{t_{c_2}}} % for all child features in the child interval
+        \forall t_{\in \, \var{getTypes}\left(c, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right)} % for all the types of the child features during the temporal scope
+        \big(\var{compatibleTypes}(\var{type}, t)\big)\\
         \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
       }
       {

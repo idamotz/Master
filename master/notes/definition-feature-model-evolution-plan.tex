@@ -37,7 +37,7 @@ That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, w
 \label{subsub:intervals}
 To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. The intervals are always used to give information about when something is true in the temporal feature model. This will be further explained in subsections \ref{subsub:mapping-names}, \ref{subsub:mapping-features}. 
 
-For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$ 
+For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{max(t_{start}, t_l)}{min(t_{end}, t_r)}$
 
 \subsubsection{Interval maps}
 \label{subsub:interval-maps}
@@ -55,6 +55,8 @@ An interval map is a map where the key is an interval (section \vref{subsub:inte
 \end{figure}
 
 $\containing{\map{IM}}{t_n}$ returns the set of keys containing time point $t_n$. For interval maps with non-overlapping keys, the will contain at most one element. For interval maps with set values, we define an additional function $\containingvalue{\map{IM}}{t_n}{v}$ where $v$ is some value, returning the set of the keys containing $t_n$ and associated with a set containing $v$. 
+
+We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns all the interval keys in the map $\map{IM}$ overlapping the interval $\interval{t_n}{t_m}$. See section \vref{subsub:interval-sets} for definition of overlapping intervals. 
 
 \subsubsection{Interval sets}
 \label{subsub:interval-sets}
