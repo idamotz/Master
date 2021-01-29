@@ -127,11 +127,11 @@ Figure \vref{rule:remove-feature} shows the semantics of removing a feature with
     \sossize$$\begin{array}{c}
       \ntyperule{Remove-Feature}
       {\\
-        \containing{F_e}{t_n} = \big\{\interval{t_{e_1}}{t_{e_2}}\big\} \qquad
+        \containing{F_e}{t_n} = \set{\interval{t_{e_1}}{t_{e_2}}} \qquad
         F_c \interval{t_{n}}{t_{e_2}} = \emptyset \\
-        F_n \interval{t_n}{t_{e_2}} = \{\var{name}\} \qquad
-        F_t \interval{t_n}{t_{e_2}} = \{\var{type}\} \qquad
-        F_p \interval{t_n}{t_{e_2}} = \{\var{parentGoupID}\} \\
+        F_n \interval{t_n}{t_{e_2}} = \set{\var{name}} \qquad
+        F_t \interval{t_n}{t_{e_2}} = \set{\var{type}} \qquad
+        F_p \interval{t_n}{t_{e_2}} = \set{\var{parentGoupID}} \\
         \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right) \\
         \lookup{\groups{}}{\var{parentGroupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
       }
@@ -150,8 +150,8 @@ Figure \vref{rule:remove-feature} shows the semantics of removing a feature with
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
 clampInterval|$\left( \map{map}, \, t_c \right)$|
-  = let |$\left\{\interval{t_{start}}{t_{end}}\right\} \assign \containing{\map{map}}{t_c}$|
-        |$\{v\} \assign \lookup{\map{map}}{t_c}$|
+  = let |$\left\set{\interval{t_{start}}{t_{end}}\right} \assign \containing{\map{map}}{t_c}$|
+        |$\set{v} \assign \lookup{\map{map}}{t_c}$|
         |$\map{map}' \assign \map{map} \remove \interval{t_{start}}{t_{end}}$|
      in |$\map{map}' \interval{t_{start}}{t_c} \assign v$|
   \end{minted}
@@ -161,7 +161,7 @@ clampInterval|$\left( \map{map}, \, t_c \right)$|
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
 clampIntervalValue|$\left( \map{map}, \, t_c ,\, v\right)$|
-  = let |$\left\{\interval{t_{start}}{t_{end}}\right\} \assign \containingvalue{\map{map}}{t_c}{v}$|
+  = let |$\left\set{\interval{t_{start}}{t_{end}}\right} \assign \containingvalue{\map{map}}{t_c}{v}$|
         |$\map{map}' \assign \map{map} \removevalue{v} \interval{t_{start}}{t_{end}}$|
      in |$\map{map}' \interval{t_{start}}{t_c} \addassign v$|
   \end{minted}
@@ -171,9 +171,9 @@ clampIntervalValue|$\left( \map{map}, \, t_c ,\, v\right)$|
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
 clampSetInterval|$\left( \map{IS}, \, t_c \right)$|
-  = let |$\left\{\interval{t_{start}}{t_{end}}\right\} \assign \containing{\map{IS}}{t_c}$|
+  = let |$set{\interval{t_{start}}{t_{end}}} \assign \containing{\map{IS}}{t_c}$|
         |$\map{IS}' \assign \map{IS} \remove \interval{t_{start}}{t_{end}}$|
-     in |$\map{IS}' \cup \{\interval{t_{start}}{t_c}\}$|
+     in |$\map{IS}' \cup \set{\interval{t_{start}}{t_c}}$|
   \end{minted}
   \caption{\label{fun:clamp-interval-set}}
 \end{figure}
@@ -199,10 +199,10 @@ clampFeature|$\left((F_e, F_n, F_t, F_p, F_c), \, t_c \right)$|
     \sossize$$\begin{array}{c}
       \ntyperule{Remove-Group}
       {\\
-        \containing{G_e}{t_n} = \big\{\interval{t_{e_1}}{t_{e_2}}\big\} \qquad
+        \containing{G_e}{t_n} = \set{\interval{t_{e_1}}{t_{e_2}}} \qquad
         G_c \interval{t_{n}}{t_{e_2}} = \emptyset \\
-        G_t \interval{t_n}{t_{e_2}} = \{\var{type}\} \qquad
-        G_p \interval{t_n}{t_{e_2}} = \{\var{parentFeatureID}\} \\
+        G_t \interval{t_n}{t_{e_2}} = \set{\var{type}} \qquad
+        G_p \interval{t_n}{t_{e_2}} = \set{\var{parentFeatureID}} \\
         \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right) \\
         \lookup{\features{}}{\var{parentFeatureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
       }
@@ -242,14 +242,14 @@ clampGroup|$\left((G_e, G_t, G_p, G_c), \, t_c \right)$|
 
 \subsection{Change feature variation type rule}
 \label{sub:change-feature-variation-type-rule}
-\todo{A lot missing (well-formed parent group types}
+The rule in figure \vref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{featureID}$ at time $t_n$. The first expression above the line ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. The next line may be hard to read, but its intent is easier to understand. It checks that all the types a parent group has \emph{while it is the parent of the feature} has a type which is compatible with the new type of the feature. If everything above the line is true, then the $\features{}$ map is updated at $\var{featureID}$ by shortening the interval key for the original type at $t_n$, and assigning the new type to the affected interval $\interval{t_n}{t_{t_2}}$. 
 
 \begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Variation-Type}
       {\\
-        \containing{F_t}{t_n} = \{\interval{t_{t_1}}{t_{t_2}}\} % Temporal scope = [t_n, t_t_2)
+        \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \forall \interval{t_{p_1}}{t_{p_2}}_{\in \overlapping{F_p}{t_n}{t_{t_2}}} % for all parent intervals overlapping the temporal scope
         \forall p_{\in F_p \interval{t_{p_1}}{t_{p_2}}} % for all parent groups (always exactly one) in the parent interval
@@ -280,14 +280,14 @@ getTypes|$\left((F_e, F_n, F_t, F_p, F_c), \, \interval{t_n}{t_m} \right) = G_t 
 
 \subsection{Change group variation type rule}
 \label{sub:change-group-variation-type-rule}
-\todo{A lot missing (well-formed child feature types}
+The rule in figure \vref{rule:change-group-varation-type} is similar to the \textbf{changeFeatureVariationType} rule in figure \vref{rule:change-feature-varation-type}, and shows the semantics of changing the type of a group. In a similar way to the aforementioned \textbf{changeFeatureVariationType} rule, it verifies that the types of all the child groups during the affected interval are compatible with the new group type.
 
 \begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Group-Variation-Type}
       {\\
-        \containing{G_t}{t_n} = \{\interval{t_{t_1}}{t_{t_2}}\} % Temporal scope = [t_n, t_t_2)
+        \containing{G_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \forall \interval{t_{c_1}}{t_{c_2}}_{\in \overlapping{G_c}{t_n}{t_{t_2}}} % for all parent intervals overlapping the temporal scope
         \forall c_{\in \, \bigcup G_c \interval{t_{c_1}}{t_{c_2}}} % for all child features in the child interval
@@ -309,13 +309,15 @@ getTypes|$\left((F_e, F_n, F_t, F_p, F_c), \, \interval{t_n}{t_m} \right) = G_t 
 \subsection{Change feature name}
 \label{sub:change-feature-name}
 
+The semantics of changing the name of a feature are shown in the \rulefont{Change-Feature-Name} rule in figure \vref{rule:change-feature-name}. The old name and the next planned name change are identified on the first line ($\lookup{F_n}{t_n} = \set{\var{oldName}}$ and $\containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}$ respectively). Since the name must not be in use during the temporal scope, we verify that looking up the new name in the $\names{}$ map returns an empty set. The $\names{}$ map is updated by shortening the interval for the old name to end at $t_n$, and assigning the feature ID to the new name during the temporal scope. Furthermore, the $\features{}$ map is updated at the feature ID, shortening the interval for the old name and assigning the new name to the temporal scope. 
+
 \begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Name}
       {\\
-        \lookup{F_n}{t_n} = \{\var{oldName}\} \qquad
-        \containing{F_n}{t_n} = \{\interval{t_{n_1}}{t_{n_2}}\} \\
+        \lookup{F_n}{t_n} = \set{\var{oldName}} \qquad
+        \containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}} \\
         \lookup{\names{}}{\var{name}}\interval{t_n}{t_{n_2}} = \emptyset \\
         \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
       }
