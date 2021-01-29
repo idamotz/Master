@@ -51,7 +51,8 @@ compatibleTypes(_, _) = True
 
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
-setFeatureAttributes(|$(F_e, F_n, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, name, type, parentGroupID)
+setFeatureAttributes(|$(F_e, F_n, F_t, F_p, F_c)$|, |$\interval{t_{start}}{t_{end}}$|, name, type
+                    , parentGroupID)
   = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
     , |$F_n \interval{t_{start}}{t_{end}}$|] |$\assign$| name
     , |$F_t \interval{t_{start}}{t_{end}}$|] |$\assign$| type
@@ -98,7 +99,8 @@ The rule in figure \vref{rule:add-group} describes the conditions which must be 
 
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
-setGroupAttributes(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, type, parentFeatureID)
+setGroupAttributes(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, type
+                  , parentFeatureID)
   = |$($| |$G_e \cup \interval{t_{start}}{t_{end}}$|
     , |$G_t \interval{t_{start}}{t_{end}}$| |$\assign$| type
     , |$G_p \interval{t_{start}}{t_{end}}$| |$\assign$| parentFeatureID
@@ -106,8 +108,6 @@ setGroupAttributes(|$(G_e, G_t, G_p, G_c)$|, |$\interval{t_{start}}{t_{end}}$|, 
      \end{minted}
   \caption{\label{fun:set-group-attributes}}
 \end{figure}
-
-\todo{create \var{addChildGroup} function}
 
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
@@ -150,7 +150,7 @@ Figure \vref{rule:remove-feature} shows the semantics of removing a feature with
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
 clampInterval|$\left( \map{map}, \, t_c \right)$|
-  = let |$\left\set{\interval{t_{start}}{t_{end}}\right} \assign \containing{\map{map}}{t_c}$|
+  = let |$\set{\interval{t_{start}}{t_{end}}} \assign \containing{\map{map}}{t_c}$|
         |$\set{v} \assign \lookup{\map{map}}{t_c}$|
         |$\map{map}' \assign \map{map} \remove \interval{t_{start}}{t_{end}}$|
      in |$\map{map}' \interval{t_{start}}{t_c} \assign v$|
@@ -161,7 +161,7 @@ clampInterval|$\left( \map{map}, \, t_c \right)$|
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
 clampIntervalValue|$\left( \map{map}, \, t_c ,\, v\right)$|
-  = let |$\left\set{\interval{t_{start}}{t_{end}}\right} \assign \containingvalue{\map{map}}{t_c}{v}$|
+  = let |$\set{\interval{t_{start}}{t_{end}}} \assign \containingvalue{\map{map}}{t_c}{v}$|
         |$\map{map}' \assign \map{map} \removevalue{v} \interval{t_{start}}{t_{end}}$|
      in |$\map{map}' \interval{t_{start}}{t_c} \addassign v$|
   \end{minted}
@@ -253,7 +253,7 @@ The rule in figure \vref{rule:change-feature-varation-type} shows the semantics 
         \\
         \forall \interval{t_{p_1}}{t_{p_2}}_{\in \overlapping{F_p}{t_n}{t_{t_2}}} % for all parent intervals overlapping the temporal scope
         \forall p_{\in F_p \interval{t_{p_1}}{t_{p_2}}} % for all parent groups (always exactly one) in the parent interval
-        \forall t_{\in \, \var{getTypes}\left(p, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)}
+        \forall t_{\in \, \var{getTypes}\left(\lookup{\groups}{p}, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)}
         \big(\var{compatibleTypes}(t, \var{type})\big)\\
         \lookup{\features{}}{\var{featureID}} = \left( F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
       }
@@ -291,7 +291,7 @@ The rule in figure \vref{rule:change-group-varation-type} is similar to the \tex
         \\
         \forall \interval{t_{c_1}}{t_{c_2}}_{\in \overlapping{G_c}{t_n}{t_{t_2}}} % for all parent intervals overlapping the temporal scope
         \forall c_{\in \, \bigcup G_c \interval{t_{c_1}}{t_{c_2}}} % for all child features in the child interval
-        \forall t_{\in \, \var{getTypes}\left(c, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right)} % for all the types of the child features during the temporal scope
+        \forall t_{\in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right)} % for all the types of the child features during the temporal scope
         \big(\var{compatibleTypes}(\var{type}, t)\big)\\
         \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
       }
