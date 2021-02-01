@@ -35,7 +35,7 @@ That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, w
 
 \subsubsection{Intervals}
 \label{subsub:intervals}
-To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. The intervals are always used to give information about when something is true in the temporal feature model. This will be further explained in subsections \ref{subsub:mapping-names}, \ref{subsub:mapping-features}. 
+To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. The intervals are always used to give information about when something is true in the temporal feature model. This will be further explained in subsections \ref{subsub:mapping-names}, \ref{subsub:mapping-features}. Single time points $t_n$ may be viewed as intervals containing only the time point $t_n$
 
 For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{max(t_{start}, t_l)}{min(t_{end}, t_r)}$
 
