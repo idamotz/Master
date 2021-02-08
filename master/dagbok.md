@@ -87,3 +87,13 @@ $\{[[t_m, t_n) \mapsto rest] \cup \{[[t_m, t_k) \mapsto  \{\texttt{childFeatureI
 1. Find mapping containing time point and child feature
 2. Remove mapping/remove child feature from value set
 3. Insert child feature at $[t_m, t_k)$
+
+### 2. februar
+
+For TUBS meeting: Think about what they can contribute, what part of the thesis. 
+
+The thesis will need examples. 
+
+Present a big example: Use the tree structure, show what you can detect. Show what the scope of an error is. 
+
+A small and specific change in a huge plan, show how the scope and representation minimize the problem 
