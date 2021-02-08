@@ -82,6 +82,8 @@ These can all be defined in terms of intervals (\todo{rephrase}) and collected i
 
 Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
+The root ID is constant for a temporal feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. In a balanced feature model, locating the root is $O(\log n)$ if we start at an arbitrary feature and follow the ancestor chain. 
+
 \subsubsection{Mapping groups}
 \label{subsub:mapping-groups}
 
