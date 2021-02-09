@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Helpers where
 
@@ -12,16 +13,16 @@ import ExampleValidities hiding ((=:))
 import Text.Pretty.Simple (pPrint)
 import Types
 
--- type instance IxValue (IM.IntervalMap k v) = v
--- type instance Index (IM.IntervalMap Validity v) = TimePoint
+type instance IxValue (IM.IntervalMap k v) = v
+type instance Index (IM.IntervalMap Validity v) = TimePoint
 
 lookupTP :: TimePoint -> ValidityMap a -> Maybe (Validity, a)
 lookupTP tp im = IM.lookupMin $ IM.containing im tp
 
--- instance Ixed (IM.IntervalMap Validity v) where
---   ix tp handler im = case lookupTP tp im of
---     Just (k, v) -> handler v <&> \v' -> IM.insert k v' im
---     Nothing -> pure im
+instance Ixed (IM.IntervalMap Validity v) where
+  ix tp handler im = case lookupTP tp im of
+    Just (k, v) -> handler v <&> \v' -> IM.insert k v' im
+    Nothing -> pure im
 
 parentGroup :: FeatureID -> TimePoint -> Fold Validities GroupID
 parentGroup fid tp =
@@ -52,17 +53,31 @@ hasCycles n c (Validity tstart tend) vs =
   let an = ancestors n tstart vs
       ac = ancestors c tstart vs
       critical = c : (ac \\ an)
-   in if n `elem` ac
-        then True
-        else case nextMove critical tstart vs of
-          Nothing -> False
-          Just (node, time, target) ->
-            if time >= tend
-              then False
-              else
-                if n `elem` ancestors target time vs
-                  then True
-                  else hasCycles n target (Validity time tend) vs
+   in undefined
 
-nextMove :: [Either FeatureID GroupID] -> TimePoint -> Validities -> Maybe (Either FeatureID GroupID, TimePoint, Either FeatureID GroupID)
-nextMove = undefined
+lookupFid :: FeatureID -> Validities -> Maybe FeatureValidity
+lookupFid fid = M.lookup fid . _featureValidities
+
+lookupGid :: GroupID -> Validities -> Maybe GroupValidity
+lookupGid gid = M.lookup gid . _groupValidities
+
+lookupNode :: Either FeatureID GroupID -> Validities -> Maybe (Either FeatureValidity GroupValidity)
+lookupNode nid vs = either (fmap Left . (`lookupFid` vs)) (fmap Right . (`lookupGid` vs)) nid
+
+nextMove :: HasParentValidities s (ValidityMap a) => TimePoint -> Fold s (Validity, a)
+nextMove tp = parentValidities . to (lookupTP tp) . _Just
+
+firstMove :: [Either FeatureID GroupID] -> TimePoint -> Validities -> Maybe (Either FeatureID GroupID, TimePoint, Either FeatureID GroupID)
+firstMove xs tp validities = undefined
+  where
+    firstTP :: Maybe TimePoint
+    firstTP =
+      minimumOf
+        ( folded
+            . beside
+              (to (`lookupFid` validities) . _Just . nextMove tp . _1 . end)
+              (to (`lookupGid` validities) . _Just . nextMove tp . _1 . end)
+        )
+        xs
+
+-- p 250
