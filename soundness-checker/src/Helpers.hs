@@ -73,10 +73,12 @@ firstMove xs tp validities = undefined
     firstTP :: Maybe TimePoint
     firstTP =
       minimumOf
-        ( folded
+        ( folded . to (`lookupNode` validities) . _Just
             . beside
-              (to (`lookupFid` validities) . _Just . nextMove tp . _1 . end)
-              (to (`lookupGid` validities) . _Just . nextMove tp . _1 . end)
+              (nextMove tp)
+              (nextMove tp)
+            . _1
+            . end
         )
         xs
 
