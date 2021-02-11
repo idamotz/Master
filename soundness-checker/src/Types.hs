@@ -12,9 +12,9 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 
 -- kanskje newtypes TODO
-type FeatureID = String
+newtype FeatureID = FeatureID String deriving (Show, Eq, Ord)
 type RootID = FeatureID
-type GroupID = String
+newtype GroupID = GroupID String deriving (Show, Eq, Ord)
 type Name = String
 
 data GroupType
@@ -54,7 +54,7 @@ instance IM.Interval Validity TimePoint where
 instance Semigroup Validity where
   Validity s1 e1 <> Validity s2 e2 = Validity (min s1 s2) (max e1 e2)
 
-data Validities = Validities
+data TemporalFeatureModel = TemporalFeatureModel
   { _rootID :: RootID
   , _nameValidities :: NameValidities
   , _featureValidities :: FeatureValidities
@@ -90,6 +90,13 @@ data GroupValidity = GroupValidity
 newtype FeatureModel = FeatureModel {_rootFeature :: Feature}
   deriving (Show, Eq)
 
+data EvolutionPlan = EvolutionPlan
+  { _initialModel :: FeatureModel
+  , _initialTime :: TimePoint
+  , _operations :: [TimeOperation]
+  }
+  deriving (Show)
+
 data Feature = Feature
   { _featureID :: FeatureID
   , _name :: Name
@@ -107,13 +114,28 @@ data Group = Group
   }
   deriving (Show, Eq)
 
+data TimeOperation = AddOperation Validity Operation | TimeOperation TimePoint Operation deriving (Show, Eq)
+
+data Operation
+  = AddFeature FeatureID Name FeatureType GroupID
+  | AddGroup GroupID GroupType FeatureID
+  | RemoveFeature FeatureID
+  | RemoveGroup GroupID
+  | MoveFeature FeatureID GroupID
+  | MoveGroup GroupID FeatureID
+  | ChangeFeatureType FeatureID FeatureType
+  | ChangeGroupType GroupID GroupType
+  | ChangeFeatureName FeatureID Name
+  deriving (Show, Eq)
+
 makePrisms ''GroupType
 makePrisms ''TimePoint
 makeFieldsNoPrefix ''Validity
-makeFieldsNoPrefix ''Validities
+makeFieldsNoPrefix ''TemporalFeatureModel
 makeFieldsNoPrefix ''FeatureValidity
 makeFieldsNoPrefix ''GroupValidity
 makePrisms ''FeatureType
 makeFieldsNoPrefix ''Feature
 makeFieldsNoPrefix ''Group
 makeFieldsNoPrefix ''FeatureModel
+makePrisms ''TimeOperation

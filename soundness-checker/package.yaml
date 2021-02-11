@@ -29,6 +29,7 @@ dependencies:
 - text
 - pretty-simple
 - IntervalMap
+- safe
 
 library:
   source-dirs: src

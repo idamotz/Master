@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d7621310f661c9c4124fbc30ad72e5162a757f1de9fd7e8485e48a8dc3904278
+-- hash: 2d4949fbb12219964efd6e856a97ddeefc7b69ff89280d9f2b03c38b3bd8dd82
 
 name:           soundness-checker
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Convert
       ExampleValidities
       Helpers
       Lib
@@ -44,6 +45,7 @@ library
     , lens-aeson
     , mtl
     , pretty-simple
+    , safe
     , text
   default-language: Haskell2010
 
@@ -63,6 +65,7 @@ executable soundness-checker-exe
     , lens-aeson
     , mtl
     , pretty-simple
+    , safe
     , soundness-checker
     , text
   default-language: Haskell2010
@@ -84,6 +87,7 @@ test-suite soundness-checker-test
     , lens-aeson
     , mtl
     , pretty-simple
+    , safe
     , soundness-checker
     , text
   default-language: Haskell2010
