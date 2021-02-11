@@ -10,9 +10,7 @@ import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import Data.Maybe (mapMaybe)
 import Data.Ord (comparing)
-import ExampleValidities hiding ((=:))
 import Safe.Foldable (minimumByMay)
-import Text.Pretty.Simple (pPrint)
 import Types
 
 infix 5 \\
