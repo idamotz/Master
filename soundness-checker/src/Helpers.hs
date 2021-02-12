@@ -10,9 +10,8 @@ import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import Data.Maybe (mapMaybe)
 import Data.Ord (comparing)
-import ExampleValidities hiding ((=:))
+import qualified Data.Set as S
 import Safe.Foldable (minimumByMay)
-import Text.Pretty.Simple (pPrint)
 import Types
 
 infix 5 \\
@@ -30,6 +29,9 @@ type NodeID = Either FeatureID GroupID
 
 lookupTP :: TimePoint -> ValidityMap a -> Maybe (Validity, a)
 lookupTP tp im = IM.lookupMin $ IM.containing im tp
+
+containingTPVal :: Ord a => TimePoint -> a -> ValidityMap (S.Set a) -> Maybe (Validity, S.Set a)
+containingTPVal tp v = IM.lookupMin . IM.filter (S.member v) . (`IM.containing` tp)
 
 instance Ixed (IM.IntervalMap Validity v) where
   ix tp handler im = case lookupTP tp im of

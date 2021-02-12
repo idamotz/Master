@@ -101,7 +101,6 @@ data Feature = Feature
   { _featureID :: FeatureID
   , _name :: Name
   , _varType :: FeatureType
-  , _parent :: Maybe GroupID
   , _childGroups :: [Group]
   }
   deriving (Show, Eq)
@@ -109,7 +108,6 @@ data Feature = Feature
 data Group = Group
   { _groupID :: GroupID
   , _varType :: GroupType
-  , _parent :: FeatureID
   , _childFeatures :: [Feature]
   }
   deriving (Show, Eq)

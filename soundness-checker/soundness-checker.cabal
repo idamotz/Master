@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2d4949fbb12219964efd6e856a97ddeefc7b69ff89280d9f2b03c38b3bd8dd82
+-- hash: cb04b110a9df86584bde771513d42adafceb5591250b15716b50f21e3c276be9
 
 name:           soundness-checker
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Convert
+      ExampleEvolutionPlan
       ExampleValidities
       Helpers
       Lib
@@ -36,6 +37,7 @@ library
       Paths_soundness_checker
   hs-source-dirs:
       src
+  ghc-options: -fwarn-incomplete-patterns -fwarn-unused-binds -fwarn-unused-imports -fwarn-overlapping-patterns
   build-depends:
       IntervalMap
     , aeson
@@ -55,7 +57,7 @@ executable soundness-checker-exe
       Paths_soundness_checker
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -fwarn-incomplete-patterns -fwarn-unused-binds -fwarn-unused-imports -fwarn-overlapping-patterns -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       IntervalMap
     , aeson
@@ -77,7 +79,7 @@ test-suite soundness-checker-test
       Paths_soundness_checker
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -fwarn-incomplete-patterns -fwarn-unused-binds -fwarn-unused-imports -fwarn-overlapping-patterns -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       IntervalMap
     , aeson

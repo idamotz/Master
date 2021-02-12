@@ -1,6 +1,5 @@
-module ExampleValidities where
+module ExampleValidities (exampleValidities) where
 
-import Control.Lens hiding (element)
 import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import qualified Data.Set as S

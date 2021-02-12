@@ -31,6 +31,12 @@ dependencies:
 - IntervalMap
 - safe
 
+ghc-options:
+  - -fwarn-incomplete-patterns
+  - -fwarn-unused-binds
+  - -fwarn-unused-imports
+  - -fwarn-overlapping-patterns
+
 library:
   source-dirs: src
 
