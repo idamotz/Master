@@ -10,8 +10,6 @@ import qualified Data.Set as S
 import Helpers
 import Types
 
-u = undefined
-
 type ValidityState = State TemporalFeatureModel
 
 convert :: EvolutionPlan -> TemporalFeatureModel
@@ -123,20 +121,6 @@ applyOperation (TimeOperation tp (ChangeFeatureName fid newName)) = \tfm ->
 applyOperation (AddOperation _ op) = error $ "Add operation can not be used with " ++ show op
 applyOperation (TimeOperation _ op) = error $ "Time operation can not be used with " ++ show op
 
--- data TimeOperation = AddOperation Validity Operation | TimeOperation TimePoint Operation deriving (Show, Eq)
-
--- data Operation
---   = AddFeature FeatureID Name FeatureType GroupID
---   | AddGroup GroupID GroupType FeatureID
---   | RemoveFeature FeatureID
---   | RemoveGroup GroupID
---   | MoveFeature FeatureID GroupID
---   | MoveGroup GroupID FeatureID
---   | ChangeFeatureType FeatureID FeatureType
---   | ChangeGroupType GroupID GroupType
---   | ChangeFeatureName FeatureID Name
---   deriving (Show, Eq)
---
 clampIntervalEnd :: TimePoint -> ValidityMap a -> ValidityMap a
 clampIntervalEnd tp vm =
   let Just (containingKey@(Validity s _), val) = lookupTP tp vm
@@ -162,15 +146,6 @@ insertEmptyFeature fid =
 insertEmptyGroup :: GroupID -> TemporalFeatureModel -> TemporalFeatureModel
 insertEmptyGroup gid =
   over groupValidities $ M.insertWith (const id) gid (GroupValidity mempty mempty mempty mempty)
-
--- data FeatureValidity = FeatureValidity
---   { _existenceValidities :: ValidityMap ()
---   , _nameValidities :: ValidityMap Name
---   , _typeValidities :: ValidityMap FeatureType
---   , _parentValidities :: ValidityMap GroupID
---   , _childValidities :: ValidityMap (S.Set GroupID)
---   }
---   deriving (Show, Eq)
 
 convertFeature :: TimePoint -> Maybe GroupID -> Feature -> State TemporalFeatureModel ()
 convertFeature tp mParentID (Feature fid name ftype children) = do
@@ -203,12 +178,3 @@ convertGroup tp parentID (Group gid gtype children) = do
   modify $ insertEmptyFeature parentID
   featureValidities . ix parentID . childValidities %= insertSingleton validity gid
   traverse_ (convertFeature tp (Just gid)) children
-
--- data Feature = Feature
---   { _featureID :: FeatureID
---   , _name :: Name
---   , _varType :: FeatureType
---   , _parent :: Maybe GroupID
---   , _childGroups :: [Group]
---   }
---   deriving (Show, Eq)
