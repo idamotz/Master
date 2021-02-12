@@ -25,7 +25,7 @@ model =
                       (g "group:info1")
                       And
                       [ Feature
-                          (f "bluetooth")
+                          (f "feature:bluetooth")
                           "Bluetooth"
                           Optional
                           []
@@ -56,11 +56,7 @@ v = Validity
 
 operations :: [TimeOperation]
 operations =
-  (ao (v (TP 1) Forever) <$> tp1)
-    ++ (ao (v (TP 2) Forever) <$> tp2)
-    ++ tp5
-    ++ (to (TP 6) <$> tp6)
-    ++ (to (TP 7) <$> tp7)
+  (ao (v (TP 1) Forever) <$> tp1) ++ (ao (v (TP 2) Forever) <$> tp2) ++ tp5 ++ tp6 ++ tp7
   where
     tp1 =
       [ AddGroup (g "group:info2") Alternative (f "feature:infotainment")
@@ -75,15 +71,21 @@ operations =
     tp5 =
       [ to (TP 5) $ ChangeGroupType (g "group:info2") Or
       , ao (v (TP 5) Forever) $ AddGroup (g "group:pilot1") And (f "feature:parking-pilot")
-      , ao (v (TP 5) Forever) $
-          AddFeature
-            (f "feature:distance-sensors")
-            "Distance Sensors"
-            Mandatory
-            (g "group:pilot1")
+      , ao (v (TP 5) Forever) $ AddFeature (f "feature:distance-sensors") "Distance Sensors" Mandatory (g "group:pilot1")
       ]
-    tp6 = []
-    tp7 = []
+    tp6 =
+      [ ao (v (TP 6) Forever) $ AddFeature (f "feature:sensors") "Sensors" Optional (g "group:car1")
+      , ao (v (TP 6) Forever) $ AddGroup (g "group:sensors1") And (f "feature:sensors")
+      , to (TP 6) $ MoveFeature (f "feature:distance-sensors") (g "group:sensors1")
+      , ao (v (TP 6) Forever) $ AddFeature (f "feature:emergency-brake") "Emergency Brake" Optional (g "group:comfort1")
+      , to (TP 6) $ ChangeFeatureName (f "feature:comfort-systems") "Assistance Systems"
+      ]
+    tp7 =
+      [ to (TP 7) $ RemoveFeature (f "feature:distance-sensors")
+      , ao (v (TP 7) Forever) $ AddFeature (f "feature:front-sensors") "FrontSensors" Optional (g "group:sensors1")
+      , ao (v (TP 7) Forever) $ AddFeature (f "feature:rear-sensors") "Rear Sensors" Optional (g "group:sensors1")
+      , to (TP 7) $ RemoveFeature (f "feature:bluetooth")
+      ]
 
 -- Group groupID varType parent childFeatures
 
@@ -103,15 +105,15 @@ operations =
 --             addFeature("feature:distance-sensors", "Distance Sensors", "group:pilot1", MANDATORY) ; ;; --- T5
 
 --             at 6 do
---             addFeature(sensors, "Sensors", "group:car1", OPTIONAL)                   --- T6
---             addGroup(sensors, "sensors1", AND)                                 --- T6 (implicit)
---             moveFeature("feature:distance-sensors", "sensors1")                                  --- T6
---             addFeature(brake, "Emergency Brake", "group:comfort1", OPTIONAL)         --- T6
+--             addFeature("feature:sensors", "Sensors", "group:car1", OPTIONAL)                   --- T6
+--             addGroup("feature:sensors", "group:sensors1", AND)                                 --- T6 (implicit)
+--             moveFeature("feature:distance-sensors", "group:sensors1")                                  --- T6
+--             addFeature("feature:emergency-brake", "Emergency Brake", "group:comfort1", OPTIONAL)         --- T6
 --             renameFeature("feature:comfort-systems", "Assistance Systems")               ; ;; --- T6
 
 --             at 7 do
 --             removeFeature("feature:distance-sensors")                                            --- T7 |
---             addFeature(frontSensors, "Front Sensors", "sensors1", OPTIONAL)    --- T7 | Split Sensors feature
---             addFeature(rearSensors, "Rear Sensors", "sensors1", OPTIONAL)      --- T7 |
---             removeFeature(bluetooth)                                      ;    --- T7
+--             addFeature("feature:front-sensors", "Front Sensors", "group:sensors1", OPTIONAL)    --- T7 | Split Sensors feature
+--             addFeature("feature:rear-sensors", "Rear Sensors", "group:sensors1", OPTIONAL)      --- T7 |
+--             removeFeature("feature:bluetooth")                                      ;    --- T7
 --             .
