@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cb04b110a9df86584bde771513d42adafceb5591250b15716b50f21e3c276be9
+-- hash: 23b243f5fd9623f8bf1332d2da848f7566ea275d14dd35249ab40c39dfcd3aaa
 
 name:           soundness-checker
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Convert
       ExampleEvolutionPlan
+      ExampleTemporalFeaturemodel
       ExampleValidities
       Helpers
       Lib

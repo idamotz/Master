@@ -1,6 +1,9 @@
 module Main where
 
-import Lib
+import Convert
+import ExampleEvolutionPlan
+import Text.Pretty.Simple (pPrint)
 
 main :: IO ()
-main = someFunc
+main =
+  pPrint $ convert exampleEvolutionPlan

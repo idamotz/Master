@@ -93,6 +93,16 @@ applyOperation (TimeOperation tp (MoveFeature fid newParent)) = \tfm ->
         & featureValidities . ix fid . parentValidities
         %~ clampIntervalEnd tp
           . IM.insert (Validity tp e) newParent
+applyOperation (TimeOperation tp (MoveGroup gid newParent)) = \tfm ->
+  let Just (Validity _ e, oldParent) = tfm ^?! groupValidities . ix gid . parentValidities . to (lookupTP tp)
+   in tfm
+        & featureValidities . ix oldParent . childValidities
+        %~ clampIntervalEndValue tp gid
+        & featureValidities . ix newParent . childValidities
+        %~ insertSingleton (Validity tp e) gid
+        & groupValidities . ix gid . parentValidities
+        %~ clampIntervalEnd tp
+          . IM.insert (Validity tp e) newParent
 applyOperation (TimeOperation tp (ChangeFeatureType fid newType)) = \tfm ->
   let types = tfm ^?! featureValidities . ix fid . typeValidities
       Just (containingKey@(Validity s e), oldType) = lookupTP tp types
