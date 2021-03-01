@@ -36,20 +36,23 @@ type NodeID = Either FeatureID GroupID
 -- ValidityMap --
 -----------------
 
-containingInterval :: TimePoint -> ValidityMap a -> Maybe Validity
-containingInterval tp = fmap fst . IM.lookupMin . (`IM.containing` tp)
-
 lookupTP :: TimePoint -> ValidityMap a -> Maybe (Validity, a)
 lookupTP tp im = IM.lookupMin $ IM.containing im tp
+
+containingInterval :: TimePoint -> ValidityMap a -> Maybe Validity
+containingInterval tp = fmap fst . lookupTP tp
 
 containingTPVal :: Ord a => TimePoint -> a -> ValidityMap (S.Set a) -> Maybe (Validity, S.Set a)
 containingTPVal tp v = IM.lookupMin . IM.filter (S.member v) . (`IM.containing` tp)
 
-lookupOverlapping :: Ord a => Validity -> ValidityMap a -> S.Set a
-lookupOverlapping validity =
-  S.fromList
-    . IM.elems
+lookupOverlappingValues :: Validity -> ValidityMap a -> [a]
+lookupOverlappingValues validity =
+  IM.elems
     . flip IM.intersecting validity
+
+lookupOverlapping :: Validity -> ValidityMap a -> [(Validity, a)]
+lookupOverlapping validity =
+  IM.assocs . flip IM.intersecting validity
 
 ---------------
 -- Intervals --

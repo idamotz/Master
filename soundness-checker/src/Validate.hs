@@ -19,8 +19,8 @@ data ValidationError
   | CreatesCycle
   deriving (Show, Eq)
 
-checkCompatibleTypes :: Validity -> FeatureType -> ValidityMap GroupType -> Maybe ValidationError
-checkCompatibleTypes validity ftype gtypes =
+checkCompatibleTypesFeature :: Validity -> FeatureType -> ValidityMap GroupType -> Maybe ValidationError
+checkCompatibleTypesFeature validity ftype gtypes =
   (\(interval, gtype) -> IncompatibleTypes ftype gtype interval)
     <$> ( IM.lookupMin
             . IM.filter (`compatibleTypes` ftype)
@@ -55,7 +55,7 @@ checkNotChanged (Validity s e) vm op =
       if e' /= e
         then ChangePlanned e' . op . snd <$> lookupTP e' vm
         else Nothing
-    Nothing -> error "This should already have been caught."
+    Nothing -> Just NodeNotExists -- but this should already have been caught
 
 checkNoChildren :: Validity -> ValidityMap a -> Maybe ValidationError
 checkNoChildren v vm =
@@ -82,7 +82,7 @@ validate (AddOperation v (AddFeature fid name ftype gid)) tfm =
         [ checkNodeNotExists v existence
         , checkParentExists v groupExistence
         , checkNameInUse v name tfm
-        , checkCompatibleTypes v ftype groupTypes
+        , checkCompatibleTypesFeature v ftype groupTypes
         ]
 validate (AddOperation v (AddGroup gid gtype fid)) tfm =
   catMaybes
@@ -125,7 +125,7 @@ validate (ChangeOperation tp (MoveFeature fid gid)) tfm =
             else
               let scope = Validity tp endTime
                in catMaybes $
-                    ((\ftype -> checkCompatibleTypes scope ftype groupTypes) <$> S.toList (lookupOverlapping scope types))
+                    ((\ftype -> checkCompatibleTypesFeature scope ftype groupTypes) <$> lookupOverlappingValues scope types)
                       ++ [checkFeatureCycles scope fid gid tfm]
 validate (ChangeOperation tp (MoveGroup gid fid)) tfm =
   let (GroupValidity existence _ _ _) = lookupGroupDefault gid tfm
@@ -140,7 +140,7 @@ validate (ChangeOperation tp (MoveGroup gid fid)) tfm =
             else
               let scope = Validity tp endTime
                in toList $ checkGroupCycles scope gid fid tfm
-validate (ChangeOperation tp (ChangeFeatureType fid ftype)) tfm =
+validate (ChangeOperation tp (ChangeFeatureType fid fType)) tfm =
   let (FeatureValidity _ _ types parents _) = lookupFeatureDefault fid tfm
    in case containingInterval tp types of
         Nothing -> [NodeNotExists]
@@ -148,21 +148,37 @@ validate (ChangeOperation tp (ChangeFeatureType fid ftype)) tfm =
           let scope = Validity tp endTime
            in mapMaybe
                 ( \(v, gid) ->
-                    tfm
-                      ^? groupValidities . ix gid . typeValidities >>= checkCompatibleTypes (validityOverlap v scope) ftype
+                    tfm ^? groupValidities . ix gid . typeValidities
+                      >>= checkCompatibleTypesFeature (validityOverlap v scope) fType
                 )
                 . IM.assocs
                 . (`IM.intersecting` scope)
                 $ parents
-validate (ChangeOperation tp (ChangeGroupType gid gtype)) tfm = undefined
--- let (GroupValidity _ types _ children) = lookupGroupDefault gid tfm
---  in case containingInterval tp types of
---       Nothing -> [NodeNotExists]
---       Just (Validity _ endTime) ->
---         let scope = Validity tp endTime
---          in mapMaybe (\(v, childIDs) -> foldMap (\cid -> tfm ^.. featureValidities . ix cid . typeValidities . to (`IM.intersecting` (validityOverlap scope v) . IM.elems)
---          . IM.assocs
---          . (`IM.intersecting` scope)
---          $ children
--- For all interval keys in children, then for all children mapped to that key, for the types they have in the overlap between the key and the scope, check that the types are compatible
-validate (ChangeOperation tp (ChangeFeatureName fid name)) tfm = undefined
+validate (ChangeOperation tp (ChangeGroupType gid gType)) tfm =
+  let (GroupValidity _ types _ children) = lookupGroupDefault gid tfm
+   in case containingInterval tp types of
+        Nothing -> [NodeNotExists]
+        Just (Validity _ endTime) ->
+          let scope = Validity tp endTime
+           in concatMap
+                ( \(v, childIDs) ->
+                    mapMaybe
+                      ( \fid ->
+                          tfm ^? featureValidities . ix fid . typeValidities
+                            >>= checkCompatibleTypesGroup (validityOverlap v scope) gType
+                      )
+                      (S.toList childIDs)
+                )
+                . IM.assocs
+                . (`IM.intersecting` scope)
+                $ children
+validate (ChangeOperation tp (ChangeFeatureName fid name)) tfm =
+  let (FeatureValidity _ names _ _ _) = lookupFeatureDefault fid tfm
+   in case containingInterval tp names of
+        Nothing -> [NodeNotExists]
+        Just (Validity _ endTime) ->
+          let scope = Validity tp endTime
+              conflictingUses = IM.assocs . flip IM.intersecting scope $ lookupNameDefault name tfm
+           in if null conflictingUses
+                then []
+                else uncurry NameInUse <$> conflictingUses
