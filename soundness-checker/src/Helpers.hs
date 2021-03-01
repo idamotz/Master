@@ -6,6 +6,7 @@
 module Helpers where
 
 import Control.Lens
+import Data.IntervalMap.Generic.Strict ((!))
 import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import Data.Maybe (mapMaybe)
@@ -60,9 +61,9 @@ lookupOverlapping validity =
 validityOverlap :: Validity -> Validity -> Validity
 validityOverlap (Validity s1 e1) (Validity s2 e2) = Validity (max s1 s2) (min e1 e2)
 
---------------------------
--- TemporalFeatureModel --
---------------------------
+---------------------------------
+-- TemporalFeatureModel lookup --
+---------------------------------
 
 lookupFeature :: FeatureID -> TemporalFeatureModel -> Maybe FeatureValidity
 lookupFeature fid = M.lookup fid . _featureValidities
@@ -106,6 +107,44 @@ lookupNameInterval name validity =
   maybe mempty (`IM.intersecting` validity)
     . M.lookup name
     . view nameValidities
+
+---------------------------------------
+-- TemporalFeatureModel modification --
+---------------------------------------
+
+insertSingleton :: Ord a => Validity -> a -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
+insertSingleton validity x = IM.insertWith (<>) validity (S.singleton x)
+
+insertName :: Name -> Validity -> FeatureID -> TemporalFeatureModel -> TemporalFeatureModel
+insertName name validity fid =
+  over nameValidities $
+    M.insertWith (const $ IM.insert validity fid) name $ IM.singleton validity fid
+
+insertEmptyFeature :: FeatureID -> TemporalFeatureModel -> TemporalFeatureModel
+insertEmptyFeature fid =
+  over featureValidities $ M.insertWith (const id) fid (FeatureValidity mempty mempty mempty mempty mempty)
+
+insertEmptyGroup :: GroupID -> TemporalFeatureModel -> TemporalFeatureModel
+insertEmptyGroup gid =
+  over groupValidities $ M.insertWith (const id) gid (GroupValidity mempty mempty mempty mempty)
+
+clampIntervalEnd :: TimePoint -> ValidityMap a -> ValidityMap a
+clampIntervalEnd tp vm =
+  let Just (containingKey@(Validity s _), val) = lookupTP tp vm
+   in IM.insert (Validity s tp) val
+        . IM.delete containingKey
+        $ vm
+
+clampIntervalEndValue :: Ord a => TimePoint -> a -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
+clampIntervalEndValue tp v vmap =
+  let Just (Validity s e, containingSet) = containingTPVal tp v vmap
+   in insertSingleton (Validity s tp) v
+        . deleteIfEmpty (Validity s e)
+        . IM.insert (Validity s e) (S.delete v containingSet)
+        $ vmap
+  where
+    deleteIfEmpty :: Validity -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
+    deleteIfEmpty k vm = if null (vm ! k) then IM.delete k vm else vm
 
 --------------------
 -- Move algorithm --
