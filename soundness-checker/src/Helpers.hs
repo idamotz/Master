@@ -24,8 +24,20 @@ xs \\ ys = helper (reverse xs) (reverse ys)
 type instance IxValue (IM.IntervalMap k v) = v
 type instance Index (IM.IntervalMap Validity v) = TimePoint
 
+instance Ixed (IM.IntervalMap Validity v) where
+  ix tp handler im = case lookupTP tp im of
+    Just (k, v) -> handler v <&> \v' -> IM.insert k v' im
+    Nothing -> pure im
+
 type Node = Either FeatureValidity GroupValidity
 type NodeID = Either FeatureID GroupID
+
+-----------------
+-- ValidityMap --
+-----------------
+
+containingInterval :: TimePoint -> ValidityMap a -> Maybe Validity
+containingInterval tp = fmap fst . IM.lookupMin . (`IM.containing` tp)
 
 lookupTP :: TimePoint -> ValidityMap a -> Maybe (Validity, a)
 lookupTP tp im = IM.lookupMin $ IM.containing im tp
@@ -33,10 +45,39 @@ lookupTP tp im = IM.lookupMin $ IM.containing im tp
 containingTPVal :: Ord a => TimePoint -> a -> ValidityMap (S.Set a) -> Maybe (Validity, S.Set a)
 containingTPVal tp v = IM.lookupMin . IM.filter (S.member v) . (`IM.containing` tp)
 
-instance Ixed (IM.IntervalMap Validity v) where
-  ix tp handler im = case lookupTP tp im of
-    Just (k, v) -> handler v <&> \v' -> IM.insert k v' im
-    Nothing -> pure im
+lookupOverlapping :: Ord a => Validity -> ValidityMap a -> S.Set a
+lookupOverlapping validity =
+  S.fromList
+    . IM.elems
+    . flip IM.intersecting validity
+
+---------------
+-- Intervals --
+---------------
+validityOverlap :: Validity -> Validity -> Validity
+validityOverlap (Validity s1 e1) (Validity s2 e2) = Validity (max s1 s2) (min e1 e2)
+
+--------------------------
+-- TemporalFeatureModel --
+--------------------------
+
+lookupFeature :: FeatureID -> TemporalFeatureModel -> Maybe FeatureValidity
+lookupFeature fid = M.lookup fid . _featureValidities
+
+lookupGroup :: GroupID -> TemporalFeatureModel -> Maybe GroupValidity
+lookupGroup gid = M.lookup gid . _groupValidities
+
+lookupFeatureDefault :: FeatureID -> TemporalFeatureModel -> FeatureValidity
+lookupFeatureDefault fid = M.findWithDefault (FeatureValidity mempty mempty mempty mempty mempty) fid . view featureValidities
+
+lookupGroupDefault :: GroupID -> TemporalFeatureModel -> GroupValidity
+lookupGroupDefault gid = M.findWithDefault (GroupValidity mempty mempty mempty mempty) gid . view groupValidities
+
+lookupNameDefault :: Name -> TemporalFeatureModel -> ValidityMap FeatureID
+lookupNameDefault name = M.findWithDefault mempty name . view nameValidities
+
+lookupNode :: Either FeatureID GroupID -> TemporalFeatureModel -> Maybe (Either FeatureValidity GroupValidity)
+lookupNode nid vs = either (fmap Left . (`lookupFeature` vs)) (fmap Right . (`lookupGroup` vs)) nid
 
 parentGroup :: FeatureID -> TimePoint -> Fold TemporalFeatureModel GroupID
 parentGroup fid tp =
@@ -51,6 +92,21 @@ parentFeature gid tp =
     . to (lookupTP tp)
     . _Just
     . _2
+
+compatibleTypes :: GroupType -> FeatureType -> Bool
+compatibleTypes And _ = True
+compatibleTypes _ Optional = True
+compatibleTypes _ _ = False
+
+lookupNameInterval :: Name -> Validity -> TemporalFeatureModel -> ValidityMap FeatureID
+lookupNameInterval name validity =
+  maybe mempty (`IM.intersecting` validity)
+    . M.lookup name
+    . view nameValidities
+
+--------------------
+-- Move algorithm --
+--------------------
 
 ancestors :: NodeID -> TimePoint -> TemporalFeatureModel -> [NodeID]
 ancestors (Left fid) _ vs | fid == _rootID vs = []
@@ -80,15 +136,6 @@ hasCycles n c interval@(Validity tstart _) vs =
                   (takeWhile (/= target) critical ++ (targetAncestors \\ an))
                   (Validity moveTime tend)
 
-lookupFid :: FeatureID -> TemporalFeatureModel -> Maybe FeatureValidity
-lookupFid fid = M.lookup fid . _featureValidities
-
-lookupGid :: GroupID -> TemporalFeatureModel -> Maybe GroupValidity
-lookupGid gid = M.lookup gid . _groupValidities
-
-lookupNode :: Either FeatureID GroupID -> TemporalFeatureModel -> Maybe (Either FeatureValidity GroupValidity)
-lookupNode nid vs = either (fmap Left . (`lookupFid` vs)) (fmap Right . (`lookupGid` vs)) nid
-
 nextMove :: HasParentValidities s (ValidityMap a) => TimePoint -> Fold s (Validity, a)
 nextMove tp = parentValidities . to (lookupTP tp) . _Just
 
@@ -98,18 +145,16 @@ firstMove xs (Validity tstart tend) featureModel =
   where
     getMove :: NodeID -> Maybe (TimePoint, NodeID, NodeID)
     getMove (Left fid) = do
-      feature <- lookupFid fid featureModel
+      feature <- lookupFeature fid featureModel
       (Validity _ e, _) <- lookupTP tstart $ feature ^. parentValidities
       (Validity _ _, target) <- lookupTP e $ feature ^. parentValidities
       if e >= tend
         then Nothing
         else Just (e, Left fid, Right target)
     getMove (Right gid) = do
-      group <- lookupGid gid featureModel
+      group <- lookupGroup gid featureModel
       (Validity _ e, _) <- lookupTP tstart $ group ^. parentValidities
       (Validity _ _, target) <- lookupTP e $ group ^. parentValidities
       if e >= tend
         then Nothing
         else Just (e, Right gid, Left target)
-
--- p 250

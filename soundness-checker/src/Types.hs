@@ -1,7 +1,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Types where
@@ -11,7 +10,6 @@ import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import qualified Data.Set as S
 
--- kanskje newtypes TODO
 newtype FeatureID = FeatureID String deriving (Show, Eq, Ord)
 type RootID = FeatureID
 newtype GroupID = GroupID String deriving (Show, Eq, Ord)
@@ -112,12 +110,15 @@ data Group = Group
   }
   deriving (Show, Eq)
 
-data TimeOperation = AddOperation Validity Operation | TimeOperation TimePoint Operation deriving (Show, Eq)
+data TimeOperation = AddOperation Validity AddOperation | ChangeOperation TimePoint ChangeOperation deriving (Show, Eq)
 
-data Operation
+data AddOperation
   = AddFeature FeatureID Name FeatureType GroupID
   | AddGroup GroupID GroupType FeatureID
-  | RemoveFeature FeatureID
+  deriving (Show, Eq)
+
+data ChangeOperation
+  = RemoveFeature FeatureID
   | RemoveGroup GroupID
   | MoveFeature FeatureID GroupID
   | MoveGroup GroupID FeatureID
