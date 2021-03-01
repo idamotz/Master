@@ -6,16 +6,23 @@ Table of Contents
 =================
 
    * [Soundness checker](#soundness-checker)
-      * [Build](#build)
-      * [Run](#run)
+   * [Table of Contents](#table-of-contents)
+      * [Build and run](#build-and-run)
+         * [Prerequisites](#prerequisites)
       * [Overview](#overview)
 
-## Build
+## Build and run
+### Prerequisites
+
+- [GHC](https://www.haskell.org/platform/mac.html)
+- [Stack](https://docs.haskellstack.org/en/stable/README/)
+
+
 ```sh
 stack build
 ```
+builds the project.
 
-## Run
 ```sh
 stack run
 ```
