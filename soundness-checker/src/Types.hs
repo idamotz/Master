@@ -32,6 +32,7 @@ data FeatureType
 
 type ValidityMap a = IM.IntervalMap Validity a
 
+-- TODO change to Moment:)
 data TimePoint
   = TP Int
   | Forever
@@ -110,7 +111,10 @@ data Group = Group
   }
   deriving (Show, Eq)
 
-data TimeOperation = AddOperation Validity AddOperation | ChangeOperation TimePoint ChangeOperation deriving (Show, Eq)
+data TimeOperation
+  = AddOperation Validity AddOperation
+  | ChangeOperation TimePoint ChangeOperation
+  deriving (Show, Eq)
 
 data AddOperation
   = AddFeature FeatureID Name FeatureType GroupID

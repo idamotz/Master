@@ -14,7 +14,7 @@ import qualified Data.Set as S
 import Safe.Foldable (minimumByMay)
 import Types
 
-infix 5 \\
+infix 6 \\
 (\\) :: Eq a => [a] -> [a] -> [a]
 xs \\ ys = helper (reverse xs) (reverse ys)
   where
@@ -124,7 +124,7 @@ hasCycles :: NodeID -> NodeID -> Validity -> TemporalFeatureModel -> Bool
 hasCycles n c interval@(Validity tstart _) vs =
   let an = ancestors n tstart vs
       ac = ancestors c tstart vs
-      critical = c : (ac \\ an)
+      critical = c : ac \\ an
    in n `elem` ac || hasCriticalMoves critical interval
   where
     hasCriticalMoves :: [NodeID] -> Validity -> Bool

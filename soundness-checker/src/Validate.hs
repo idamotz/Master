@@ -125,7 +125,9 @@ validate (ChangeOperation tp (MoveFeature fid gid)) tfm =
             else
               let scope = Validity tp endTime
                in catMaybes $
-                    ((\ftype -> checkCompatibleTypesFeature scope ftype groupTypes) <$> lookupOverlappingValues scope types)
+                    ( flip (checkCompatibleTypesFeature scope) groupTypes
+                        <$> lookupOverlappingValues scope types
+                    )
                       ++ [checkFeatureCycles scope fid gid tfm]
 validate (ChangeOperation tp (MoveGroup gid fid)) tfm =
   let (GroupValidity existence _ _ _) = lookupGroupDefault gid tfm
