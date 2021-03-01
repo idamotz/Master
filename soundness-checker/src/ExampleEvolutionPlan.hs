@@ -14,29 +14,28 @@ model =
         (f "feature:car")
         "Car"
         Mandatory
-        ( [ Group
-              (g "group:car1")
-              And
-              [ Feature
-                  (f "feature:infotainment")
-                  "Infotainment System"
-                  Mandatory
-                  [ Group
-                      (g "group:info1")
-                      And
-                      [ Feature
-                          (f "feature:bluetooth")
-                          "Bluetooth"
-                          Optional
-                          []
-                      ]
-                  ]
-              ]
-          ]
-        )
+        [ Group
+            (g "group:car1")
+            And
+            [ Feature
+                (f "feature:infotainment")
+                "Infotainment System"
+                Mandatory
+                [ Group
+                    (g "group:info1")
+                    And
+                    [ Feature
+                        (f "feature:bluetooth")
+                        "Bluetooth"
+                        Optional
+                        []
+                    ]
+                ]
+            ]
+        ]
     )
 
-to = TimeOperation
+to = ChangeOperation
 ao = AddOperation
 v = Validity
 

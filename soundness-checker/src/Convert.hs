@@ -14,7 +14,10 @@ type ValidityState = State TemporalFeatureModel
 
 convert :: EvolutionPlan -> TemporalFeatureModel
 convert (EvolutionPlan initModel startTime operations) =
-  foldl (flip applyOperation) (convertInitModel initModel startTime) (operations)
+  foldl
+    (flip applyOperation)
+    (convertInitModel initModel startTime)
+    operations
 
 insertSingleton :: Ord a => Validity -> a -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
 insertSingleton validity x = IM.insertWith (<>) validity (S.singleton x)
@@ -56,34 +59,32 @@ applyOperation (AddOperation validity (AddGroup gid gType parentID)) =
             & parentValidities %~ IM.insert validity parentID
       )
     . insertEmptyGroup gid
-applyOperation (TimeOperation tp (RemoveFeature fid)) = \tfm ->
+applyOperation (ChangeOperation tp (RemoveFeature fid)) = \tfm ->
   let (FeatureValidity fe fn ft fp fc) = tfm ^?! featureValidities . ix fid
       Just (_, name) = lookupTP tp fn
       Just (_, parentID) = lookupTP tp fp
    in tfm
         & nameValidities . ix name %~ clampIntervalEnd tp
         & featureValidities . ix fid
-        .~ ( FeatureValidity
-              (clampIntervalEnd tp fe)
-              (clampIntervalEnd tp fn)
-              (clampIntervalEnd tp ft)
-              (clampIntervalEnd tp fp)
-              fc
-           )
+        .~ FeatureValidity
+          (clampIntervalEnd tp fe)
+          (clampIntervalEnd tp fn)
+          (clampIntervalEnd tp ft)
+          (clampIntervalEnd tp fp)
+          fc
           & groupValidities . ix parentID . childValidities %~ clampIntervalEndValue tp fid
-applyOperation (TimeOperation tp (RemoveGroup gid)) = \tfm ->
+applyOperation (ChangeOperation tp (RemoveGroup gid)) = \tfm ->
   let (GroupValidity ge gt gp gc) = tfm ^?! groupValidities . ix gid
       Just (_, parentID) = lookupTP tp gp
    in tfm
         & groupValidities . ix gid
-        .~ ( GroupValidity
-              (clampIntervalEnd tp ge)
-              (clampIntervalEnd tp gt)
-              (clampIntervalEnd tp gp)
-              gc
-           )
+        .~ GroupValidity
+          (clampIntervalEnd tp ge)
+          (clampIntervalEnd tp gt)
+          (clampIntervalEnd tp gp)
+          gc
           & featureValidities . ix parentID . childValidities %~ clampIntervalEndValue tp gid
-applyOperation (TimeOperation tp (MoveFeature fid newParent)) = \tfm ->
+applyOperation (ChangeOperation tp (MoveFeature fid newParent)) = \tfm ->
   let Just (Validity _ e, oldParent) = tfm ^?! featureValidities . ix fid . parentValidities . to (lookupTP tp)
    in tfm
         & groupValidities . ix oldParent . childValidities
@@ -93,7 +94,7 @@ applyOperation (TimeOperation tp (MoveFeature fid newParent)) = \tfm ->
         & featureValidities . ix fid . parentValidities
         %~ clampIntervalEnd tp
           . IM.insert (Validity tp e) newParent
-applyOperation (TimeOperation tp (MoveGroup gid newParent)) = \tfm ->
+applyOperation (ChangeOperation tp (MoveGroup gid newParent)) = \tfm ->
   let Just (Validity _ e, oldParent) = tfm ^?! groupValidities . ix gid . parentValidities . to (lookupTP tp)
    in tfm
         & featureValidities . ix oldParent . childValidities
@@ -103,7 +104,7 @@ applyOperation (TimeOperation tp (MoveGroup gid newParent)) = \tfm ->
         & groupValidities . ix gid . parentValidities
         %~ clampIntervalEnd tp
           . IM.insert (Validity tp e) newParent
-applyOperation (TimeOperation tp (ChangeFeatureType fid newType)) = \tfm ->
+applyOperation (ChangeOperation tp (ChangeFeatureType fid newType)) = \tfm ->
   let types = tfm ^?! featureValidities . ix fid . typeValidities
       Just (containingKey@(Validity s e), oldType) = lookupTP tp types
    in tfm
@@ -111,7 +112,7 @@ applyOperation (TimeOperation tp (ChangeFeatureType fid newType)) = \tfm ->
         %~ IM.insert (Validity tp e) newType
           . IM.insert (Validity s tp) oldType
           . IM.delete containingKey
-applyOperation (TimeOperation tp (ChangeGroupType gid newType)) = \tfm ->
+applyOperation (ChangeOperation tp (ChangeGroupType gid newType)) = \tfm ->
   let types = tfm ^?! groupValidities . ix gid . typeValidities
       Just (containingKey@(Validity s e), oldType) = lookupTP tp types
    in tfm
@@ -119,8 +120,8 @@ applyOperation (TimeOperation tp (ChangeGroupType gid newType)) = \tfm ->
         %~ IM.insert (Validity tp e) newType
           . IM.insert (Validity s tp) oldType
           . IM.delete containingKey
-applyOperation (TimeOperation tp (ChangeFeatureName fid newName)) = \tfm ->
-  let Just ((Validity _ e), oldName) = tfm ^?! featureValidities . ix fid . nameValidities . to (lookupTP tp)
+applyOperation (ChangeOperation tp (ChangeFeatureName fid newName)) = \tfm ->
+  let Just (Validity _ e, oldName) = tfm ^?! featureValidities . ix fid . nameValidities . to (lookupTP tp)
    in tfm
         & nameValidities . ix oldName
           %~ clampIntervalEnd tp
@@ -128,8 +129,6 @@ applyOperation (TimeOperation tp (ChangeFeatureName fid newName)) = \tfm ->
           %~ insertName newName (Validity tp e) fid
         & featureValidities . ix fid . nameValidities
           %~ clampIntervalEnd tp . IM.insert (Validity tp e) newName
-applyOperation (AddOperation _ op) = error $ "Add operation can not be used with " ++ show op
-applyOperation (TimeOperation _ op) = error $ "Time operation can not be used with " ++ show op
 
 clampIntervalEnd :: TimePoint -> ValidityMap a -> ValidityMap a
 clampIntervalEnd tp vm =
@@ -140,7 +139,7 @@ clampIntervalEnd tp vm =
 
 clampIntervalEndValue :: Ord a => TimePoint -> a -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
 clampIntervalEndValue tp v vmap =
-  let Just ((Validity s e), containingSet) = containingTPVal tp v vmap
+  let Just (Validity s e, containingSet) = containingTPVal tp v vmap
    in insertSingleton (Validity s tp) v
         . deleteIfEmpty (Validity s e)
         . IM.insert (Validity s e) (S.delete v containingSet)
