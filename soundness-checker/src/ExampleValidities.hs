@@ -5,9 +5,13 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import Types
 
+(=:) :: a -> b -> (a, b)
 (=:) = (,)
 
+f :: String -> FeatureID
 f = FeatureID
+
+g :: String -> GroupID
 g = GroupID
 
 exampleValidities :: TemporalFeatureModel

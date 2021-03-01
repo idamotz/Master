@@ -36,6 +36,8 @@ ghc-options:
   - -fwarn-unused-binds
   - -fwarn-unused-imports
   - -fwarn-overlapping-patterns
+  - -Wmissing-signatures
+  - -fdefer-typed-holes
 
 library:
   source-dirs: src

@@ -2,9 +2,13 @@ module ExampleEvolutionPlan where
 
 import Types
 
+f :: String -> FeatureID
 f = FeatureID
+
+g :: String -> GroupID
 g = GroupID
 
+exampleEvolutionPlan :: EvolutionPlan
 exampleEvolutionPlan = EvolutionPlan model (TP 0) operations
 
 model :: FeatureModel
@@ -35,8 +39,13 @@ model =
         ]
     )
 
+to :: TimePoint -> ChangeOperation -> TimeOperation
 to = ChangeOperation
+
+ao :: Validity -> AddOperation -> TimeOperation
 ao = AddOperation
+
+v :: TimePoint -> TimePoint -> Validity
 v = Validity
 
 operations :: [TimeOperation]
