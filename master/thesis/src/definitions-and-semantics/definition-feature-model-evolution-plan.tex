@@ -1,5 +1,3 @@
-\todo{Look at default maps}
-
 \subsection{Feature model evolution plan}
 \label{sub:feature-model-evolution-plan}
 A feature model evolution plan is defined as a triple $(\names, \features, \groups)$ where \names, \features, and \groups{} are all maps.
@@ -9,7 +7,7 @@ A feature model evolution plan is defined as a triple $(\names, \features, \grou
 
 \todo{Motivate choice of data structure (mainly efficiency and modularity)}
 
-In general, a map is a set of entries on the form $\mapping{k}{v}$. Looking up a value at the key $k$ in map \map{map} looks like this:
+In general, a map is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. Looking up a value at the key $k$ in map \map{map} looks like this:
 \[
   \lookup{\map{map}}{k}
 \]
@@ -74,25 +72,23 @@ The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map
 \subsubsection{Mapping features}
 \label{subsub:mapping-features}
 
-\todo{Child features/groups cannot have identical keys, change semantics}
-
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
 A feature has a name, a type, a parent group, and zero or more child groups. Furthermore, a feature may be removed and re-added during the course of the plan, so we also need information about when the feature exists.
-These can all be defined in terms of intervals (\todo{rephrase}) and collected into a 5-tuple $(\map{existence} \comma \, \map{names} \comma \, \map{types} \comma \, \map{parentGroups} \comma \, \map{childGroups})$, where \map{existence} is an interval set denoting when the feature exists, \map{names} is an interval map with name values, \map{types} is a map with the feature's variation types, \map{parentGroups} is a map with group ID values, and childGroups is an interval map with group ID values, the interval keys possibly overlapping. 
+This information is collected into a 5-tuple $(F_e \comma \, F_n \comma \, F_t \comma \, F_p \comma \, F_c)$, where $F_e$ is an interval set denoting when the feature exists, $F_n$ is an interval map with name values, $F_t$ is an interval map with the feature's variation types, $F_p$ is an interval map with group ID values, and $F_c$ is an interval map where the values are sets containing group IDs, the interval keys possibly overlapping.
 
 Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
-The root ID is constant for a temporal feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. In a balanced feature model, locating the root is $O(\log n)$ if we start at an arbitrary feature and follow the ancestor chain. 
+The root ID is constant for a temporal feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. 
 
 \subsubsection{Mapping groups}
 \label{subsub:mapping-groups}
 
-The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $(\map{existence} \comma \, \map{types}  \comma \, \map{parentFeatures} \comma \, \map{childFeatures})$, where \map{existence} is an interval set denoting when the group exists, \map{types} is a map with the group's types, \map{parentFeatures} is a map with feature IDs, and \map{childFeatures} is a map with feature ID values, the interval keys possibly overlapping.
+The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $(G_e \comma \, G_t  \comma \, G_p \comma \, G_c)$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is a map with the group's types, $G_p$ is a map with feature IDs, and $G_c$ is a map with feature ID values, the interval keys possibly overlapping.
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
 \subsubsection{Example evolution plan}
-I've created a small example (see Figure \vref{ex:washing-machine}) containing three features and one group, describing a feature model evolution plan for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. I say that the example is small, but written out it looks huge. This is because there is a lot of redundancy, which is necessary for scoping etc. \todo{rewrite this, the language is too informal}
+A small example of a temporal feature model can be found in Figure \vref{ex:washing-machine}. It contains three features and one group, and describes a temporal feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
 
 \begin{figure}
   \begin{align*}
