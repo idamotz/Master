@@ -5,10 +5,13 @@ CITATIONS=citations.bib
 
 export TEXINPUTS := ifimaster/:duoforside/:$(TEXINPUTS)
 
-all: $(PDF)
+pdf: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
+	cd $(SRCDIR) && latexmk -pdf -use-make $(SRCFILE) && mv $(PDF) ..
 
-$(PDF): $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
+
+watch: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
 	cd $(SRCDIR) && latexmk -pdf -pvc -use-make $(SRCFILE) && mv $(PDF) ..
 
+
 clean:
-	rm $(PDF) && cd $(SRCDIR) && latexmk -CA && rm $(SRCFILE).bbl $(SRCFILE).run.xml
+	rm $(PDF); cd $(SRCDIR) && latexmk -CA && rm $(SRCFILE).bbl $(SRCFILE).run.xml
