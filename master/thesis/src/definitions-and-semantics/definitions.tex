@@ -1,5 +1,153 @@
 \section{Definitions}
-\todo{This section assumes knowledge of normal feature models and evolution plans, and only defines the specific definitions used in this thesis.}
 
-\input{definitions-and-semantics/definition-feature-model-evolution-plan}
-\input{definitions-and-semantics/definition-operations}
+\subsection{Feature model evolution plan}
+\label{sub:feature-model-evolution-plan}
+A feature model evolution plan is defined as a triple $(\names, \features, \groups)$ where \names, \features, and \groups{} are all maps.
+
+\subsubsection{Maps}
+\label{subsub:maps}
+
+\todo{Motivate choice of data structure (mainly efficiency and modularity)}
+
+In general, a map is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. Looking up a value at the key $k$ in map \map{map} looks like this:
+\[
+  \lookup{\map{map}}{k}
+\]
+
+This query would give us $v$ if $\mapping{k}{v} \in \map{map}$. If we wish to assign a value $v'$ to key $k$, this is the syntax:
+
+\[
+\lookup{\map{map}}{k} \assign v'
+\]
+
+This also works if $k$ is not already in the map. We assume $O(1)$ for lookup and insertion. For maps with set values, we define an additional operator $\addassign$. If $\lookup{\map{map}}{k} = S$ then 
+\[\lookup{\map{map}}{k} \addassign v = \lookup{\map{map}}{k} \assign S \cup \{v\}\]
+To remove a mapping with key $k$, we use $\map{map} \setminus k$. For maps with set values, we additionally define $\removevalue{v}$, where $v$ is some value. Let $\map{map}$ be a map with set values containing the mapping $\mapping{k}{\{v\} \cup S}$. Then $\removevalue{v}$ is defined as follows:
+
+\[
+  \map{map} \removevalue{v} k =
+  \begin{cases}
+    \map{map} \remove k & \text{if } S = \emptyset\\
+    \lookup{\map{map}}{k} \assign S & \text{if } |S| > 0
+  \end{cases}
+\]
+That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, we remove the mapping. Otherwise, we only remove $v$ from the set of values associated with $k$. 
+
+\subsubsection{Intervals}
+\label{subsub:intervals}
+To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. The intervals are always used to give information about when something is true in the temporal feature model. This will be further explained in subsections \ref{subsub:mapping-names}, \ref{subsub:mapping-features}. Single time points $t_n$ may be viewed as intervals containing only the time point $t_n$
+
+For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{max(t_{start}, t_l)}{min(t_{end}, t_r)}$
+
+\subsubsection{Interval maps}
+\label{subsub:interval-maps}
+An interval map is a map where the key is an interval (section \vref{subsub:intervals}). To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
+
+\begin{figure}[h]
+  \begin{align*}
+    & \lookup{\map{i}}{t_1} \\
+    & \lookup{\map{i}}{t_3} \\
+    & \lookup{\map{i}}{\interval{t_1}{t_5}} \\
+    & \lookup{\map{i}}{\interval{t_2}{t_4}}
+  \end{align*}
+  \caption{Interval map example}
+  \label{ex:interval-map}
+\end{figure}
+
+$\containing{\map{IM}}{t_n}$ returns the set of keys containing time point $t_n$. For interval maps with non-overlapping keys, the will contain at most one element. For interval maps with set values, we define an additional function $\containingvalue{\map{IM}}{t_n}{v}$ where $v$ is some value, returning the set of the keys containing $t_n$ and associated with a set containing $v$. 
+
+We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns all the interval keys in the map $\map{IM}$ overlapping the interval $\interval{t_n}{t_m}$. See section \vref{subsub:interval-sets} for definition of overlapping intervals. 
+
+\subsubsection{Interval sets}
+\label{subsub:interval-sets}
+An interval set is a set of intervals with a few custom predicates and operations. Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ overlap iff there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
+
+Notice that $\in \, \subseteq \, \inn \, \subseteq \, \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$.
+
+$\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
+
+\subsubsection{Mapping names}
+\label{subsub:mapping-names}
+
+The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the feature model evolution plan. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$.
+
+\subsubsection{Mapping features}
+\label{subsub:mapping-features}
+
+The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
+A feature has a name, a type, a parent group, and zero or more child groups. Furthermore, a feature may be removed and re-added during the course of the plan, so we also need information about when the feature exists.
+This information is collected into a 5-tuple $(F_e \comma \, F_n \comma \, F_t \comma \, F_p \comma \, F_c)$, where $F_e$ is an interval set denoting when the feature exists, $F_n$ is an interval map with name values, $F_t$ is an interval map with the feature's variation types, $F_p$ is an interval map with group ID values, and $F_c$ is an interval map where the values are sets containing group IDs, the interval keys possibly overlapping.
+
+Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
+
+The root ID is constant for a temporal feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. 
+
+\subsubsection{Mapping groups}
+\label{subsub:mapping-groups}
+
+The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $(G_e \comma \, G_t  \comma \, G_p \comma \, G_c)$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is a map with the group's types, $G_p$ is a map with feature IDs, and $G_c$ is a map with feature ID values, the interval keys possibly overlapping.
+
+Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
+
+\subsubsection{Example evolution plan}
+A small example of a temporal feature model can be found in Figure \vref{ex:washing-machine}. It contains three features and one group, and describes a temporal feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
+
+\begin{figure}
+  \begin{align*}
+    ( \{ \; & \mapping{\text{Washing Machine}}{\intervalmapping{t_0}{\forever}{0}} \\
+       ,\; & \mapping{\text{Washer}}{\intervalmapping{t_0}{\forever}{1}} \\
+       ,\; & \mapping{\text{Dryer}}{\intervalmapping{t_5}{\forever}{2}}\; \} \\
+       \\
+       ,\{\; & \mapping{0}{(\{ \interval{t_0}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\text{Washing Machine}}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\textbf{mandatory}}\} ,\, \\
+             &  \emptyset ,\, \\ 
+             & \{\intervalmapping{t_0}{\forever}{10}\} ) } \\
+             ,\, & \mapping{1}{(\{\interval{t_0}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\text{Washer}}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\textbf{mandatory}}\} ,\, \\
+             &  \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
+             & \emptyset)} \\
+             ,\, & \mapping{2}{(\{\interval{t_5}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_5}{\forever}{\text{Dryer}}\} ,\, \\
+             & \{\intervalmapping{t_5}{\forever}{\textbf{optional}}\} ,\, \\
+             &  \{\intervalmapping{t_5}{\forever}{10}\} ,\, \\ 
+             & \emptyset)} \}\\
+             \\
+               ,\; \{ \; & [ 10 \mapsto (\{\interval{t_0}{\forever}\} ,\, \\
+                         & \{\intervalmapping{t_0}{\forever}{\textbf{AND}}\} ,\, \\
+                         & \{\intervalmapping{t_0}{\forever}{0}\} ,\, \\
+                         & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} ) ]\\
+    \}&)\\
+  \end{align*}
+  \caption{Small feature model evolution plan}
+  \label{ex:washing-machine}
+\end{figure}
+
+\subsection{Operations}
+\label{sub:operations}
+
+We define \emph{operations} to alter the feature model evolution plan. A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not enough to let a human verify a change. 
+
+\begin{itemize}
+  \item \textbf{addFeature(featureID, parentGroupID, name, featureType)} from $t_n$ to $t_m$\\
+    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \textbf{mandatory}, then the parent group must have type \textbf{AND}.
+  \item \textbf{addGroup(groupID, parentFeatureID, groupType)} from $t_n$ to $t_m$\\
+    Adds group with id \var{groupID} and type \var{groupType} to the feature with id \var{parentFeatureID} during the interval $\interval{t_n}{t_m}$. The group ID must be fresh, and the parent feature must exist during the interval. 
+  \item \textbf{removeFeature(featureID)} at time $t_n$\\
+    Removes the feature with ID \var{featureID} from the feature model at $t_n$ (does not affect possible reintroductions). The \features{} map in the original plan must contain a mapping $\mapping{\var{featureID}}{(\map{existence}, \ldots)}$ such that $\interval{t_i}{t_j} \in \map{existence}$ with $ t_i \leq t_n \leq t_j$. The feature must not have any child groups during $\interval{t_n}{t_j}$. After removing the feature, all interval mappings should be updated from $\interval{t_i}{t_j}$ to $\interval{t_i}{t_n}$.
+  \item \textbf{removeGroup(groupID)} at time $t_n$\\
+    Removes the group with ID \var{groupID} from the feature model at $t_n$ (does not affect possible reintroductions). The \groups{} map in the original plan must contain a mapping $\mapping{\var{groupID}}{(\map{existence}, \ldots)}$ such that $\interval{t_i}{t_j} \in \map{existence}$ with $t_i \leq t_n \leq t_j$. The group must not have any child features during $\interval{t_n}{t_j}$. After removing the group, all interval mappings should be updated from $\interval{t_i}{t_j}$ to $\interval{t_i}{t_n}$. 
+  \item \textbf{moveFeature(featureID, targetGroupID)} at $t_n$\\
+    Moves the feature with id \var{featureID} to the group with ID $\var{targetGroupID}$. The move cannot be done if it introduces a cycle; that is, if the target group is in the feature's subtree. The feature's subtree is moved along with it. Parent group and child feature mappings are updated accordingly. 
+  \item \textbf{moveGroup(groupID, targetFeatureID)} \\
+    Moves the group with id \var{groupID} to the feature with ID $\var{targetFeatureID}$. Very similar to \textbf{moveFeature}. 
+  \item \textbf{changeFeatureVariationType(featureID, newType)} \\
+    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType}. If the new type is \textbf{mandatory}, the parent group type must be \textbf{AND}. 
+  \item \textbf{changeGroupVariationType(groupID, newType)}\\
+    Changes the group variation type of the group with ID \var{groupID} to \var{newType}. If the new type is \textbf{OR} or \textbf{XOR}, make sure that no child feature has type \textbf{mandatory}. 
+  \item \textbf{changeFeatureName(featureID, name)}\\
+    Changes the name of the feature with ID \var{featureID} to \var{name}. No other feature may have the same name.
+\end{itemize}
+
+\todo{Look at possibilities for changing intervals; extending, restricting, and moving. This would be equivalent to removing/moving operations in the summer project semantics.}
