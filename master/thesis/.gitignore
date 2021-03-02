@@ -1,1 +1,16 @@
-watchnotes
+.DS_Store
+*.aux
+*.log
+*.pdf
+*~
+*.bbl
+*.blg
+*.dvi
+*.out
+*.fdb_latexmk
+*.fls
+*.bcf
+*.lof
+*.lot
+*.run.xml
+*.toc

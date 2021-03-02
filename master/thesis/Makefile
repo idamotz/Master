@@ -1,9 +1,14 @@
+SRCDIR=src
+SRCFILE=thesis
+PDF=$(SRCFILE).pdf
+CITATIONS=citations.bib
 
-run:
-		latexmk -pdf -pvc definitions-and-semantics
+export TEXINPUTS := ifimaster/:duoforside/:$(TEXINPUTS)
 
-debug:
-		pdflatex -shell-escape definitions-and-semantics.tex
+all: $(PDF)
+
+$(PDF): $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
+	cd $(SRCDIR) && latexmk -pdf -use-make $(SRCFILE) && mv $(PDF) ..
 
 clean:
-		rm *.aux *.toc *.out *.fdb_latexmk *.fls *.log *.synctex.gz; rm -rf _minted-definitions-and-semantics/
+	rm $(PDF) && cd $(SRCDIR) && latexmk -CA && rm $(SRCFILE).bbl $(SRCFILE).run.xml
