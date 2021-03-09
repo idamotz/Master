@@ -104,22 +104,22 @@ A small example of a temporal feature model can be found in Figure \vref{ex:wash
        \\
        ,\{\; & \mapping{0}{(\{ \interval{t_0}{\forever}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\text{Washing Machine}}\} ,\, \\
-             & \{\intervalmapping{t_0}{\forever}{\mandatory}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\mandatory{}}\} ,\, \\
              &  \emptyset ,\, \\ 
              & \{\intervalmapping{t_0}{\forever}{10}\} ) } \\
              ,\, & \mapping{1}{(\{\interval{t_0}{\forever}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\text{Washer}}\} ,\, \\
-             & \{\intervalmapping{t_0}{\forever}{\mandatory}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\mandatory{}}\} ,\, \\
              &  \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
              & \emptyset)} \\
              ,\, & \mapping{2}{(\{\interval{t_5}{\forever}\} ,\, \\
              & \{\intervalmapping{t_5}{\forever}{\text{Dryer}}\} ,\, \\
-             & \{\intervalmapping{t_5}{\forever}{\optional}\} ,\, \\
+             & \{\intervalmapping{t_5}{\forever}{\optional{}}\} ,\, \\
              &  \{\intervalmapping{t_5}{\forever}{10}\} ,\, \\ 
              & \emptyset)} \}\\
              \\
                ,\; \{ \; & [ 10 \mapsto (\{\interval{t_0}{\forever}\} ,\, \\
-                         & \{\intervalmapping{t_0}{\forever}{\andtype}\} ,\, \\
+                         & \{\intervalmapping{t_0}{\forever}{\andtype{}}\} ,\, \\
                          & \{\intervalmapping{t_0}{\forever}{0}\} ,\, \\
                          & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} ) ]\\
     \}&)\\
@@ -135,7 +135,7 @@ We define \emph{operations} to alter the temporal feature model. A software prod
 
 \begin{itemize}
   \item \textbf{addFeature(featureID, parentGroupID, name, featureType)} from $t_n$ to $t_m$\\
-    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \mandatory, then the parent group must have type \andtype.
+    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \mandatory{}, then the parent group must have type \andtype{}.
   \item \textbf{addGroup(groupID, parentFeatureID, groupType)} from $t_n$ to $t_m$\\
     Adds group with id \var{groupID} and type \var{groupType} to the feature with id \var{parentFeatureID} during the interval $\interval{t_n}{t_m}$. The group ID must be fresh, and the parent feature must exist during the interval. 
   \item \textbf{removeFeature(featureID)} at time $t_n$\\
@@ -147,9 +147,9 @@ We define \emph{operations} to alter the temporal feature model. A software prod
   \item \textbf{moveGroup(groupID, targetFeatureID)} \\
     Moves the group with id \var{groupID} to the feature with ID $\var{targetFeatureID}$. Very similar to \textbf{moveFeature}. 
   \item \textbf{changeFeatureVariationType(featureID, newType)} \\
-    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType}. If the new type is \mandatory, the parent group type must be \andtype. 
+    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType}. If the new type is \mandatory{}, the parent group type must be \andtype{}. 
   \item \textbf{changeGroupVariationType(groupID, newType)}\\
-    Changes the group variation type of the group with ID \var{groupID} to \var{newType}. If the new type is \ortype or \xortype, make sure that no child feature has type \mandatory. 
+    Changes the group variation type of the group with ID \var{groupID} to \var{newType}. If the new type is \ortype{} or \xortype{}, make sure that no child feature has type \mandatory{}. 
   \item \textbf{changeFeatureName(featureID, name)}\\
     Changes the name of the feature with ID \var{featureID} to \var{name}. No other feature may have the same name.
 \end{itemize}

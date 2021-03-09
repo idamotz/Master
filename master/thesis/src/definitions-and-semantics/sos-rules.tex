@@ -304,6 +304,7 @@ The rule in figure \vref{rule:change-feature-varation-type} shows the semantics 
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Variation-Type}
       {\\
+        \var{featureID} \neq \var{rootID} \qquad
         \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \forall \interval{t_{p_1}}{t_{p_2}} \in \overlapping{F_p}{t_n}{t_{t_2}} % for all parent intervals overlapping the temporal scope
