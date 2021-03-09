@@ -344,10 +344,13 @@ The rule in figure \vref{rule:change-group-varation-type} is similar to the \tex
       {\\
         \containing{G_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
-        \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}} % for all parent intervals overlapping the temporal scope
-        \forall c \in \, \bigcup G_c \interval{t_{c_1}}{t_{c_2}} % for all child features in the child interval
-        \forall t \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right) % for all the types of the child features during the temporal scope
-        \cdot \big(\var{compatibleTypes}(\var{type}, t)\big)\\
+        \\
+        \qqquad \qqquad \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}}\hfill\\ % for all parent intervals overlapping the temporal scope 
+        \qqquad \qqquad\forall c \in \, \bigcup G_c \interval{t_{c_1}}{t_{c_2}}\hfill\\ % for all child features in the child interval
+        \qqquad \qqquad\forall t \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right)\hfill \\ % for all the types of the child features during the temporal scope
+         \qqquad \qqquad \quad \big(\var{compatibleTypes}(\var{type}, t)\big)\hfill\\
+         \\
+
         \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
       }
       {

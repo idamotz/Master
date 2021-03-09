@@ -2,6 +2,8 @@
 
 \usepackage{hyperref}
 \usepackage{interval}
+\usepackage{csquotes}
+\usepackage[shortlabels]{enumitem}
 
 \newcommand{\todo}[1]{{\color{red}TODO: #1}}
 \synctex=1
@@ -38,6 +40,15 @@
 \newcommand{\features}{\map{features}}
 \newcommand{\groups}{\map{groups}{}}
 \newcommand{\names}{\map{names}}
+
+\newcommand{\typefont}[1]{\textsc{#1}}
+\newcommand{\andtype}{\typefont{and}}
+\newcommand{\ortype}{\typefont{or}}
+\newcommand{\xortype}{\typefont{alternative}}
+\newcommand{\optional}{\typefont{optional}}
+\newcommand{\mandatory}{\typefont{mandatory}}
+
+\newcommand{\itbf}[1]{\textit{\textbf{#1}}}
 
 
 %%------------------------------------------------------------------------

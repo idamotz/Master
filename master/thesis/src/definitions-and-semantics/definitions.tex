@@ -1,13 +1,13 @@
 \section{Definitions}
 
-\subsection{Feature model evolution plan}
-\label{sub:feature-model-evolution-plan}
-A feature model evolution plan is defined as a triple $(\names, \features, \groups)$ where \names, \features, and \groups{} are all maps.
+\subsection{Temporal feature model}
+\label{sub:temporal-feature-model}
+A temporal feature model is defined as a triple $(\names, \features, \groups)$ where \names, \features, and \groups{} are all maps. The reason for this choice is efficiency and modularity. As mentioned in \todo{motivation or background or something}, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be a mistake to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations as described in \citetitle{art:consistency-preserving-evolution-planning} \parencite{art:consistency-preserving-evolution-planning}. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID is fresh.
+
+To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of temporal feature models.
 
 \subsubsection{Maps}
 \label{subsub:maps}
-
-\todo{Motivate choice of data structure (mainly efficiency and modularity)}
 
 In general, a map is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. Looking up a value at the key $k$ in map \map{map} looks like this:
 \[
@@ -69,7 +69,9 @@ $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 \subsubsection{Mapping names}
 \label{subsub:mapping-names}
 
-The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the feature model evolution plan. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$.
+The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the temporal feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
+
+This map is mainly used when adding features or changing names. The new name and the scope of the change is then looked up in the \names{} map to verify that no other feature shares the name.
 
 \subsubsection{Mapping features}
 \label{subsub:mapping-features}
@@ -81,6 +83,8 @@ This information is collected into a 5-tuple $(F_e \comma \, F_n \comma \, F_t \
 Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
 The root ID is constant for a temporal feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. 
+
+The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 
 \subsubsection{Mapping groups}
 \label{subsub:mapping-groups}
@@ -100,38 +104,38 @@ A small example of a temporal feature model can be found in Figure \vref{ex:wash
        \\
        ,\{\; & \mapping{0}{(\{ \interval{t_0}{\forever}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\text{Washing Machine}}\} ,\, \\
-             & \{\intervalmapping{t_0}{\forever}{\textbf{mandatory}}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\mandatory}\} ,\, \\
              &  \emptyset ,\, \\ 
              & \{\intervalmapping{t_0}{\forever}{10}\} ) } \\
              ,\, & \mapping{1}{(\{\interval{t_0}{\forever}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\text{Washer}}\} ,\, \\
-             & \{\intervalmapping{t_0}{\forever}{\textbf{mandatory}}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{\mandatory}\} ,\, \\
              &  \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
              & \emptyset)} \\
              ,\, & \mapping{2}{(\{\interval{t_5}{\forever}\} ,\, \\
              & \{\intervalmapping{t_5}{\forever}{\text{Dryer}}\} ,\, \\
-             & \{\intervalmapping{t_5}{\forever}{\textbf{optional}}\} ,\, \\
+             & \{\intervalmapping{t_5}{\forever}{\optional}\} ,\, \\
              &  \{\intervalmapping{t_5}{\forever}{10}\} ,\, \\ 
              & \emptyset)} \}\\
              \\
                ,\; \{ \; & [ 10 \mapsto (\{\interval{t_0}{\forever}\} ,\, \\
-                         & \{\intervalmapping{t_0}{\forever}{\textbf{AND}}\} ,\, \\
+                         & \{\intervalmapping{t_0}{\forever}{\andtype}\} ,\, \\
                          & \{\intervalmapping{t_0}{\forever}{0}\} ,\, \\
                          & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} ) ]\\
     \}&)\\
   \end{align*}
-  \caption{Small feature model evolution plan}
+  \caption{Small temporal feature model}
   \label{ex:washing-machine}
 \end{figure}
 
 \subsection{Operations}
 \label{sub:operations}
 
-We define \emph{operations} to alter the feature model evolution plan. A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not enough to let a human verify a change. 
+We define \emph{operations} to alter the temporal feature model. A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not enough to let a human verify a change. 
 
 \begin{itemize}
   \item \textbf{addFeature(featureID, parentGroupID, name, featureType)} from $t_n$ to $t_m$\\
-    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \textbf{mandatory}, then the parent group must have type \textbf{AND}.
+    Adds feature with id \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with id \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. \var{featureID} must be fresh, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible. If the feature has type \mandatory, then the parent group must have type \andtype.
   \item \textbf{addGroup(groupID, parentFeatureID, groupType)} from $t_n$ to $t_m$\\
     Adds group with id \var{groupID} and type \var{groupType} to the feature with id \var{parentFeatureID} during the interval $\interval{t_n}{t_m}$. The group ID must be fresh, and the parent feature must exist during the interval. 
   \item \textbf{removeFeature(featureID)} at time $t_n$\\
@@ -143,9 +147,9 @@ We define \emph{operations} to alter the feature model evolution plan. A softwar
   \item \textbf{moveGroup(groupID, targetFeatureID)} \\
     Moves the group with id \var{groupID} to the feature with ID $\var{targetFeatureID}$. Very similar to \textbf{moveFeature}. 
   \item \textbf{changeFeatureVariationType(featureID, newType)} \\
-    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType}. If the new type is \textbf{mandatory}, the parent group type must be \textbf{AND}. 
+    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType}. If the new type is \mandatory, the parent group type must be \andtype. 
   \item \textbf{changeGroupVariationType(groupID, newType)}\\
-    Changes the group variation type of the group with ID \var{groupID} to \var{newType}. If the new type is \textbf{OR} or \textbf{XOR}, make sure that no child feature has type \textbf{mandatory}. 
+    Changes the group variation type of the group with ID \var{groupID} to \var{newType}. If the new type is \ortype or \xortype, make sure that no child feature has type \mandatory. 
   \item \textbf{changeFeatureName(featureID, name)}\\
     Changes the name of the feature with ID \var{featureID} to \var{name}. No other feature may have the same name.
 \end{itemize}

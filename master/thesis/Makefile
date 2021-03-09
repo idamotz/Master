@@ -12,6 +12,9 @@ pdf: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
 watch: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
 	cd $(SRCDIR) && latexmk -pdf -pvc -use-make $(SRCFILE) && mv $(PDF) ..
 
+debug: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
+	cd $(SRCDIR) && pdflatex -shell-escape $(SRCFILE) && mv $(PDF) ..
+
 
 clean:
 	rm $(PDF); cd $(SRCDIR) && latexmk -CA && rm $(SRCFILE).bbl $(SRCFILE).run.xml

@@ -1,0 +1,45 @@
+\chapter{Soundness}
+\label{cha:soundness}
+\todo{and completeness? The operations in themselves are not complete, in the sense that there is not a one-to-one correspondence between the operations defined on temporal feature models (temporal operations) and the operations defined on feature models (model operations). However, the temporal operations are more restricted than the model operations, and any valid change within that subset to an evolution plan would be accepted by the rules. Should I try to prove completeness as well?}
+
+\todo{Root feature requirements}
+
+\section{Soundness for temporal feature models}
+\label{sec:soundness-for-temporal-feature-models}
+The temporal feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
+
+According to \cite{art:consistency-preserving-evolution-planning}, the structural requirements (well-formedness rules) are 
+\begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
+   \item A feature model has exactly one root feature.
+   \item The root feature must be mandatory.
+   \item Each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups.
+   \item Features are organized in groups that have exactly one variation type.
+   \item Each feature, except for the root feature, must be part of exactly one group.
+   \item Each group must have exactly one parent feature.
+   \item Groups with types \xortype or \ortype must not contain \mandatory features.
+   \item Groups with types \xortype or \ortype must contain at least two child features.
+\end{enumerate}
+
+Some of these requirements are not upheld in this thesis: \itbf{WF1}, \itbf{WF2}, and \itbf{WF7}. \todo{Explain why}
+
+\todo{This may not be a good idea, since the reasoning for scope blends with the reasoning for the other checks. Maybe divide into validate and apply, like in the implementation?}
+The proof for soundness includes two parts: 
+\begin{enumerate}[(i)]
+   \item proving that the temporal and spatial scopes are correct, and
+   \item that the checks within those scopes are sufficient for soundness.
+\end{enumerate}
+For each rule, the proofs are divided into these two parts.
+
+   
+
+\subsection{Soundness for the Add feature rule}
+\label{sub:soundness-for-the-add-feature-rule}
+
+See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
+Let 
+\[ \textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m}
+\shove (\names{}, \features{}, \groups{})
+\]
+be the initial state. Recall that this operation adds the feature with ID \var{fid} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_n$.
+
+We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the temporal feature model is affected by the change. In other words, if we look at the temporal feature model as a sequence of feature models, the only models that may break as a result of this modifications, are the one associated with time points between $t_n$ and (but not including) $t_m$. 
