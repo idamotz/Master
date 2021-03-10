@@ -6,8 +6,8 @@ A temporal feature model is defined as a triple $(\names, \features, \groups)$ w
 
 To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of temporal feature models.
 
-\subsubsection{Maps}
-\label{subsub:maps}
+\subsection{Maps}
+\label{sub:maps}
 
 In general, a map is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. Looking up a value at the key $k$ in map \map{map} looks like this:
 \[
@@ -33,15 +33,15 @@ To remove a mapping with key $k$, we use $\map{map} \setminus k$. For maps with 
 \]
 That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, we remove the mapping. Otherwise, we only remove $v$ from the set of values associated with $k$. 
 
-\subsubsection{Intervals}
-\label{subsub:intervals}
-To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. The intervals are always used to give information about when something is true in the temporal feature model. This will be further explained in subsections \ref{subsub:mapping-names}, \ref{subsub:mapping-features}. Single time points $t_n$ may be viewed as intervals containing only the time point $t_n$
+\subsection{Intervals}
+\label{sub:intervals}
+To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains} the time point $t_k$ if $t_\text{start} \leq t_k < t_\text{end}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ \emph{overlap} if there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
 
-For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{max(t_{start}, t_l)}{min(t_{end}, t_r)}$
+For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{\textbf{max}(t_{start}, t_l)}{\textbf{min}(t_{end}, t_r)}$.
 
-\subsubsection{Interval maps}
-\label{subsub:interval-maps}
-An interval map is a map where the key is an interval (section \vref{subsub:intervals}). To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
+\subsection{Interval maps}
+\label{sub:interval-maps}
+An interval map is a map where the key is an interval (section \vref{sub:intervals}). To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
 
 \begin{figure}[h]
   \begin{align*}
@@ -54,27 +54,27 @@ An interval map is a map where the key is an interval (section \vref{subsub:inte
   \label{ex:interval-map}
 \end{figure}
 
-$\containing{\map{IM}}{t_n}$ returns the set of keys containing time point $t_n$. For interval maps with non-overlapping keys, the will contain at most one element. For interval maps with set values, we define an additional function $\containingvalue{\map{IM}}{t_n}{v}$ where $v$ is some value, returning the set of the keys containing $t_n$ and associated with a set containing $v$. 
+$\containing{\map{IM}}{t_n}$ returns the set of keys containing time point $t_n$. For interval maps with non-overlapping keys, the resulting set will contain at most one element. For interval maps with set values, we define an additional function $\containingvalue{\map{IM}}{t_n}{v}$ where $v$ is some value, returning the set of the keys containing $t_n$ and associated with a set containing $v$. 
 
-We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns all the interval keys in the map $\map{IM}$ overlapping the interval $\interval{t_n}{t_m}$. See section \vref{subsub:interval-sets} for definition of overlapping intervals. 
+We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns all the interval keys in the map $\map{IM}$ overlapping the interval $\interval{t_n}{t_m}$. 
 
-\subsubsection{Interval sets}
-\label{subsub:interval-sets}
-An interval set is a set of intervals with a few custom predicates and operations. Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ overlap iff there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
+\subsection{Interval sets}
+\label{sub:interval-sets}
+An interval set is a set of intervals with a few custom predicates and operations. Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
 
 Notice that $\in \, \subseteq \, \inn \, \subseteq \, \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$.
 
 $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 
-\subsubsection{Mapping names}
-\label{subsub:mapping-names}
+\subsection{Mapping names}
+\label{sub:mapping-names}
 
 The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the temporal feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
 
 This map is mainly used when adding features or changing names. The new name and the scope of the change is then looked up in the \names{} map to verify that no other feature shares the name.
 
-\subsubsection{Mapping features}
-\label{subsub:mapping-features}
+\subsection{Mapping features}
+\label{sub:mapping-features}
 
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
 A feature has a name, a type, a parent group, and zero or more child groups. Furthermore, a feature may be removed and re-added during the course of the plan, so we also need information about when the feature exists.
@@ -86,14 +86,14 @@ The root ID is constant for a temporal feature model. We assume that it has been
 
 The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 
-\subsubsection{Mapping groups}
-\label{subsub:mapping-groups}
+\subsection{Mapping groups}
+\label{sub:mapping-groups}
 
 The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $(G_e \comma \, G_t  \comma \, G_p \comma \, G_c)$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is a map with the group's types, $G_p$ is a map with feature IDs, and $G_c$ is a map with feature ID values, the interval keys possibly overlapping.
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
-\subsubsection{Example evolution plan}
+\subsection{Example evolution plan}
 A small example of a temporal feature model can be found in Figure \vref{ex:washing-machine}. It contains three features and one group, and describes a temporal feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
 
 \begin{figure}
