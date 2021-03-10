@@ -152,7 +152,7 @@ Figure \ref{rule:remove-feature} shows the semantics of removing a feature with 
         \transition \\
         \big(\lookup{\names{}}{\var{name}} \assign \var{clampInterval}(\lookup{\names{}}{\var{name}}, t_n),\\
         \lookup{\features{}}{\var{featureID}} \assign \var{clampFeature}(\lookup{\features{}}{\var{featureID}}, t_n) ,\\
-        \lookup{\groups{}}{\var{parentGroupID}} \assign \left( G_e,\, G_t,\, G_p,\, \var{clampIntervalValue}(G_c, t_n, \var{featureID})\right)\big)
+      \lookup{\groups{}}{\var{parentGroupID}} \assign \var{removeFeatureAt}\left(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n\right)\big)
       }
     \end{array}$$
   \caption{\label{rule:remove-feature}}
@@ -264,7 +264,7 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
         (\names{}, \features{}, \groups{}) \\
         \transition \\
         \big(\lookup{\names{}}{\var{name}} \assign \var{clampInterval}(\lookup{\names{}}{\var{name}}, t_n),\\
-          \lookup{\features{}}{\var{parentFeatureID}} \assign \left(F_e, \, F_n, \, F_t, \, F_p, \, \var{clampIntervalValue}(F_c, t_n, \var{groupID})\right) ,\\
+          \lookup{\features{}}{\var{parentFeatureID}} \assign \var{removeGroupAt}\left(\lookup{\features}{\var{parentFeatureID}}, \var{groupID}, t_n\right) ,\\
         \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}(\lookup{\groups{}}{\var{groupID}}, t_n) \big)
       }
     \end{array}$$
