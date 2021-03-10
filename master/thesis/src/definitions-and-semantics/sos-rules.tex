@@ -216,6 +216,28 @@ clampGroup|$\left((G_e, G_t, G_p, G_c), \, t_c \right)$|
   \end{minted}
   \captionof{figure}{\label{fun:clamp-group}}
 \end{minipage}
+
+\begin{minipage}{0.6\textwidth}
+  \begin{minted}[escapeinside=||]{text}
+    |$$|
+    |$$|
+removeFeatureAt|$\big((G_e, G_t, G_p, G_c), \var{featureID}, t_c \big)$|
+  = |$\big(G_e, G_t, G_p$|
+    |$,\var{clampIntervalValue}\left(G_c, t_c, \var{featureID}\right)\big)$|
+  \end{minted}
+  \captionof{figure}{\label{fun:remove-feature-at}}
+\end{minipage}
+
+\begin{minipage}{0.6\textwidth}
+  \begin{minted}[escapeinside=||]{text}
+    |$$|
+    |$$|
+removeGroupAt|$\left((F_e, F_t, F_p, F_c), \var{groupID}, t_c \right)$|
+  = |$\big(F_e, F_n, F_t, F_p$|
+    |$,\var{clampIntervalValue}\left(F_c, t_c, \var{groupID}\right)\big)$|
+  \end{minted}
+  \captionof{figure}{\label{fun:remove-group-at}}
+\end{minipage}
 \end{figure}
 
 \subsection{Remove group rule}
@@ -249,10 +271,25 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
   \caption{\label{rule:remove-group}}
 \end{figure}
 
-\subsection{Move feature rule}
-\label{sub:move-feature-rule}
+\subsection{Algorithm for detecting cycles resulting from \textbf{move} operations}
+\label{sub:move-algorithm}
 
-The \var{ancestors} function (Figure \vref{fun:ancestors}) returns a list of ancestors for a feature ID \emph{or} a group ID. 
+Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation results in a sound plan. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. 
+
+Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(TFM, \var{node}, \var{time})$ which takes the temporal feature model, a node and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
+
+First, check whether $n \in \texttt{ancestors}(TFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
+
+Next, find a list of critical nodes. 
+Let $A_n = \texttt{ancestors}(TFM, n, t_1) = [a_1, a_2, \dots, SN, \dots, r]$ and $A_{c_1} = \texttt{ancestors}(TFM, c_1, t_1) = [c_2, c_3, \dots, c_n, SN, \dots, r]$ with $SN$ the first common ancestor of $n$ and $c_1$. The list of critical nodes is then $C = [c_1, c_2, \dots, c_n]$, which is essentially the list of $n$'s new ancestors after the move. 
+
+\textbf{Repeat this step until the algorithm terminates:}
+
+Look for the first move of one of the critical nodes. If no such moves occur until $t_e$, the operation causes no paradoxes, and the algorithm terminates successfully.  
+  Suppose there is a `move` operation scheduled for $t_k$, with $t_1 < t_k < t_e$, where $c_i$ is moved to $k$. There are two possibilities:  
+
+  1. $k$ is in $n$'s subtree, which is equivalent to $n \in \texttt{ancestors}(TFM, k, t_k)$. Report that the move caused a cycle and terminate. 
+  2. $k$ is not in $n$'s subtree, so this move is safe. Let $A_k = \texttt{ancestors}(TFM, k, t_k) = [k_1, k_2, \dots, k_n, SN', \dots, r]$, with SN' the first common element of $A_k$ and $A_n$. Update the list of critical nodes to $[c_1, \dots, c_i, k_1, \dots, k_n]$.
 
 \begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
@@ -273,23 +310,66 @@ ancestors|$\left((\names{}, \features{}, \groups{}), \, \var{groupID}, t_n \righ
   \caption{\label{fun:ancestors}}
 \end{figure}
 
-\begin{figure}
-  \begin{minted}[escapeinside=||]{text}
-hasCycles|$\left((\names{}, \features{}, \groups{}), n, c, \interval{t_{start}}{t_{end}}\right)$|
-  = let |$A_n \assign \var{ancestors}(n, t_{start})$|
-        |$A_c \assign \var{ancestors}(c, t_{start})$|
-        |$C \assign c:$| -- critical nodes (A_c cut off at the first node in common with A_n)
-     in
-      if |$n \in A_c$| then True
-      else 
-        let r |$\assign$| firstMove|$(C)$|
-         in if r = 
-  \end{minted}
-  \caption{\label{fun:has-cycles}}
+\subsection{Move feature rule}
+\label{sub:move-feature-rule}
+See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the algorithm described in subsection \vref{sub:move-algorithm}. The algorithm is not described as a function here, as it is easier to understand written in natural language. An implementation of it can be found in the \todo{appendix}.
+
+\begin{figure}[h]
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Move-Feature}
+      {\\
+        \neg \var{createsCycle} \qquad
+        \containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \qquad
+        F_p \interval{t_n}{t_{p_2}} = \set{\var{oldParentID}} \\
+        \forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
+        \lookup{\features{}}{\var{featureID}} = \left(F_e,\, F_n,\, F_t,\, F_p,\, F_c \right) \\
+        \lookup{\groups{}}{\var{newParentID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right)
+      }
+      {
+        \textbf{moveFeature}\left( \var{featureID, newParentID}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        \big(\names,\\
+        \lookup{\features{}}{\var{featureID}} \assign \left( F_e,\, F_n,\, F_t,\, 
+        \var{clampInterval}(F_p, t_n)\interval{t_n}{t_{p_2}} \assign \var{newParentID},\, F_c \right), \\
+        \lookup{\big(\lookup{\groups{}}{\var{newParentID}} \\
+        \assign \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})\big)}{\var{oldParentID}} \\
+        \assign 
+      \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)}
+    \end{array}$$
+  \caption{\label{rule:move-feature}}
 \end{figure}
 
 \subsection{Move group rule}
 \label{sub:move-group-rule}
+See figure \vref{rule:move-group} for the semantics of the \textbf{moveGroup} operation. The semantics is similar to the one for the \textbf{moveFeature} operation, but it differs in that it does not have a check for types. This is because there can only be a conflict between a parent group and a child feature, not a parent feature and a child group. Since only the latter relation changes in this rule, it is not necessary to check that the types are compatible.
+
+\begin{figure}[h]
+    \renewcommand{\arraystretch}{1.1}
+    \sossize$$\begin{array}{c}
+      \ntyperule{Move-Group}
+      {\\
+        \neg \var{createsCycle} \qquad
+        \containing{G_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \qquad
+        G_p \interval{t_n}{t_{p_2}} = \set{\var{oldParentID}} \\
+        \lookup{\groups{}}{\var{groupID}} = \left( G_e,\, G_t,\, G_p,\, G_c \right) \\
+        \lookup{\features{}}{\var{newParentID}} = \left(F_e,\, F_n,\, F_t,\, F_p,\, F_c \right)
+      }
+      {
+        \textbf{moveGroup}\left( \var{groupID, newParentID}\right) \text{ at } t_n \shove \\
+        (\names{}, \features{}, \groups{}) \\
+        \transition \\
+        \big(\names,\\
+        \lookup{\big(\lookup{\features{}}{\var{newParentID}} \\
+        \assign \var{addChildGroup}(\lookup{\features{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{groupID})\big)}{\var{oldParentID}} \\
+        \assign 
+      \var{removeGroupAt}\left(\lookup{\features{}}{\var{oldParentID}}, \var{groupID}, t_n\right), \\
+        \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, G_n,\, G_t,\, 
+        \var{clampInterval}(G_p, t_n)\interval{t_n}{t_{p_2}} \assign \var{newParentID},\, G_c \right)}
+    \end{array}$$
+  \caption{\label{rule:move-group}}
+\end{figure}
 
 \todo{This is hard}
 
