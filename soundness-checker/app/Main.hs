@@ -1,9 +1,9 @@
 module Main where
 
-import Convert
-import ExampleEvolutionPlan
+import ExampleTemporalFeaturemodel
 import Text.Pretty.Simple (pPrint)
+import qualified TreeSequence as TS
 
 main :: IO ()
 main =
-  pPrint $ convert exampleEvolutionPlan
+  pPrint $ TS.toTreeSequence exampleTemporalFeatureModel

@@ -80,7 +80,7 @@ exampleValidities =
               (IM.fromList [Validity (TP 0) Forever =: ()])
               (IM.fromList [Validity (TP 0) Forever =: "Bluetooth"])
               (IM.fromList [Validity (TP 0) Forever =: Optional])
-              (IM.fromList [Validity (TP 0) Forever =: (g "group:info1")])
+              (IM.fromList [Validity (TP 0) Forever =: g "group:info1"])
               IM.empty
           )
         ,
@@ -89,7 +89,7 @@ exampleValidities =
               (IM.fromList [Validity (TP 1) Forever =: ()])
               (IM.fromList [Validity (TP 1) Forever =: "Android Auto"])
               (IM.fromList [Validity (TP 1) Forever =: Optional])
-              (IM.fromList [Validity (TP 1) Forever =: (g "group:info2")])
+              (IM.fromList [Validity (TP 1) Forever =: g "group:info2"])
               IM.empty
           )
         ,
@@ -98,7 +98,7 @@ exampleValidities =
               (IM.fromList [Validity (TP 1) Forever =: ()])
               (IM.fromList [Validity (TP 1) Forever =: "Apple Car Play"])
               (IM.fromList [Validity (TP 1) Forever =: Optional])
-              (IM.fromList [Validity (TP 1) Forever =: (g "group:info2")])
+              (IM.fromList [Validity (TP 1) Forever =: g "group:info2"])
               IM.empty
           )
         ,
@@ -107,7 +107,7 @@ exampleValidities =
               (IM.fromList [Validity (TP 2) Forever =: ()])
               (IM.fromList [Validity (TP 2) Forever =: "Comfort Systems"])
               (IM.fromList [Validity (TP 2) Forever =: Optional])
-              (IM.fromList [Validity (TP 2) Forever =: (g "group:car1")])
+              (IM.fromList [Validity (TP 2) Forever =: g "group:car1"])
               (IM.fromList [Validity (TP 2) Forever =: S.singleton (g "group:comfort1")])
           )
         ,

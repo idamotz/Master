@@ -89,6 +89,8 @@ data GroupValidity = GroupValidity
 newtype FeatureModel = FeatureModel {_rootFeature :: Feature}
   deriving (Show, Eq)
 
+type TreeSequence = [(TimePoint, FeatureModel)]
+
 data EvolutionPlan = EvolutionPlan
   { _initialModel :: FeatureModel
   , _initialTime :: TimePoint
