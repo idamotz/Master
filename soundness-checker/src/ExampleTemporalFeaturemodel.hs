@@ -1,793 +1,232 @@
-module ExampleTemporalFeaturemodel where
+module ExampleTemporalFeaturemodel (exampleTemporalFeatureModel) where
 
 import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Types
 
+f :: String -> FeatureID
+f = FeatureID
+
+g :: String -> GroupID
+g = GroupID
+
+v :: TimePoint -> TimePoint -> Validity
+v = Validity
+
+(∞) :: TimePoint
+(∞) = Forever
+
+im :: [(Validity, a)] -> ValidityMap a
+im = IM.fromList
+
+set :: Ord a => [a] -> S.Set a
+set = S.fromList
+
 -- This is the output of `convert exampleEvolutionPlan`
 exampleTemporalFeatureModel :: TemporalFeatureModel
 exampleTemporalFeatureModel =
   TemporalFeatureModel
-    (FeatureID "feature:car")
+    (f "feature:car")
+    ( M.fromList
+        [ ("Android Auto", im [(v (TP 1) (∞), f "feature:android-auto")])
+        , ("Apple Car Play", im [(v (TP 1) (∞), f "feature:car-play")])
+        , ("Assistance Systems", im [(v (TP 6) (∞), f "feature:comfort-systems")])
+        , ("Bluetooth", im [(v (TP 0) (TP 7), f "feature:bluetooth")])
+        , ("Car", im [(v (TP 0) (∞), f "feature:car")])
+        , ("Comfort Systems", im [(v (TP 2) (TP 6), f "feature:comfort-systems")])
+        , ("Distance Sensors", im [(v (TP 5) (TP 7), f "feature:distance-sensors")])
+        , ("Emergency Brake", im [(v (TP 6) (∞), f "feature:emergency-brake")])
+        , ("FrontSensors", im [(v (TP 7) (∞), f "feature:front-sensors")])
+        , ("Infotainment System", im [(v (TP 0) (∞), f "feature:infotainment")])
+        , ("Parking Pilot", im [(v (TP 2) (∞), f "feature:parking-pilot")])
+        , ("Rear Sensors", im [(v (TP 7) (∞), f "feature:rear-sensors")])
+        , ("Sensors", im [(v (TP 6) (∞), f "feature:sensors")])
+        ]
+    )
     ( M.fromList
         [
-          ( "Android Auto"
-          , IM.fromList
-              [
-                ( Validity (TP 1) Forever
-                , FeatureID "feature:android-auto"
-                )
-              ]
+          ( f "feature:android-auto"
+          , FeatureValidity
+              (im [(v (TP 1) (∞), ())])
+              (im [(v (TP 1) (∞), "Android Auto")])
+              (im [(v (TP 1) (∞), Optional)])
+              (im [(v (TP 1) (∞), g "group:info2")])
+              mempty
           )
         ,
-          ( "Apple Car Play"
-          , IM.fromList
-              [
-                ( Validity (TP 1) Forever
-                , FeatureID "feature:car-play"
-                )
-              ]
+          ( f "feature:bluetooth"
+          , FeatureValidity
+              (im [(v (TP 0) (TP 7), ())])
+              (im [(v (TP 0) (TP 7), "Bluetooth")])
+              (im [(v (TP 0) (TP 7), Optional)])
+              (im [(v (TP 0) (TP 7), g "group:info1")])
+              mempty
           )
         ,
-          ( "Assistance Systems"
-          , IM.fromList
-              [
-                ( Validity (TP 6) Forever
-                , FeatureID "feature:comfort-systems"
-                )
-              ]
+          ( f "feature:car"
+          , FeatureValidity
+              (im [(v (TP 0) (∞), ())])
+              (im [(v (TP 0) (∞), "Car")])
+              (im [(v (TP 0) (∞), Mandatory)])
+              mempty
+              (im [(v (TP 0) (∞), set [g "group:car1"])])
           )
         ,
-          ( "Bluetooth"
-          , IM.fromList
-              [
-                ( Validity (TP 0) (TP 7)
-                , FeatureID "feature:bluetooth"
-                )
-              ]
+          ( f "feature:car-play"
+          , FeatureValidity
+              (im [(v (TP 1) (∞), ())])
+              (im [(v (TP 1) (∞), "Apple Car Play")])
+              (im [(v (TP 1) (∞), Optional)])
+              (im [(v (TP 1) (∞), g "group:info2")])
+              mempty
           )
         ,
-          ( "Car"
-          , IM.fromList
-              [
-                ( Validity (TP 0) Forever
-                , FeatureID "feature:car"
-                )
-              ]
+          ( f "feature:comfort-systems"
+          , FeatureValidity
+              (im [(v (TP 2) (∞), ())])
+              ( im
+                  [ (v (TP 2) (TP 6), "Comfort Systems")
+                  , (v (TP 6) (∞), "Assistance Systems")
+                  ]
+              )
+              (im [(v (TP 2) (∞), Optional)])
+              (im [(v (TP 2) (∞), g "group:car1")])
+              (im [(v (TP 2) (∞), set [g "group:comfort1"])])
           )
         ,
-          ( "Comfort Systems"
-          , IM.fromList
-              [
-                ( Validity (TP 2) (TP 6)
-                , FeatureID "feature:comfort-systems"
-                )
-              ]
+          ( f "feature:distance-sensors"
+          , FeatureValidity
+              (im [(v (TP 5) (TP 7), ())])
+              (im [(v (TP 5) (TP 7), "Distance Sensors")])
+              (im [(v (TP 5) (TP 7), Mandatory)])
+              ( im
+                  [ (v (TP 5) (TP 6), g "group:pilot1")
+                  , (v (TP 6) (TP 7), g "group:sensors1")
+                  ]
+              )
+              mempty
           )
         ,
-          ( "Distance Sensors"
-          , IM.fromList
-              [
-                ( Validity (TP 5) (TP 7)
-                , FeatureID "feature:distance-sensors"
-                )
-              ]
+          ( f "feature:emergency-brake"
+          , FeatureValidity
+              (im [(v (TP 6) (∞), ())])
+              (im [(v (TP 6) (∞), "Emergency Brake")])
+              (im [(v (TP 6) (∞), Optional)])
+              (im [(v (TP 6) (∞), g "group:comfort1")])
+              mempty
           )
         ,
-          ( "Emergency Brake"
-          , IM.fromList
-              [
-                ( Validity (TP 6) Forever
-                , FeatureID "feature:emergency-brake"
-                )
-              ]
+          ( f "feature:front-sensors"
+          , FeatureValidity
+              (im [(v (TP 7) (∞), ())])
+              (im [(v (TP 7) (∞), "FrontSensors")])
+              (im [(v (TP 7) (∞), Optional)])
+              (im [(v (TP 7) (∞), g "group:sensors1")])
+              mempty
           )
         ,
-          ( "FrontSensors"
-          , IM.fromList
-              [
-                ( Validity (TP 7) Forever
-                , FeatureID "feature:front-sensors"
-                )
-              ]
+          ( f "feature:infotainment"
+          , FeatureValidity
+              (im [(v (TP 0) (∞), ())])
+              (im [(v (TP 0) (∞), "Infotainment System")])
+              (im [(v (TP 0) (∞), Mandatory)])
+              (im [(v (TP 0) (∞), g "group:car1")])
+              ( im
+                  [ (v (TP 0) (∞), set [g "group:info1"])
+                  , (v (TP 1) (∞), set [g "group:info2"])
+                  ]
+              )
           )
         ,
-          ( "Infotainment System"
-          , IM.fromList
-              [
-                ( Validity (TP 0) Forever
-                , FeatureID "feature:infotainment"
-                )
-              ]
+          ( f "feature:parking-pilot"
+          , FeatureValidity
+              (im [(v (TP 2) (∞), ())])
+              (im [(v (TP 2) (∞), "Parking Pilot")])
+              (im [(v (TP 2) (∞), Optional)])
+              (im [(v (TP 2) (∞), g "group:comfort1")])
+              (im [(v (TP 5) (∞), set [g "group:pilot1"])])
           )
         ,
-          ( "Parking Pilot"
-          , IM.fromList
-              [
-                ( Validity (TP 2) Forever
-                , FeatureID "feature:parking-pilot"
-                )
-              ]
+          ( f "feature:rear-sensors"
+          , FeatureValidity
+              (im [(v (TP 7) (∞), ())])
+              (im [(v (TP 7) (∞), "Rear Sensors")])
+              (im [(v (TP 7) (∞), Optional)])
+              (im [(v (TP 7) (∞), g "group:sensors1")])
+              mempty
           )
         ,
-          ( "Rear Sensors"
-          , IM.fromList
-              [
-                ( Validity (TP 7) Forever
-                , FeatureID "feature:rear-sensors"
-                )
-              ]
-          )
-        ,
-          ( "Sensors"
-          , IM.fromList
-              [
-                ( Validity (TP 6) Forever
-                , FeatureID "feature:sensors"
-                )
-              ]
+          ( f "feature:sensors"
+          , FeatureValidity
+              (im [(v (TP 6) (∞), ())])
+              (im [(v (TP 6) (∞), "Sensors")])
+              (im [(v (TP 6) (∞), Optional)])
+              (im [(v (TP 6) (∞), g "group:car1")])
+              (im [(v (TP 6) (∞), set [g "group:sensors1"])])
           )
         ]
     )
     ( M.fromList
         [
-          ( FeatureID "feature:android-auto"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , "Android Auto"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , GroupID "group:info2"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:bluetooth"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) (TP 7)
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) (TP 7)
-                    , "Bluetooth"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) (TP 7)
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) (TP 7)
-                    , GroupID "group:info1"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:car"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , "Car"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , Mandatory
-                    )
-                  ]
-              )
-              (IM.fromList [])
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , S.fromList [GroupID "group:car1"]
-                    )
-                  ]
-              )
-          )
-        ,
-          ( FeatureID "feature:car-play"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , "Apple Car Play"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , GroupID "group:info2"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:comfort-systems"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) (TP 6)
-                    , "Comfort Systems"
-                    )
-                  ,
-                    ( Validity (TP 6) Forever
-                    , "Assistance Systems"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , GroupID "group:car1"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , S.fromList [GroupID "group:comfort1"]
-                    )
-                  ]
-              )
-          )
-        ,
-          ( FeatureID "feature:distance-sensors"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) (TP 7)
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) (TP 7)
-                    , "Distance Sensors"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) (TP 7)
-                    , Mandatory
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) (TP 6)
-                    , GroupID "group:pilot1"
-                    )
-                  ,
-                    ( Validity (TP 6) (TP 7)
-                    , GroupID "group:sensors1"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:emergency-brake"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , "Emergency Brake"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , GroupID "group:comfort1"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:front-sensors"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , "FrontSensors"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , GroupID "group:sensors1"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:infotainment"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , "Infotainment System"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , Mandatory
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , GroupID "group:car1"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , S.fromList [GroupID "group:info1"]
-                    )
-                  ,
-                    ( Validity (TP 1) Forever
-                    , S.fromList [GroupID "group:info2"]
-                    )
-                  ]
-              )
-          )
-        ,
-          ( FeatureID "feature:parking-pilot"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , "Parking Pilot"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , GroupID "group:comfort1"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) Forever
-                    , S.fromList [GroupID "group:pilot1"]
-                    )
-                  ]
-              )
-          )
-        ,
-          ( FeatureID "feature:rear-sensors"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , "Rear Sensors"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 7) Forever
-                    , GroupID "group:sensors1"
-                    )
-                  ]
-              )
-              ( IM.fromList []
-              )
-          )
-        ,
-          ( FeatureID "feature:sensors"
-          , FeatureValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , "Sensors"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , Optional
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , GroupID "group:car1"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , S.fromList [GroupID "group:sensors1"]
-                    )
-                  ]
-              )
-          )
-        ]
-    )
-    ( M.fromList
-        [
-          ( GroupID "group:car1"
+          ( g "group:car1"
           , GroupValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , And
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , FeatureID "feature:car"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , S.fromList [FeatureID "feature:infotainment"]
-                    )
-                  ,
-                    ( Validity (TP 2) Forever
-                    , S.fromList [FeatureID "feature:comfort-systems"]
-                    )
-                  ,
-                    ( Validity (TP 6) Forever
-                    , S.fromList [FeatureID "feature:sensors"]
-                    )
+              (im [(v (TP 0) (∞), ())])
+              (im [(v (TP 0) (∞), And)])
+              (im [(v (TP 0) (∞), f "feature:car")])
+              ( im
+                  [ (v (TP 0) (∞), set [f "feature:infotainment"])
+                  , (v (TP 2) (∞), set [f "feature:comfort-systems"])
+                  , (v (TP 6) (∞), set [f "feature:sensors"])
                   ]
               )
           )
         ,
-          ( GroupID "group:comfort1"
+          ( g "group:comfort1"
           , GroupValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , And
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , FeatureID "feature:comfort-systems"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 2) Forever
-                    , S.fromList [FeatureID "feature:parking-pilot"]
-                    )
-                  ,
-                    ( Validity (TP 6) Forever
-                    , S.fromList [FeatureID "feature:emergency-brake"]
-                    )
+              (im [(v (TP 2) (∞), ())])
+              (im [(v (TP 2) (∞), And)])
+              (im [(v (TP 2) (∞), f "feature:comfort-systems")])
+              ( im
+                  [ (v (TP 2) (∞), set [f "feature:parking-pilot"])
+                  , (v (TP 6) (∞), set [f "feature:emergency-brake"])
                   ]
               )
           )
         ,
-          ( GroupID "group:info1"
+          ( g "group:info1"
           , GroupValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , And
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) Forever
-                    , FeatureID "feature:infotainment"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 0) (TP 7)
-                    , S.fromList [FeatureID "feature:bluetooth"]
-                    )
-                  ]
+              (im [(v (TP 0) (∞), ())])
+              (im [(v (TP 0) (∞), And)])
+              (im [(v (TP 0) (∞), f "feature:infotainment")])
+              (im [(v (TP 0) (TP 7), set [f "feature:bluetooth"])])
+          )
+        ,
+          ( g "group:info2"
+          , GroupValidity
+              (im [(v (TP 1) (∞), ())])
+              (im [(v (TP 1) (TP 5), Alternative), (v (TP 5) (∞), Or)])
+              (im [(v (TP 1) (∞), f "feature:infotainment")])
+              ( im [(v (TP 1) (∞), set [f "feature:android-auto", f "feature:car-play"])]
               )
           )
         ,
-          ( GroupID "group:info2"
+          ( g "group:pilot1"
           , GroupValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) (TP 5)
-                    , Alternative
-                    )
-                  ,
-                    ( Validity (TP 5) Forever
-                    , Or
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , FeatureID "feature:infotainment"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 1) Forever
-                    , S.fromList
-                        [ FeatureID "feature:android-auto"
-                        , FeatureID "feature:car-play"
-                        ]
-                    )
-                  ]
-              )
+              (im [(v (TP 5) (∞), ())])
+              (im [(v (TP 5) (∞), And)])
+              (im [(v (TP 5) (∞), f "feature:parking-pilot")])
+              (im [(v (TP 5) (TP 6), set [f "feature:distance-sensors"])])
           )
         ,
-          ( GroupID "group:pilot1"
+          ( g "group:sensors1"
           , GroupValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) Forever
-                    , And
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) Forever
-                    , FeatureID "feature:parking-pilot"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 5) (TP 6)
-                    , S.fromList [FeatureID "feature:distance-sensors"]
-                    )
-                  ]
-              )
-          )
-        ,
-          ( GroupID "group:sensors1"
-          , GroupValidity
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , ()
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , And
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) Forever
-                    , FeatureID "feature:sensors"
-                    )
-                  ]
-              )
-              ( IM.fromList
-                  [
-                    ( Validity (TP 6) (TP 7)
-                    , S.fromList [FeatureID "feature:distance-sensors"]
-                    )
-                  ,
-                    ( Validity (TP 7) Forever
-                    , S.fromList
-                        [ FeatureID "feature:front-sensors"
-                        , FeatureID "feature:rear-sensors"
-                        ]
-                    )
+              (im [(v (TP 6) (∞), ())])
+              (im [(v (TP 6) (∞), And)])
+              (im [(v (TP 6) (∞), f "feature:sensors")])
+              ( im
+                  [ (v (TP 6) (TP 7), set [f "feature:distance-sensors"])
+                  , (v (TP 7) (∞), set [f "feature:front-sensors", f "feature:rear-sensors"])
                   ]
               )
           )
