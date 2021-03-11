@@ -14,7 +14,7 @@ type ValidityState = State TemporalFeatureModel
 convert :: EvolutionPlan -> TemporalFeatureModel
 convert (EvolutionPlan initModel startTime operations) =
   foldl
-    (flip applyOperation)
+    (flip apply)
     (convertInitModel initModel startTime)
     operations
 

@@ -131,6 +131,21 @@ data ChangeOperation
   | ChangeFeatureName FeatureID Name
   deriving (Show, Eq)
 
+--------------------
+-- Error Messages --
+--------------------
+
+data ValidationError
+  = NodeAlreadyExists Validity
+  | ParentNotExists
+  | NameInUse Validity FeatureID
+  | IncompatibleTypes FeatureType GroupType Validity
+  | ChangePlanned TimePoint ChangeOperation
+  | NodeNotExists
+  | HasChildren Validity
+  | CreatesCycle
+  deriving (Show, Eq)
+
 makePrisms ''GroupType
 makePrisms ''TimePoint
 makeFieldsNoPrefix ''Validity

@@ -8,17 +8,6 @@ import qualified Data.Set as S
 import Helpers
 import Types
 
-data ValidationError
-  = NodeAlreadyExists Validity
-  | ParentNotExists
-  | NameInUse Validity FeatureID
-  | IncompatibleTypes FeatureType GroupType Validity
-  | ChangePlanned TimePoint ChangeOperation
-  | NodeNotExists
-  | HasChildren Validity
-  | CreatesCycle
-  deriving (Show, Eq)
-
 checkCompatibleTypesFeature :: Validity -> FeatureType -> ValidityMap GroupType -> Maybe ValidationError
 checkCompatibleTypesFeature validity ftype gtypes =
   (\(interval, gtype) -> IncompatibleTypes ftype gtype interval)
