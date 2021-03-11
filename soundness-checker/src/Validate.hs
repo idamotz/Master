@@ -1,4 +1,4 @@
-module Validate where
+module Validate (validate) where
 
 import Control.Lens
 import Data.Foldable (toList)

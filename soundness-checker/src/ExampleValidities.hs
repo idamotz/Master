@@ -116,7 +116,7 @@ exampleValidities =
               (IM.fromList [Validity (TP 2) Forever =: ()])
               (IM.fromList [Validity (TP 2) Forever =: "Parking Pilot"])
               (IM.fromList [Validity (TP 2) Forever =: Optional])
-              (IM.fromList [Validity (TP 2) Forever =: (g "group:comfort1")])
+              (IM.fromList [Validity (TP 2) Forever =: g "group:comfort1"])
               IM.empty
           )
         ]

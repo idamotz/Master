@@ -1,4 +1,4 @@
-module Convert where
+module Convert (convert) where
 
 import Apply
 import Control.Lens
@@ -8,8 +8,6 @@ import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map.Strict as M
 import Helpers
 import Types
-
-type ValidityState = State TemporalFeatureModel
 
 convert :: EvolutionPlan -> TemporalFeatureModel
 convert (EvolutionPlan initModel startTime operations) =

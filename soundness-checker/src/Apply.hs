@@ -1,4 +1,4 @@
-module Apply where
+module Apply (apply) where
 
 import Control.Lens
 import qualified Data.IntervalMap.Generic.Strict as IM
