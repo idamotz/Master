@@ -1,4 +1,4 @@
-module TreeSequence where
+module TreeSequence (toTreeSequence, treeAt, getTimePoints) where
 
 import Control.Lens
 import qualified Data.IntervalMap.Generic.Strict as IM
@@ -13,28 +13,26 @@ toSetOf l = S.fromList . toListOf l
 
 toTreeSequence :: TemporalFeatureModel -> TreeSequence
 toTreeSequence tfm =
-  let tps = filter (/= Forever) $ S.toAscList $ getTimePoints tfm
+  let tps = filter (/= Forever) . S.toAscList $ getTimePoints tfm
    in zip tps $ treeAt tfm <$> tps
 
 treeAt :: TemporalFeatureModel -> TimePoint -> FeatureModel
-treeAt tfm tp = FeatureModel . fromJust $ convertFeature tfm tp (tfm ^. rootID)
+treeAt tfm tp = FeatureModel . fromJust . convertFeature tfm tp $ tfm ^. rootID
 
 convertFeature :: TemporalFeatureModel -> TimePoint -> FeatureID -> Maybe Feature
 convertFeature tfm tp fid = do
-  FeatureValidity e n t p c <- tfm ^? featureValidities . ix fid
-  (_, name) <- lookupTP tp n
-  (_, typ) <- lookupTP tp t
-  let childIDs = foldMap S.toList . IM.elems $ IM.containing c tp
-  let children = mapMaybe (convertGroup tfm tp) childIDs
-  return $ Feature fid name typ children
+  FeatureValidity _ names types _ childGroups <- tfm ^? featureValidities . ix fid
+  (_, name) <- lookupTP tp names
+  (_, typ) <- lookupTP tp types
+  let childIDs = foldMap S.toList . IM.elems $ IM.containing childGroups tp
+  return . Feature fid name typ $ mapMaybe (convertGroup tfm tp) childIDs
 
 convertGroup :: TemporalFeatureModel -> TimePoint -> GroupID -> Maybe Group
 convertGroup tfm tp gid = do
-  GroupValidity e t p c <- tfm ^? groupValidities . ix gid
-  (_, typ) <- lookupTP tp t
-  let childIDs = foldMap S.toList . IM.elems $ IM.containing c tp
-  let children = mapMaybe (convertFeature tfm tp) childIDs
-  return $ Group gid typ children
+  GroupValidity _ types _ childFeatures <- tfm ^? groupValidities . ix gid
+  (_, typ) <- lookupTP tp types
+  let childIDs = foldMap S.toList . IM.elems $ IM.containing childFeatures tp
+  return . Group gid typ $ mapMaybe (convertFeature tfm tp) childIDs
 
 validityToList :: Validity -> [TimePoint]
 validityToList (Validity s e) = [s, e]

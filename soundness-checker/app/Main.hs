@@ -2,8 +2,8 @@ module Main where
 
 import ExampleTemporalFeaturemodel
 import Text.Pretty.Simple (pPrint)
-import qualified TreeSequence as TS
+import TreeSequence
 
 main :: IO ()
 main =
-  pPrint $ TS.toTreeSequence exampleTemporalFeatureModel
+  pPrint $ toTreeSequence exampleTemporalFeatureModel
