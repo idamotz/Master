@@ -9,7 +9,7 @@ g :: String -> GroupID
 g = GroupID
 
 exampleEvolutionPlan :: EvolutionPlan
-exampleEvolutionPlan = EvolutionPlan model (TP 0) operations
+exampleEvolutionPlan = EvolutionPlan model (TP 0) ops
 
 model :: FeatureModel
 model =
@@ -48,8 +48,8 @@ ao = AddOperation
 v :: TimePoint -> TimePoint -> Validity
 v = Validity
 
-operations :: [TimeOperation]
-operations =
+ops :: [TimeOperation]
+ops =
   (ao (v (TP 1) Forever) <$> tp1) ++ (ao (v (TP 2) Forever) <$> tp2) ++ tp5 ++ tp6 ++ tp7
   where
     tp1 =

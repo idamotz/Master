@@ -1,9 +1,8 @@
 module TreeSequence where
 
 import Control.Lens
-import Control.Monad.State.Lazy
 import qualified Data.IntervalMap.Generic.Strict as IM
-import Data.Maybe (catMaybes, fromJust, isNothing)
+import Data.Maybe (fromJust, mapMaybe)
 import Data.Monoid (Endo)
 import qualified Data.Set as S
 import Helpers
@@ -18,30 +17,24 @@ toTreeSequence tfm =
    in zip tps $ treeAt tfm <$> tps
 
 treeAt :: TemporalFeatureModel -> TimePoint -> FeatureModel
-treeAt tfm tp = FeatureModel . fromJust $ evalState (convertFeature tp (tfm ^. rootID)) tfm
+treeAt tfm tp = FeatureModel . fromJust $ convertFeature tfm tp (tfm ^. rootID)
 
-convertFeature :: TimePoint -> FeatureID -> State TemporalFeatureModel (Maybe Feature)
-convertFeature tp fid = do
-  FeatureValidity e n t p c <- fmap fromJust . gets . preview $ featureValidities . ix fid
-  if isNothing $ containingInterval tp e
-    then return Nothing
-    else do
-      let Just (_, name) = lookupTP tp n
-      let Just (_, typ) = lookupTP tp t
-      let childIDs = foldMap S.toList . IM.elems $ IM.containing c tp
-      children <- traverse (convertGroup tp) childIDs
-      return . Just $ Feature fid name typ (catMaybes children)
+convertFeature :: TemporalFeatureModel -> TimePoint -> FeatureID -> Maybe Feature
+convertFeature tfm tp fid = do
+  FeatureValidity e n t p c <- tfm ^? featureValidities . ix fid
+  (_, name) <- lookupTP tp n
+  (_, typ) <- lookupTP tp t
+  let childIDs = foldMap S.toList . IM.elems $ IM.containing c tp
+  let children = mapMaybe (convertGroup tfm tp) childIDs
+  return $ Feature fid name typ children
 
-convertGroup :: TimePoint -> GroupID -> State TemporalFeatureModel (Maybe Group)
-convertGroup tp gid = do
-  GroupValidity e t p c <- fmap fromJust . gets . preview $ groupValidities . ix gid
-  if isNothing $ containingInterval tp e
-    then return Nothing
-    else do
-      let Just (_, typ) = lookupTP tp t
-      let childIDs = foldMap S.toList . IM.elems $ IM.containing c tp
-      children <- traverse (convertFeature tp) childIDs
-      return . Just $ Group gid typ (catMaybes children)
+convertGroup :: TemporalFeatureModel -> TimePoint -> GroupID -> Maybe Group
+convertGroup tfm tp gid = do
+  GroupValidity e t p c <- tfm ^? groupValidities . ix gid
+  (_, typ) <- lookupTP tp t
+  let childIDs = foldMap S.toList . IM.elems $ IM.containing c tp
+  let children = mapMaybe (convertFeature tfm tp) childIDs
+  return $ Group gid typ children
 
 validityToList :: Validity -> [TimePoint]
 validityToList (Validity s e) = [s, e]

@@ -158,4 +158,5 @@ makePrisms ''FeatureType
 makeFieldsNoPrefix ''Feature
 makeFieldsNoPrefix ''Group
 makeFieldsNoPrefix ''FeatureModel
+makeFieldsNoPrefix ''EvolutionPlan
 makePrisms ''TimeOperation
