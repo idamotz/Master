@@ -1,13 +1,13 @@
 cradle:
-  cabal:
-    - path: "src"
-      component: "lib:soundness-checker"
+  stack:
+    - path: "./src"
+      component: "soundness-checker:lib"
 
-    - path: "app/Main.hs"
+    - path: "./app/Main.hs"
       component: "soundness-checker:exe:soundness-checker-exe"
 
-    - path: "app/Paths_soundness_checker.hs"
+    - path: "./app/Paths_soundness_checker.hs"
       component: "soundness-checker:exe:soundness-checker-exe"
 
-    - path: "test"
+    - path: "./test"
       component: "soundness-checker:test:soundness-checker-test"
