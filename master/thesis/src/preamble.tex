@@ -49,6 +49,10 @@
 \newcommand{\xortype}{\typefont{alternative}}
 \newcommand{\optional}{\typefont{optional}}
 \newcommand{\mandatory}{\typefont{mandatory}}
+\newcommand{\featurevar}[1]{\left(#1_e,\, #1_n,\, #1_t,\, #1_p,\, #1_c\right)}
+\newcommand{\feature}{\featurevar{F}}
+\newcommand{\groupvar}[1]{\left(#1_e,\, #1_t,\, #1_p,\, #1_c\right)}
+\newcommand{\group}{\groupvar{G}}
 
 %%------------------------------------------------------------------------
 %% INTERVALS
@@ -75,6 +79,7 @@
 \newcommand{\var}[1]{\texttt{#1}}
 \newcommand{\inn}{\in_\leq}
 \newcommand{\innr}{\in_{\leq\!\!\!\!\geq}}
+\newcommand{\notinn}{\notin_\leq}
 \newcommand{\notinnr}{\notin_{\leq\!\!\!\!\geq}}
 
 \newcommand{\remove}{\setminus}

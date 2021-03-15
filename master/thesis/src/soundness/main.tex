@@ -6,7 +6,12 @@
 
 \section{Soundness for temporal feature models}
 \label{sec:soundness-for-temporal-feature-models}
+\todo{Argue that the rules are \emph{enough} to preserve soundness.}
+\todo{Show what needs to be proved for an initial model. ``correct by construction". In a well-formed structure. Lemma: What is a sound structure. Soundness theorem: Preserves soundness, using the lemma.}
+
 The temporal feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
+
+We must first define what it means for a temporal feature model to be sound. Essentially, it means that if we converted the temporal feature model into a sequence of time points associated with feature model, each feature model would be sound.
 
 According to \cite{art:consistency-preserving-evolution-planning}, the structural requirements (well-formedness rules) are 
 \begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
@@ -17,23 +22,41 @@ According to \cite{art:consistency-preserving-evolution-planning}, the structura
    \item Each feature, except for the root feature, must be part of exactly one group.
    \item Each group must have exactly one parent feature.
    \item Groups with types \xortype{} or \ortype{} must not contain \mandatory{} features.
-   \item Groups with types \xortype{} or \ortype{} must contain at least two child features.
 \end{enumerate}
 
-One of these requirements is not upheld in this thesis, namely \itbf{WF8}. This is because it would cause unnecessary clutter in the rules, although it could be verified quite easily in an actual implementation.
+Furthermore, a feature model is a tree structure and must not contain cycles. There is an additional requirement that groups with types \xortype{} or \ortype{} must contain at least two child features, but this is not taken into account in this thesis.
 
-\todo{This may not be a good idea, since the reasoning for scope blends with the reasoning for the other checks. Maybe divide into validate and apply, like in the implementation?}
-The proof for soundness includes two parts: 
+These requirements can be translated into rules for temporal feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
+
+\begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
+   \item A temporal feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
+\item The root feature must be mandatory. This means that $$R_t  = \set{\intervalmapping{t_0}{\forever}{\mandatory}}$$ where $R_t$ is the types map of the root feature. 
+\item At any time $t_n \geq t_0$, each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups. Given a feature ID $\var{featureID}$, this means that if $\lookup{\features}{\var{featureID}} = \feature$ and $t_n \inn F_e$ , then
+   \begin{enumerate}[(i)]
+      \item $\lookup{F_n}{t_n} = \set{\var{name}}$ \textemdash{} the feature has exactly one name,
+      \item $\lookup{\lookup{\names}{\var{name}}}{t_n} = \set{\var{featureID}}$ \textemdash{} the name is unique \emph{at the time point $t_n$},
+      \item $\lookup{F_t}{t_n} = \set{\var{type}} \text{ with } \var{type} \in \set{\mandatory, \optional}$ \textemdash{} the feature has exactly one type, and
+      \item $\lookup{F_c}{t_n} = C$, such that $\bigcup C$ is a set of the group IDs, and if $\var{groupID} \in \bigcup C$, then $\lookup{\groups}{\var{groupID}} = \group{}$ and $\lookup{G_p}{t_n} = \set{\var{featureID}}$ \textemdash{} if a group is listed as a subgroup of a feature, then the feature is listed as the parent of the group at the same time.
+   \end{enumerate}
+   \item At any time $t_n \geq t_0$, each group has exactly one variation type. Given a group ID $\var{groupID}$, this means that if $\lookup{\groups}{\var{groupID}} = \group$ and $t_n \inn G_e$, then $\lookup{G_t}{t_n} = \set{\var{type}}$ for $\var{type} \in \set{\andtype, \ortype, \xortype}$.
+   \item At any time $t_n \geq t_0$, each feature, except for the root feature, must be part of exactly one group. Formally, given a feature ID $\var{featureID} \neq \var{rootID}$, if $\lookup{\features}{\var{featureID}} = \feature$, and $t_n \inn F_e$, then $\lookup{F_p}{t_n} = \set{\var{groupID}}$ with $\lookup{\groups}{\var{groupID}} = \group$, $t_n \inn G_e$, and $\var{featureID} \in \bigcup \lookup{G_c}{t_n}$. 
+   \item At any time $t_n \geq t_0$, each group must have exactly one parent feature. Formally, given a group ID $\var{groupID}$, if $\lookup{\groups}{\var{groupID}} = \group$ and $t_n \inn G_e$, then $\lookup{G_p}{t_n} = \set{\var{featureID}}$, and $\lookup{\features}{\var{featureID}} = \feature$ with $\var{groupID} \in \bigcup \lookup{F_c}{t_n}$.
+   \item At any time $t_n$, a group with types \xortype{} or \ortype{} must not contain \mandatory{} features. Formally, given a group ID $\var{groupID}$ with $\lookup{\groups}{\var{groupID}} = \group$, if $\lookup{F_t}{t_n} \set{\var{type}}$ with $\var{type} \in \set{\xortype{}, \ortype{}}$, and if $\var{featureID} \in \bigcup \lookup{F_c}{t_n}$ and $\lookup{\features}{\var{featureID}} = \feature$, then $\lookup{F_t}{t_n} = \set{\optional}$.
+\end{enumerate}
+
+We must add an additional requirement:
+\begin{enumerate}[\itbf{WF8}]
+   \item For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\lookup{\lookup{\names}{\var{name}}}{t_n} = \emptyset$ . Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
+\end{enumerate}
+
+
+The proof for soundness includes three parts: 
 \begin{enumerate}[(i)]
-   \item proving that the temporal and spatial scopes are correct, and
-   \item that the checks within those scopes are sufficient for soundness.
+   \item proving that the temporal and spatial scopes are correct, \todo{change to "the rule stays within the scope", refer to the scope section} and
+\item The rule preserves well-formedness \todo{update}
+   \item \todo{The Separate between premises and transition, also read about what the correct term for ``transition" is. The rule updates the temporal feature model correctly}
 \end{enumerate}
 For each rule, the proofs are divided into these two parts.
-
-   
-
-\subsection{Soundness for the Add feature rule}
-\label{sub:soundness-for-the-add-feature-rule}
 
 See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
 Let 
@@ -50,3 +73,11 @@ Since we give a parent group in the operation, the new feature cannot be a root 
 
 However, \itbf{WF3} must be looked at more closely for this rule. Since we check that no other feature has the name \var{name} during the temporal scope, the name is unique for each affected time point. The variation type is given in the operation, and a newly added feature does not have child groups. Thus, \itbf{WF3} is upheld. Since the rule does not change the type of a group, \itbf{WF4} is not affected. As for \itbf{WF5}, since the ID of the parent group (\var{parentGroupID}) is also specified in the operation, the feature is part of exactly one group. \todo{WF6!!!}
 
+\todo{Veiledermøte: 
+
+Prove that the rule only works within the scope, in particular the spatial scope. We've already defined the scope, but now I must prove that the rules only check within the scope. The rule should follow what I define.
+
+
+
+Should divide the proof into parts: One that proves that the premises are sound, an one that checks that the transition does what it should.
+}

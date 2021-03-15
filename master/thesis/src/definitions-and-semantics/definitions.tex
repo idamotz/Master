@@ -62,7 +62,9 @@ We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns 
 \label{sub:interval-sets}
 An interval set is a set of intervals with a few custom predicates and operations. Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
 
-Notice that $\in \, \subseteq \, \inn \, \subseteq \, \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$.
+Notice that $\in \, \subseteq \, \inn \, \subseteq \, \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$. \todo{double check with respect to the next paragraph}
+
+We also define these predicates for time points $t_n$, so that $t_n \inn \map{IS}$ if some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n < t_j$. 
 
 $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 
@@ -78,7 +80,7 @@ This map is mainly used when adding features or changing names. The new name and
 
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
 A feature has a name, a type, a parent group, and zero or more child groups. Furthermore, a feature may be removed and re-added during the course of the plan, so we also need information about when the feature exists.
-This information is collected into a 5-tuple $(F_e \comma \, F_n \comma \, F_t \comma \, F_p \comma \, F_c)$, where $F_e$ is an interval set denoting when the feature exists, $F_n$ is an interval map with name values, $F_t$ is an interval map with the feature's variation types, $F_p$ is an interval map with group ID values, and $F_c$ is an interval map where the values are sets containing group IDs, the interval keys possibly overlapping.
+This information is collected into a 5-tuple $\feature$, where $F_e$ is an interval set denoting when the feature exists, $F_n$ is an interval map with name values, $F_t$ is an interval map with the feature's variation types, $F_p$ is an interval map with group ID values, and $F_c$ is an interval map where the values are sets containing group IDs, the interval keys possibly overlapping.
 
 Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
@@ -89,7 +91,7 @@ The reasoning behind the choice of interval sets and maps here is in large part 
 \subsection{Mapping groups}
 \label{sub:mapping-groups}
 
-The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $(G_e \comma \, G_t  \comma \, G_p \comma \, G_c)$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is a map with the group's types, $G_p$ is a map with feature IDs, and $G_c$ is a map with feature ID values, the interval keys possibly overlapping.
+The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $\group$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is a map with the group's types, $G_p$ is a map with feature IDs, and $G_c$ is a map with feature ID values, the interval keys possibly overlapping.
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
