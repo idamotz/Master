@@ -60,10 +60,14 @@ For each rule, the proofs are divided into these two parts.
 
 See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
 Let 
-\[ \textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m}
-\shove (\names{}, \features{}, \groups{})
-\]
-be the initial state. Recall that this operation adds the feature with ID \var{fid} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_n$.
+\begin{equation*}
+   \begin{split}
+      \textbf{addFeature}(\var{featureID}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m}
+      \shove \\
+   (\names{}, \features{}, \groups{})
+\end{split}
+\end{equation*}
+be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$.
 
 We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the temporal feature model is affected by the change. In other words, if we look at the temporal feature model as a sequence of feature models, the only models that may break as a result of this modifications, are the ones associated with time points between $t_n$ and (but not including) $t_m$. 
 
@@ -71,7 +75,21 @@ The well-formedness rules must hold for each feature model in the sequence; that
 
 Since we give a parent group in the operation, the new feature cannot be a root feature, so \itbf{WF1} is not violated. It is also obvious that the root feature does not change its type in this rule, so \itbf{WF2} is upheld. 
 
-However, \itbf{WF3} must be looked at more closely for this rule. Since we check that no other feature has the name \var{name} during the temporal scope, the name is unique for each affected time point. The variation type is given in the operation, and a newly added feature does not have child groups. Thus, \itbf{WF3} is upheld. Since the rule does not change the type of a group, \itbf{WF4} is not affected. As for \itbf{WF5}, since the ID of the parent group (\var{parentGroupID}) is also specified in the operation, the feature is part of exactly one group. \todo{WF6!!!}
+However, \itbf{WF3} must be looked at more closely for this rule. Since we check that no other feature has the name \var{name} during the temporal scope, the name is unique for each affected time point. The variation type is given in the operation, and a newly added feature does not have child groups. Thus, \itbf{WF3} and \itbf{WF6} are upheld. Since the rule does not change the type of a group, \itbf{WF4} is not affected. As for \itbf{WF5}, since the ID of the parent group (\var{parentGroupID}) is also specified in the operation, the feature is part of exactly one group. The rule checks that the type of the new feature is compatible with all types the parent group has during the temporal scope, so \itbf{WF7} holds, also.
+
+\subsection{Soundness for the Add group rule}
+\label{sub:soundness-for-the-add-group-rule}
+
+See figure \vref{rule:add-group} for the \rulefont{Add-Group} rule. 
+Let 
+\begin{equation*}
+   \begin{split}
+      \textbf{addGroup}(\var{groupID}, \var{type}, \var{parentFeatureID})\text{ at }\interval{t_n}{t_m}
+      \shove \\
+   (\names{}, \features{}, \groups{})
+\end{split}
+\end{equation*}
+be the initial state. Recall that this operation adds the group with ID \var{groupID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. As this rule does not remove or change the type of any feature, \itbf{WF1-3} and \itbf{WF5} hold trivially. Since we check that the group does not already exist ($\interval{t_n}{t_m} \notinnr G_e$), and the original temporal feature model is assumed to be sound, it is impossible that the added group has more than one type or parent. Furthermore, the function $\var{setGroupAttributes}$ sets the type and parent feature ID during the temporal scope, so the added group has at least one type and parent during that interval. The parent feature is looked up in the $\features{}$ map, and asserted to exist during the entire temporal scope ($\interval{t_n}{t_m} \inn F_e$). Thus, \itbf{WF4} and \itbf{WF6} hold. Since the group is added without child features, it does not contain child features during the temporal scope, and so \itbf{WF7} holds.
 
 \todo{Veiledermøte: 
 

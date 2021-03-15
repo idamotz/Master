@@ -242,7 +242,7 @@ removeGroupAt|$\left(\feature, \var{groupID}, t_c \right)$|
 
 \subsection{Remove group rule}
 \label{sub:remove-group-rule}
-The $\rulefont{Remove-Group}$ rule in figure \ref{rule:remove-group} describes the semantics of removing a group in a temporal feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group may not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
+The $\rulefont{Remove-Group}$ rule in figure \vref{rule:remove-group} describes the semantics of removing a group in a temporal feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group may not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
 
 We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clampIntervalValue}$ (figure \vref{fun:clamp-interval-value}), and $\var{clampGroup}$ (figure \vref{fun:clamp-group}) helper functions to update the temporal feature model.  The $\var{clampInterval}$ function takes an interval map with non-overlapping keys and a time point $t_c$, and updates the interval key containing $t_c$ to end at $t_c$. $\var{clampIntervalValue}$ does the same, but for interval maps with overlapping keys and set values. It takes an interval map, a time point $t_c$, and a value $v$, and shortens the interval key containing $t_c$ and $v$ to end at $t_c$. $\var{clampSetInterval}$ takes an interval set with non-overlapping values and a time point $t_c$, and shortens the interval containing $t_c$. 
 
@@ -387,10 +387,12 @@ The rule in figure \vref{rule:change-feature-varation-type} shows the semantics 
         \var{featureID} \neq \var{rootID} \qquad
         \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
-        \forall \interval{t_{p_1}}{t_{p_2}} \in \overlapping{F_p}{t_n}{t_{t_2}} % for all parent intervals overlapping the temporal scope
-        \forall p \in F_p \interval{t_{p_1}}{t_{p_2}} % for all parent groups (always exactly one) in the parent interval
-        \forall t \in \, \var{getTypes}\left(\lookup{\groups}{p}, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)
-        \cdot \big(\var{compatibleTypes}(t, \var{type})\big)\\
+        \\
+        \qqquad \qqquad \forall \interval{t_{p_1}}{t_{p_2}} \in \overlapping{F_p}{t_n}{t_{t_2}} \hfill \\ % for all parent intervals overlapping the temporal scope
+        \qqquad \qqquad \forall p \in F_p \interval{t_{p_1}}{t_{p_2}} \hfill \\% for all parent groups (always exactly one) in the parent interval
+        \qqquad \qqquad \forall t \in \, \var{getTypes}\left(\lookup{\groups}{p}, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right) \hfill \\
+        \qqquad \qqquad \quad \big(\var{compatibleTypes}(t, \var{type})\big) \hfill \\
+        \\
         \lookup{\features{}}{\var{featureID}} = \feature
       }
       {
@@ -429,7 +431,7 @@ The rule in figure \vref{rule:change-group-varation-type} is similar to the \tex
         \qqquad \qqquad \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}}\hfill\\ % for all parent intervals overlapping the temporal scope 
         \qqquad \qqquad\forall c \in \, \bigcup G_c \interval{t_{c_1}}{t_{c_2}}\hfill\\ % for all child features in the child interval
         \qqquad \qqquad\forall t \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right)\hfill \\ % for all the types of the child features during the temporal scope
-         \qqquad \qqquad \quad \big(\var{compatibleTypes}(\var{type}, t)\big)\hfill\\
+        \qqquad \qqquad \quad \big(\var{compatibleTypes}(\var{type}, t)\big)\hfill\\
          \\
 
         \lookup{\groups{}}{\var{groupID}} = \group
