@@ -4,21 +4,22 @@
 What is the scope?
 \\
 
-Given a sound plan P and an operation associated with a timepoint O, the scope is the part of P that \textit{may be affected} by adding O. The scope must be defined in two dimensions:\\
+Given a sound plan P and an operation associated with a time point O, the scope is the part of P that \textit{may be affected} by adding O. The scope must be defined in two dimensions:\\
 
 \subsubsection*{Time}
-Which timepoints of the plan may be affected by the change?
+Which time points of the plan may be affected by the change?
 
 \subsubsection*{Space}
-Which parts of the feature model may be affected within the time scope?
+Which parts of the feature model may be affected within the temporal scope?
 
 \subsubsection*{Operation scopes}
 We define the \textit{minimal} scope for each operation.
 \begin{itemize}
 
   \item \textbf{addFeature}(\var{featureID}, \var{parentGroupID}, \var{name}, \var{featureType}) from $t_n$ to $t_m$\\
-    \todo{Give an argument why the parent group is the spatial scope of this rule}
-    When we add a feature from $t_n$ to $t_m$, it is quite obvious that the scope in time will be $\interval{t_n}{t_m}$, since this is the interval in which the feature will exist. The spatial scope must be only the parent group: If the group type changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. But what about the name? If we only stored name information inside features, we would have to check every feature in the whole interval for this change. However, since we store information about names in a separate map, we can look up the name and check that it is not in use during the interval. \todo{Consider moving last part to data structure definitions}
+     We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the temporal feature model is affected by the change. In other words, if we look at the temporal feature model as a sequence of feature models, the only models that may break as a result of this modification, are the ones associated with time points between $t_n$ and (but not including) $t_m$. The spatial scope must be only the feature itself, the parent group and the name. If the group type of the parent changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. The name is unique, so we must also verify that no other feature is using the name during the temporal scope. 
+ 
+
   \item \textbf{addGroup}(\var{groupID}, \var{parentFeatureID}, \var{groupType}) from $t_n$ to $t_m$\\
     The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the parent feature, for which the only conflicting event is removal -- the types of a group and its parent never conflict.
   \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\

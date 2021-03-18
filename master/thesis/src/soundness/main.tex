@@ -36,7 +36,7 @@ These requirements can be translated into rules for temporal feature models $(\n
       \item $\lookup{F_n}{t_n} = \set{\var{name}}$ \textemdash{} the feature has exactly one name,
       \item $\lookup{\lookup{\names}{\var{name}}}{t_n} = \set{\var{featureID}}$ \textemdash{} the name is unique \emph{at the time point $t_n$},
       \item $\lookup{F_t}{t_n} = \set{\var{type}} \text{ with } \var{type} \in \set{\mandatory, \optional}$ \textemdash{} the feature has exactly one type, and
-      \item $\lookup{F_c}{t_n} = C$, such that $\bigcup C$ is a set of the group IDs, and if $\var{groupID} \in \bigcup C$, then $\lookup{\groups}{\var{groupID}} = \group{}$ and $\lookup{G_p}{t_n} = \set{\var{featureID}}$ \textemdash{} if a group is listed as a subgroup of a feature, then the feature is listed as the parent of the group at the same time.
+      \item $\lookup{F_c}{t_n} = C$, such that $\bigcup C$ is a set of the group IDs, and if $\var{groupID} \in \bigcup C$ and $\lookup{\groups}{\var{groupID}} = \group{}$, then $\lookup{G_p}{t_n} = \set{\var{featureID}}$ \textemdash{} if a group is listed as a subgroup of a feature, then the feature is listed as the parent of the group at the same time.
    \end{enumerate}
    \item At any time $t_n \geq t_0$, each group has exactly one variation type. Given a group ID $\var{groupID}$, this means that if $\lookup{\groups}{\var{groupID}} = \group$ and $t_n \inn G_e$, then $\lookup{G_t}{t_n} = \set{\var{type}}$ for $\var{type} \in \set{\andtype, \ortype, \xortype}$.
    \item At any time $t_n \geq t_0$, each feature, except for the root feature, must be part of exactly one group. Formally, given a feature ID $\var{featureID} \neq \var{rootID}$, if $\lookup{\features}{\var{featureID}} = \feature$, and $t_n \inn F_e$, then $\lookup{F_p}{t_n} = \set{\var{groupID}}$ with $\lookup{\groups}{\var{groupID}} = \group$, $t_n \inn G_e$, and $\var{featureID} \in \bigcup \lookup{G_c}{t_n}$. 
@@ -44,19 +44,24 @@ These requirements can be translated into rules for temporal feature models $(\n
    \item At any time $t_n$, a group with types \xortype{} or \ortype{} must not contain \mandatory{} features. Formally, given a group ID $\var{groupID}$ with $\lookup{\groups}{\var{groupID}} = \group$, if $\lookup{F_t}{t_n} \set{\var{type}}$ with $\var{type} \in \set{\xortype{}, \ortype{}}$, and if $\var{featureID} \in \bigcup \lookup{F_c}{t_n}$ and $\lookup{\features}{\var{featureID}} = \feature$, then $\lookup{F_t}{t_n} = \set{\optional}$.
 \end{enumerate}
 
-We must add an additional requirement:
-\begin{enumerate}[\itbf{WF8}]
-   \item For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\lookup{\lookup{\names}{\var{name}}}{t_n} = \emptyset$ . Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
+We must add two additional requirements:
+\begin{enumerate}[itemsep=0mm]
+   \item[\itbf{WF8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
+   \item[\itbf{WF9}] The temporal feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
 \end{enumerate}
 
+Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original temporal feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
 
-The proof for soundness includes three parts: 
+\paragraph{Soundness of the rules}
+For each rule, the proof for soundness includes three parts: 
 \begin{enumerate}[(i)]
-   \item proving that the temporal and spatial scopes are correct, \todo{change to "the rule stays within the scope", refer to the scope section} and
-\item The rule preserves well-formedness \todo{update}
-   \item \todo{The Separate between premises and transition, also read about what the correct term for ``transition" is. The rule updates the temporal feature model correctly}
+   \item proving that the rule operates strictly within the previously defined temporal and spatial scopes (section \vref{sec:define-the-scope}), 
+   \item that the rule preserves well-formedness, as defined in the above requirements \itbf{WF1-9}, and
+   \item that the rule updates the model correctly, preserving soundness as well as respecting the semantics of the operation.
 \end{enumerate}
-For each rule, the proofs are divided into these two parts.
+
+\section{Soundness of the Add feature rule}
+\label{sec:soundness-of-the-add-feature-rule}
 
 See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
 Let 
@@ -67,18 +72,40 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$.
+be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \itbf{WF1-9}.
 
-We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the temporal feature model is affected by the change. In other words, if we look at the temporal feature model as a sequence of feature models, the only models that may break as a result of this modifications, are the ones associated with time points between $t_n$ and (but not including) $t_m$. 
+\paragraph{Scope} 
 
-The well-formedness rules must hold for each feature model in the sequence; that is, for any time point $t_k$ within the scope, the feature model at $t_k$ must uphold all the rules. 
+Recall from section \vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the feature itself, the parent group and the name. In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation.
 
-Since we give a parent group in the operation, the new feature cannot be a root feature, so \itbf{WF1} is not violated. It is also obvious that the root feature does not change its type in this rule, so \itbf{WF2} is upheld. 
+\paragraph{Preserving well-formedness}
 
-However, \itbf{WF3} must be looked at more closely for this rule. Since we check that no other feature has the name \var{name} during the temporal scope, the name is unique for each affected time point. The variation type is given in the operation, and a newly added feature does not have child groups. Thus, \itbf{WF3} and \itbf{WF6} are upheld. Since the rule does not change the type of a group, \itbf{WF4} is not affected. As for \itbf{WF5}, since the ID of the parent group (\var{parentGroupID}) is also specified in the operation, the feature is part of exactly one group. The rule checks that the type of the new feature is compatible with all types the parent group has during the temporal scope, so \itbf{WF7} holds, also.
+If the rule is applied, the well-formedness requirements must hold for the updated feature model. 
+Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \itbf{WF1} and \itbf{WF2} hold for the updated temporal feature model.
 
-\subsection{Soundness for the Add group rule}
-\label{sub:soundness-for-the-add-group-rule}
+Because we assume that \itbf{WF8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
+Consequently, \itbf{WF3} holds.
+
+The rule does not modify the parent group's variation type, so \itbf{WF4} is preserved in the modified temporal feature model.
+
+Similarly to the argument for \itbf{WF3}, the parent group ID is uniquely defined for the feature in \var{setFeatureAttributes}, and \var{featureID} is added to the parent group's set of child features, so the new feature is part of exactly one group. Since we do not remove any other feature IDs from the parent group's set of features, and as we already established that the new feature is not the root feature, \itbf{WF5} is preserved.
+
+The new feature does not have any subgroups during the temporal scope, and we do not modify the parent group's parent feature. Under the assumption that \itbf{WF6} holds in the original model, it still holds after applying the \rulefont{Add-Feature} rule.
+
+The rule verifies that all of the parent group's types are compatible with the added feature's type during the temporal scope, so \itbf{WF7} holds after applying the rule.
+
+Since the rule adds the temporal scope to the new feature's existence table, and since the parent group exists in the original plan, \itbf{WF8} is preserved after the rule is applied.
+
+It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no subgroups, so it cannot be part of a cycle. Because of the assumption that \itbf{WF9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
+
+We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the temporal feature model, according to well-formedness rules \itbf{WF1-9}.
+
+\paragraph{Correctness of model modification}
+
+The operation's intent is to add the feature with ID \var{featureID} to the temporal feature model during the interval $\interval{t_n}{t_m}$. We argue that the SOS rule does exactly that. The $\names{}$ map is meant to give complete information about which names are used in the feature model, and which feature each name belongs to at any time point. The only name added to the feature model when we add the new feature is \var{name}, and the new feature only uses this name during the temporal scope $\interval{t_n}{t_m}$. The rule should then reflect this, so the $\names{}$ map is updated at key \var{name} and $\interval{t_n}{t_m}$ with the value $\var{featureID}$.
+
+\section{Soundness for the Add group rule}
+\label{sec:soundness-for-the-add-group-rule}
 
 See figure \vref{rule:add-group} for the \rulefont{Add-Group} rule. 
 Let 

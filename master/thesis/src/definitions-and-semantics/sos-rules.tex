@@ -29,20 +29,21 @@ $$\sossize\begin{array}{c}
         \interval{t_n}{t_m} \not \innr F_e \qquad
         \interval{t_n}{t_m} \inn G_e \qquad
         \lookup{\names{}}{\var{name}}\interval{t_n}{t_m} = \emptyset \\
-        \lookup{\features{}}{\var{fid}} = \feature \\
+        \lookup{\features{}}{\var{featureID}} = \feature \\
         \lookup{\groups{}}{\var{parentGroupID}} = \group\\
         \forall \var{gt}_{\in G_t\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
       }
       {
-        \textbf{addFeature}(\var{fid}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \shove \\
+        \textbf{addFeature}(\var{featureID}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \shove \\
          (\names{}, \features{}, \groups{})\\
         \transition\\
-        (\lookup{\names{}}{\var{name}}\interval{t_n}{t_m} \assign \var{fid},  \\
-        {\lookup{\features{}}{\var{fid}}} \assign 
-        \var{setFeatureAttributes}(\lookup{\features{}}{\var{fid}}, \interval{t_n}{t_m}, 
+        (\lookup{\names{}}{\var{name}}\interval{t_n}{t_m} \assign \var{featureID},  \\
+        {\lookup{\features{}}{\var{featureID}}} \assign 
+        \var{setFeatureAttributes}(\lookup{\features{}}{\var{featureID}}, 
+        \interval{t_n}{t_m}, \\
         \var{name}, \var{type}, \var{parentGroupID}),\\
         {\lookup{\groups{}}{\var{parentGroupID}}} \assign 
-        \var{addChildFeature}(\lookup{\groups{}}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{fid}))
+        \var{addChildFeature}(\lookup{\groups{}}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID}))
     }
     \end{array}$$
     \caption{\label{rule:add-feature}}
