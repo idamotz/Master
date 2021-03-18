@@ -28,7 +28,7 @@ Furthermore, a feature model is a tree structure and must not contain cycles. Th
 
 These requirements can be translated into rules for temporal feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
 
-\begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
+\begin{enumerate}[\itbf{TFMWF\arabic*}, itemsep=0mm]
    \item A temporal feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
 \item The root feature must be mandatory. This means that $$R_t  = \set{\intervalmapping{t_0}{\forever}{\mandatory}}$$ where $R_t$ is the types map of the root feature. 
 \item At any time $t_n \geq t_0$, each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups. Given a feature ID $\var{featureID}$, this means that if $\lookup{\features}{\var{featureID}} = \feature$ and $t_n \inn F_e$ , then
@@ -46,8 +46,8 @@ These requirements can be translated into rules for temporal feature models $(\n
 
 We must add two additional requirements:
 \begin{enumerate}[itemsep=0mm]
-   \item[\itbf{WF8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
-   \item[\itbf{WF9}] The temporal feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
+   \item[\itbf{TFMWF8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
+   \item[\itbf{TFMWF9}] The temporal feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
 \end{enumerate}
 
 Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original temporal feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
@@ -56,7 +56,7 @@ Together, these requirements form the basis of the soundness proofs. We assume t
 For each rule, the proof for soundness includes three parts: 
 \begin{enumerate}[(i)]
    \item proving that the rule operates strictly within the previously defined temporal and spatial scopes (section \vref{sec:define-the-scope}), 
-   \item that the rule preserves well-formedness, as defined in the above requirements \itbf{WF1-9}, and
+   \item that the rule preserves well-formedness, as defined in the above requirements \itbf{TFMWF1-9}, and
    \item that the rule updates the model correctly, preserving soundness as well as respecting the semantics of the operation.
 \end{enumerate}
 
@@ -72,7 +72,7 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \itbf{WF1-9}.
+be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \itbf{TFMWF1-9}.
 
 \paragraph{Scope} 
 
@@ -81,24 +81,24 @@ Recall from section \vref{sec:define-the-scope} that the temporal scope of this 
 \paragraph{Preserving well-formedness}
 
 If the rule is applied, the well-formedness requirements must hold for the updated feature model. 
-Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \itbf{WF1} and \itbf{WF2} hold for the updated temporal feature model.
+Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \itbf{TFMWF1} and \itbf{TFMWF2} hold for the updated temporal feature model.
 
-Because we assume that \itbf{WF8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
-Consequently, \itbf{WF3} holds.
+Because we assume that \itbf{TFMWF8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
+Consequently, \itbf{TFMWF3} holds.
 
-The rule does not modify the parent group's variation type, so \itbf{WF4} is preserved in the modified temporal feature model.
+The rule does not modify the parent group's variation type, so \itbf{TFMWF4} is preserved in the modified temporal feature model.
 
-Similarly to the argument for \itbf{WF3}, the parent group ID is uniquely defined for the feature in \var{setFeatureAttributes}, and \var{featureID} is added to the parent group's set of child features, so the new feature is part of exactly one group. Since we do not remove any other feature IDs from the parent group's set of features, and as we already established that the new feature is not the root feature, \itbf{WF5} is preserved.
+Similarly to the argument for \itbf{TFMWF3}, the parent group ID is uniquely defined for the feature in \var{setFeatureAttributes}, and \var{featureID} is added to the parent group's set of child features, so the new feature is part of exactly one group. Since we do not remove any other feature IDs from the parent group's set of features, and as we already established that the new feature is not the root feature, \itbf{TFMWF5} is preserved.
 
-The new feature does not have any subgroups during the temporal scope, and we do not modify the parent group's parent feature. Under the assumption that \itbf{WF6} holds in the original model, it still holds after applying the \rulefont{Add-Feature} rule.
+The new feature does not have any subgroups during the temporal scope, and we do not modify the parent group's parent feature. Under the assumption that \itbf{TFMWF6} holds in the original model, it still holds after applying the \rulefont{Add-Feature} rule.
 
-The rule verifies that all of the parent group's types are compatible with the added feature's type during the temporal scope, so \itbf{WF7} holds after applying the rule.
+The rule verifies that all of the parent group's types are compatible with the added feature's type during the temporal scope, so \itbf{TFMWF7} holds after applying the rule.
 
-Since the rule adds the temporal scope to the new feature's existence table, and since the parent group exists in the original plan, \itbf{WF8} is preserved after the rule is applied.
+Since the rule adds the temporal scope to the new feature's existence table, and since the parent group exists in the original plan, \itbf{TFMWF8} is preserved after the rule is applied.
 
-It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no subgroups, so it cannot be part of a cycle. Because of the assumption that \itbf{WF9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
+It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no subgroups, so it cannot be part of a cycle. Because of the assumption that \itbf{TFMWF9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
 
-We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the temporal feature model, according to well-formedness rules \itbf{WF1-9}.
+We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the temporal feature model, according to well-formedness rules \itbf{TFMWF1-9}.
 
 \paragraph{Correctness of model modification}
 
