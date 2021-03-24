@@ -102,7 +102,27 @@ We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for t
 
 \paragraph{Correctness of model modification}
 
-The operation's intent is to add the feature with ID \var{featureID} to the temporal feature model during the interval $\interval{t_n}{t_m}$. We argue that the SOS rule does exactly that. The $\names{}$ map is meant to give complete information about which names are used in the feature model, and which feature each name belongs to at any time point. The only name added to the feature model when we add the new feature is \var{name}, and the new feature only uses this name during the temporal scope $\interval{t_n}{t_m}$. The rule should then reflect this, so the $\names{}$ map is updated at key \var{name} and $\interval{t_n}{t_m}$ with the value $\var{featureID}$.
+The operation is intended to add the feature with ID \var{featureID} to the temporal feature model during the interval $\interval{t_n}{t_m}$. We argue that the SOS rule does exactly that. The $\names{}$ map is meant to give complete information about which names are used in the feature model, and which feature each name belongs to at any time point. The only name added to the feature model when we add the new feature is \var{name}, and the new feature only uses this name during the temporal scope $\interval{t_n}{t_m}$. After applying the rule, 
+$$\lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} = \set{\var{featureID}}$$.
+
+Similarly, if we wish to lookup information about the feature during the interval $\interval{t_n}{t_m}$ in the modified model, the results should match the information in the operation. The rule assigns 
+\begin{equation*}
+   \begin{split}
+   \var{setFeatureAttributes}(\lookup{\features{}}{\var{featureID}}, \interval{t_n}{t_m}, \var{name}, \var{type}, \\
+   \var{parentGroupID})
+   \end{split}
+\end{equation*}
+
+to $\lookup{\features}{\var{featureID}}$. According to the semantics of assignment (section \vref{sub:maps}) and $\var{setFeatureAttributes}$ (figure \vref{fun:set-feature-attributes}), and given that $\lookup{\features}{\var{featureID}} = \feature$, then 
+\begin{align}
+   \interval{t_n}{t_m} &\in F_e \tag{1} \label{add-feature1} && \text{the feature exists}\\
+   \lookup{F_n}{\interval{t_n}{t_m}} &= \set{\var{name}} \tag{2} \label{add-feature2} && \text{the feature has the expected name}\\
+   \lookup{F_t}{\interval{t_n}{t_m}} &= \set{\var{type}} \tag{3} \label{add-feature3} && \text{the feature has the expected type} \\
+   \lookup{F_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}} \tag{4} \label{add-feature4} && \text{the feature has the expected type} \\
+   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset \tag{5} \label{add-feature5} && \text{the feature has no children}
+\end{align}
+
+Statement number (\ref{add-feature1}) holds due to the line $F_e \cup \interval{t_n}{t_m}$ in $\var{setFeatureAttributes}$. The next four hold due to both premises in the rule and modifications in the function. Equation (\ref{add-feature2}) states that the feature has the name $\var{name}$ and no others during the interval. 
 
 \section{Soundness for the Add group rule}
 \label{sec:soundness-for-the-add-group-rule}
