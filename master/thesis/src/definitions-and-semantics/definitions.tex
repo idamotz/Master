@@ -2,14 +2,25 @@
 
 \subsection{Temporal feature model}
 \label{sub:temporal-feature-model}
-A temporal feature model is defined as a triple $(\names, \features, \groups)$ where \names, \features, and \groups{} are all maps. The reason for this choice is efficiency and modularity. As mentioned in \todo{motivation or background or something}, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be a mistake to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations as described in \citetitle{art:consistency-preserving-evolution-planning} \parencite{art:consistency-preserving-evolution-planning}. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID is fresh.
+
+\begin{definition}[Temporal feature model]
+  A \emph{temporal feature model} is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from \emph{names} to \emph{feature IDs}, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from \emph{group IDs} to \emph{group entries}. 
+  \label{def:temporal-feature-model}
+\end{definition}
+
+The reason for this choice is efficiency and modularity. As mentioned in \todo{motivation or background or something}, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be a mistake to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations as described in \citetitle{art:consistency-preserving-evolution-planning} \parencite{art:consistency-preserving-evolution-planning}. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID is fresh.
 
 To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of temporal feature models.
 
 \subsection{Maps}
 \label{sub:maps}
 
-In general, a map is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. Looking up a value at the key $k$ in map \map{map} looks like this:
+\begin{definition}[Map]
+  A \emph{map} is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. 
+  \label{def:map}
+\end{definition}
+
+Following is the syntax for looking up a value at the key $k$ in map \map{map}:
 \[
   \lookup{\map{map}}{k}
 \]
@@ -20,7 +31,7 @@ This query would give us $v$ if $\mapping{k}{v} \in \map{map}$. If we wish to as
 \lookup{\map{map}}{k} \assign v'
 \]
 
-This also works if $k$ is not already in the map. We assume $O(1)$ for lookup and insertion. For maps with set values, we define an additional operator $\addassign$. If $\lookup{\map{map}}{k} = S$ then 
+This also works if $k$ is not already in the map. We assume $O(1)$ \todo{$\leftarrow$ maybe not?} for lookup and insertion. For maps with set values, we define an additional operator $\addassign$. If $\lookup{\map{map}}{k} = S$ then 
 \[\lookup{\map{map}}{k} \addassign v = \lookup{\map{map}}{k} \assign S \cup \{v\}\]
 To remove a mapping with key $k$, we use $\map{map} \setminus k$. For maps with set values, we additionally define $\removevalue{v}$, where $v$ is some value. Let $\map{map}$ be a map with set values containing the mapping $\mapping{k}{\{v\} \cup S}$. Then $\removevalue{v}$ is defined as follows:
 
@@ -35,13 +46,23 @@ That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, w
 
 \subsection{Intervals}
 \label{sub:intervals}
-To define the map values, we must first define an interval. We use the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$ for the intervals, where $t_\text{start}$ and $t_\text{end}$ denote points in time. The intervals are left-closed and right-open, meaning that $t_\text{start}$ is included in the interval, and all time points until but not including $t_\text{end}$. We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains} the time point $t_k$ if $t_\text{start} \leq t_k < t_\text{end}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ \emph{overlap} if there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
+To define the map values used in temporal feature models, we must first define an \emph{interval}.
+\begin{definition}[Interval]
+  An interval is a set of time points between a lower and an upper bound. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
+  \label{def:interval}
+\end{definition}
+
+We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains} the time point $t_k$ if $t_\text{start} \leq t_k < t_\text{end}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ \emph{overlap} if there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
 
 For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{\textbf{max}(t_{start}, t_l)}{\textbf{min}(t_{end}, t_r)}$.
 
 \subsection{Interval maps}
 \label{sub:interval-maps}
-An interval map is a map where the key is an interval (section \vref{sub:intervals}). To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
+\begin{definition}[Interval map]
+An \emph{interval map} is a map where the key is an interval (definition \vref{def:interval}). 
+\end{definition}
+
+To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
 
 \begin{figure}[h]
   \begin{align*}
@@ -60,7 +81,12 @@ We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns 
 
 \subsection{Interval sets}
 \label{sub:interval-sets}
-An interval set is a set of intervals with a few custom predicates and operations. Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
+
+\begin{definition}[Interval set]
+  An \emph{interval set} is a set of intervals (definition \vref{def:interval}). 
+\end{definition}
+
+Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
 
 Notice that $\in \, \subseteq \, \inn \, \subseteq \, \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$. \todo{double check with respect to the next paragraph}
 

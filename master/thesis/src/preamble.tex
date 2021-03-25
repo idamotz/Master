@@ -1,5 +1,6 @@
 \usepackage{amsmath, listings, amsthm, amssymb, xspace, xcolor, varioref, minted, caption, mathtools}
 
+\usepackage{amsthm}
 \usepackage{hyperref}
 \usepackage{interval}
 \usepackage{csquotes}
@@ -14,6 +15,9 @@
 %%------------------------------------------------------------------------
 %% DEFINITION HELPERS
 %%------------------------------------------------------------------------
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
 
 % When a line break should be allowed following a comma
 \newcommand{\comma}{, \allowbreak}
@@ -122,3 +126,11 @@
   \end{array}}
 
 \newcommand{\qqquad}{\qquad \quad}
+
+%%------------------------------------------------------------------------
+%% Proof environments
+%%------------------------------------------------------------------------
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
