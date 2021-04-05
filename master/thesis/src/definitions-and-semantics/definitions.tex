@@ -60,6 +60,7 @@ For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restri
 \label{sub:interval-maps}
 \begin{definition}[Interval map]
 An \emph{interval map} is a map where the key is an interval (definition \vref{def:interval}). 
+  \label{def:interval-map}
 \end{definition}
 
 To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure \vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
