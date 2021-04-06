@@ -21,7 +21,7 @@ We define the \textit{minimal} scope for each operation.
  
 
   \item \textbf{addGroup}(\var{groupID}, \var{parentFeatureID}, \var{groupType}) from $t_n$ to $t_m$\\
-    The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the parent feature, for which the only conflicting event is removal -- the types of a group and its parent never conflict.
+    The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the group with id $\var{groupID}$ and the parent feature with ID$\var{parentFeatureID}$, for which the only conflicting event is removal -- the types of a group and its parent never conflict.
   \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\
     \todo{Explain why the temporal scope is the way it is}
     If the original interval containing $t_n$ in which the feature exists inside the feature model is $\interval{t_m}{t_k}$, then the temporal scope is $\interval{t_n}{t_k}$ - from the feature is removed until it would have been removed anyway \todo{rephrase}. Since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.\\

@@ -189,9 +189,75 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation adds the group with ID \var{groupID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. As this rule does not remove or change the type of any feature, \itbf{WF1-3} and \itbf{WF5} hold trivially. Since we check that the group does not already exist ($\interval{t_n}{t_m} \notinnr G_e$), and the original temporal feature model is assumed to be sound, it is impossible that the added group has more than one type or parent. Furthermore, the function $\var{setGroupAttributes}$ sets the type and parent feature ID during the temporal scope, so the added group has at least one type and parent during that interval. The parent feature is looked up in the $\features{}$ map, and asserted to exist during the entire temporal scope ($\interval{t_n}{t_m} \inn F_e$). Thus, \itbf{WF4} and \itbf{WF6} hold. Since the group is added without child features, it does not contain child features during the temporal scope, and so \itbf{WF7} holds.
+be the initial state. Recall that this operation adds the group with ID \var{groupID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. 
+
+\paragraph{Scope}
+
+Recall from section \vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the group itself and the parent feature.
+
+In the premise of the rule, only $\var{groupID}$ and $\var{parentFeatureID}$ are looked up in the temporal feature model. Consequently, the premise stays within the spatial scope of the rule. In the conclusion of the rule, $\features{}$ are assigned to and looked up at $\var{parentFeatureID}$, and $\groups{}$ at $\var{groupID}$. The helper functions $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) and $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}) do not take the temporal feature model as argument, and so only affects the parent feature and the group itself, respectively.
+
+As for the temporal scope, the only interval looked up in the rule is $\interval{t_n}{t_m}$. Hence the rule operates only within the defined temporal scope.
+\\
+
+\begin{lemma}
+   The \rulefont{Add-Group} rule operates strictly within the scope of the \textbf{addGroup} operation.
+   \label{lemma:add-group-scope}
+\end{lemma}
+
+\paragraph{Preserving well-formedness}
+
+If the \rulefont{Add-Group} rule is applied, the resulting temporal feature model must be well-formed according to to the well-formedness rules \itbf{TFMWF1-9}. 
+
+The rule does not change the root feature's existence or type, so it does not violate \itbf{TFMWF1} or \itbf{TFMWF2}. The $\names{}$ map is left unchanged, and the only change made to a feature is to the parent feature, adding $\var{groupID}$ to the set of child groups at $\interval{t_n}{t_m}$. The only feature modified is the parent feature, and only in its child groups map $F_c$. Since $\var{parentFeatureID}$ is assigned to the group's parent feature table $F_p$ at the same key $\interval{t_n}{t_m}$, \itbf{TFMWF3} holds.
+
+Given that \itbf{TFMWF8} holds in the original model, and as the rule premise makes certain that the group does not already exist during the interval $\interval{t_n}{t_m}$, the group does not have any types, parent features, or child features during the interval. When the rule is applied, the group is given exactly one type and parent feature, and $\interval{t_n}{t_m}$ is added to its existence set. Thus \itbf{TFMWF4}, \itbf{TFMWF6}, and \itbf{TFMWF8} hold. 
+
+As for \itbf{TFMWF5}, this requirement holds trivially given that it holds in the original model. No feature is added or removed from any group in the \itbf{Add-Group} rule, so this condition is not affected and thus still holds.
+
+Similarly, \itbf{TFMWF7} will hold in the altered model given that it holds in the original one, since the new group does not contain any features during the temporal scope. For the same reason, the rule does not create a cycle, and so \itbf{TFMWF9} is true for the altered model.
+\\
+
+\begin{lemma}
+   The \rulefont{Add-Group} rule preserves well-formedness of the temporal feature model.
+   \label{lemma:add-group-well-formed}
+\end{lemma}
+
+\paragraph{Correctness of model modification}
+
+The operation is intended to add the group with ID $\var{groupID}$ to the temporal feature model during the interval $\interval{t_n}{t_m}$. Since groups have no names, this operation should not affect the $\names{}$ map. Indeed, the rule reflects this, as the map is not changed in the transition.
+
+However, the operation does naturally add information to the $\groups{}$ map, assigning
+\begin{equation*}
+   \var{setGroupAttributes}( \lookup{\groups{}}{\var{groupID}}, \var{type}, 
+   \var{parentFeatureID} )
+\end{equation*}
+to $\lookup{\groups}{\var{groupID}}$.
+
+Looking up the added group's ID in the modified model should return the information we put in the operation, and given $\lookup{\groups}{\var{groupID}} = \group$, the following statements hold:
+\begin{align}
+   \interval{t_n}{t_m} &\in G_e && \text{the group exists} \tag{1} \label{add-group1}\\
+   \lookup{G_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the group has the expected type} \tag{2} \label{add-group2}\\
+   \lookup{G_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}}  && \text{the group has the expected parent feature} \tag{3} \label{add-group3}\\
+   \lookup{G_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the group has no children} \tag{4} \label{add-group4}
+\end{align}
+
+Statement (\ref{add-group1}) holds due to the line $G_e \cup \interval{t_n}{t_m}$ in $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \itbf{TFMWF8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
+
+Furthermore, we would expect the group to be listed as a child group of the parent feature in the modified model, so given that $\lookup{\features{}}{\var{parentFeatureID}} = \feature$, then
+\begin{equation*}
+   \var{groupID} \in \bigcup \lookup{F_p}{\interval{t_n}{t_m}}
+\end{equation*}
+In the \rulefont{Add-Group} rule, $\var{addChildGroup}(\lookup{\features}{\var{parentFeatureID}}, \interval{t_n}{t_m}, \var{groupID}$ is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) adds $\var{groupID}$ to the set of child features at key $\interval{t_n}{t_m}$, so according to the semantics of $\addassign$, it is indeed true that the group is in the parent feature's set of child group in the temporal scope.
+\\
+
+\begin{lemma}
+   The \rulefont{Add-Group} rule updates the temporal feature model according to the semantics of the \textbf{addGroup} operation.
+   \label{lemma:add-group-mod}
+\end{lemma}
 
 \todo{Veiledermøte: 
+
 
 Prove that the rule only works within the scope, in particular the spatial scope. We've already defined the scope, but now I must prove that the rules only check within the scope. The rule should follow what I define.
 

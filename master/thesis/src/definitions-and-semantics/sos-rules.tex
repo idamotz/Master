@@ -103,7 +103,7 @@ The rule in figure \ref{rule:add-group} describes the conditions which must be i
         ( \names{}, \features{}, \groups{} ) \\
         \transition \\
         (\names{}, \\
-        \lookup{\features{}}{\var{parentFeatureID}} \assign (F_e,\, F_n,\, F_t,\, F_p ,\, F_c \cup \intervalmapping{t_n}{t_m}{\var{groupID}} ), \\ 
+        \lookup{\features{}}{\var{parentFeatureID}} \assign \var{addChildGroup}\left(\lookup{\features{}}{\var{parentFeatureID}},\, \interval{t_n}{t_m},\, \var{groupID} \right), \\ 
       {\lookup{\groups{}}{\var{groupID}}} \assign 
              \var{setGroupAttributes}( \lookup{\groups{}}{\var{groupID}}, \var{type}, \var{parentFeatureID} )  )
       }
@@ -125,8 +125,8 @@ setGroupAttributes|$\big(\group, \, \interval{t_{start}}{t_{end}}, \, \var{type}
 
 \begin{figure}
   \begin{minted}[escapeinside=||]{text}
-addChildGroup|$\left(\feature, \,\interval{t_{start}}{t_{end}}, \, \var{gid}\right)$|
-  = |$\left(F_e,\, F_n,\, F_t,\, F_p,\, \lookup{F_c}{\interval{t_{start}}{t_{end}}} \addassign \var{gid}\right)$|
+addChildGroup|$\left(\feature, \,\interval{t_{start}}{t_{end}}, \, \var{groupID}\right)$|
+  = |$\left(F_e,\, F_n,\, F_t,\, F_p,\, \lookup{F_c}{\interval{t_{start}}{t_{end}}} \addassign \var{groupID}\right)$|
   \end{minted}
   \caption{\label{fun:add-child-group}}
 \end{figure}
