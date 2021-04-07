@@ -1,0 +1,110 @@
+
+\section{Soundness of the Add feature rule}
+\label{sec:soundness-of-the-add-feature-rule}
+
+\todo{Use a proof environment that clearly separate definitions from proofs. The proofs should contain syntactic correctness, not semantic (that part is moved out of the proof)}
+
+See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
+Let 
+\begin{equation*}
+   \begin{split}
+      \textbf{addFeature}(\var{featureID}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m}
+      \shove \\
+   (\names{}, \features{}, \groups{})
+\end{split}
+\end{equation*}
+be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \itbf{TFMWF1-9}.
+
+\todo{Show that the feature model outside the scope is unchanged}
+
+\paragraph{Scope}
+
+Recall from section \vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the feature itself, the parent group and the name. 
+
+In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation.
+\\
+
+\begin{lemma}
+   The \rulefont{Add-Feature} rule operates strictly within the scope of the \textbf{addFeature} operation.
+   \label{lemma:add-feature-scope}
+\end{lemma}
+
+
+\paragraph{Preserving well-formedness}
+
+If the rule is applied, the well-formedness requirements must hold for the updated feature model. 
+
+Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \itbf{TFMWF1} and \itbf{TFMWF2} hold for the updated temporal feature model.
+
+Because we assume that \itbf{TFMWF8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
+Consequently, \itbf{TFMWF3} holds.
+
+The rule does not modify the parent group's variation type, so \itbf{TFMWF4} is preserved in the modified temporal feature model.
+
+Similarly to the argument for \itbf{TFMWF3}, the parent group ID is uniquely defined for the feature in \var{setFeatureAttributes}, and \var{featureID} is added to the parent group's set of child features, so the new feature is part of exactly one group. Since we do not remove any other feature IDs from the parent group's set of features, and as we already established that the new feature is not the root feature, \itbf{TFMWF5} is preserved.
+
+The new feature does not have any subgroups during the temporal scope, and we do not modify the parent group's parent feature. Under the assumption that \itbf{TFMWF6} holds in the original model, it still holds after applying the \rulefont{Add-Feature} rule.
+
+The rule verifies that all of the parent group's types are compatible with the added feature's type during the temporal scope, so \itbf{TFMWF7} holds after applying the rule.
+
+Since the rule adds the temporal scope to the new feature's existence table, and since the parent group exists in the original plan, \itbf{TFMWF8} is preserved after the rule is applied.
+
+It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no subgroups, so it cannot be part of a cycle. Because of the assumption that \itbf{TFMWF9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
+
+As the rule operates within the scope (lemma \vref{lemma:add-feature-scope}), it does not affect any other part of the plan.
+
+We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the temporal feature model, according to well-formedness rules \itbf{TFMWF1-9}. 
+\\
+\begin{lemma}
+   The \rulefont{{Add-Feature}} rule preserves well-formedness of the temporal feature model.
+   \label{lemma:add-feature-well-formed}
+\end{lemma}
+
+\todo{Mention that the scope part ensures that no other part of the plan is affected}
+\paragraph{Correctness of model modification}
+
+The operation is intended to add the feature with ID \var{featureID} to the temporal feature model during the interval $\interval{t_n}{t_m}$. 
+
+After adding the feature to the temporal feature model, looking up the name $\var{name}$ in the $\names{}$ map at interval key $\interval{t_n}{t_m}$ should give the value $\var{featureID}$. Indeed, since the $\names{}$ map is updated thus:
+\[
+   \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID}
+\]
+, then due to the semantics of map assignment (definition \vref{def:map}), and lookup in interval maps (definition \vref{def:interval-map}),
+\[
+   \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} = \set{\var{featureID}}
+\]
+will hold.
+
+Similarly, if we wish to lookup information about the feature during the interval $\interval{t_n}{t_m}$ in the modified model, the results should match the information in the operation. The rule assigns 
+\begin{equation*}
+   \begin{split}
+   \var{setFeatureAttributes}(\lookup{\features{}}{\var{featureID}}, \interval{t_n}{t_m}, \var{name}, \var{type}, \\
+   \var{parentGroupID})
+   \end{split}
+\end{equation*}
+
+to $\lookup{\features}{\var{featureID}}$. 
+
+According to the semantics of assignment (section \vref{sub:maps}) and $\var{setFeatureAttributes}$ (figure \vref{fun:set-feature-attributes}), and given that $\lookup{\features}{\var{featureID}} = \feature$, then 
+\begin{align}
+   \interval{t_n}{t_m} &\in F_e && \text{the feature exists} \tag{1} \label{add-feature1}\\
+   \lookup{F_n}{\interval{t_n}{t_m}} &= \set{\var{name}} && \text{the feature has the expected name} \tag{2} \label{add-feature2}\\
+   \lookup{F_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the feature has the expected type} \tag{3} \label{add-feature3}\\
+   \lookup{F_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}}  && \text{the feature has the expected parent group} \tag{4} \label{add-feature4}\\
+   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has no children} \tag{5} \label{add-feature5}
+\end{align}
+
+Statement (\ref{add-feature1}) holds due to the line $F_e \cup \interval{t_n}{t_m}$ in $\var{setFeatureAttributes}$. The next four hold due to both premises in the rule and modifications in the function. Due to the premise $\interval{t_n}{t_m} \not \innr F_e$, which means that the feature does not previously exist at any point during the interval, and since \itbf{TFMWF8} is assumed to hold for the original model, the original feature does not have a name, type, parent group or child groups during the interval. In the function $\var{setFeatureAttributes}$, the name is added ($\lookup{F_n}{\interval{t_{start}}{t_{end}}} \assign \var{name}$), and so is the type ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{type}$) and the parent group ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{parentGroupID}$). The child groups are not modified, and so (\ref{add-feature5}) holds.
+
+The child features of the group must also be updated according to the semantics of the operation. After applying the rule, given that $\lookup{\groups}{\var{parentGroupID}} = \group{}$, 
+\[
+   \var{featureID} \in \bigcup \lookup{G_c}{\interval{t_n}{t_m}}
+\]
+, meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see figure \vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
+\\
+
+\begin{lemma}
+   The \rulefont{Add-Feature} rule updates the temporal feature model according to the semantics of the \textbf{addFeature} operation.
+   \label{lemma:add-feature-mod}
+\end{lemma}
+
