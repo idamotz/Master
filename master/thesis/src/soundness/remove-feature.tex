@@ -41,5 +41,19 @@ The \rulefont{Remove-Feature} rule contains the premise
 \end{equation*}
 , ensuring that the feature has \emph{exactly} one parent group during the temporal scope of the rule. Under the assumption that \itbf{TFMWF1} holds in the original model, the feature being removed cannot be the root feature, since the root has no parent group. Furthermore, it means that the feature does not move during the temporal scope, which would be a conflict. Therefore, both \itbf{TFMWF1} and \itbf{TFMWF2} hold in the modified model.
 
-For any time point $t_n$ in the temporal scope of the rule, $t_n \notinn F_e$, so \itbf{TFMWF3} holds trivially. Since $\var{removeFeatureAt}(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n)$ is the only change made to a group, and since it only 
+For any time point $t_n$ in the temporal scope of the rule, $t_n \notinn F_e$ due to the semantics of $\var{removeFeatureAt}$ (figure \vref{fun:remove-feature-at}), so \itbf{TFMWF3} and \itbf{TFMWF5} hold trivially. As the only change made to a group is by the function $\var{clampFeature}$ (figure \vref{fun:clamp-feature}), and since that function does not modify the types map $G_t$ of the group, \itbf{TFMWF4} holds given that it is true for the original model. 
+
+The premise $\lookup{F_c}{\interval{t_n}{t_{e_2}}} = \emptyset$ ensures that the feature to be removed does not have any subgroups during the temporal scope, so no group is left without a parent in the updated model. Thus \itbf{TFMWF6} holds. 
+
+Suppose that the parent group has the type $\xortype{}$ or $\ortype{}$ at some point during the temporal scope. In the original model, no child feature of the group has type $\mandatory{}$ due to the assumption that \itbf{TFMWF7} is true. The \rulefont{Remove-Feature} rule does not add any features or change a feature type, so this requirement still holds for the modified model. 
+
+After applying the rule, we have that $\interval{t_n}{t_j} \notinnr F_e$, which means that the feature does not exist during the temporal scope of the operation. To fulfil \itbf{TFMWF8}, we must furthermore have that $\lookup{F_n}{\interval{t_n}{t_j}} = \lookup{F_t}{\interval{t_n}{t_j}}= \lookup{F_p}{\interval{t_n}{t_j}} = \lookup{F_c}{\interval{t_n}{t_j}} = \emptyset$, and that $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_j}}$. The former statement holds due to the semantics of $\var{clampFeature}$ and $\var{clampInterval}$; the feature's attributes are all clamped to end at the time of removal, and the premises on the form $\lookup{F_x}{\interval{t_n}{t_{e_2}}} = \set{v}$ ensure that no changes are made to those attributes during the temporal scope. $\lookup{F_c}{\interval{t_n}{t_j}} = \emptyset$ is a premise in the rule (since $t_j = t_{e_2}$). As for the $\names$ map, the mapping from $\var{name}$ to $\intervalmapping{t_i}{t_j}{\var{featureID}}$ is replaced by $\intervalmapping{t_i}{t_n}{\var{featureID}}$ in the function $\var{clampInterval}(\lookup{\names}{\var{name}}, t_n)$. Hence \itbf{TFMWF8} is true for the altered temporal feature model.
+
+Under the assumption that no cycles exist in the original model, removing a feature does not create a new one, so \itbf{TFMWF9} is holds for the modified model as well.
+\\
+
+\begin{lemma}
+   The \rulefont{Remove-Feature} rule preserves well-formedness of the temporal feature model. 
+   \label{lemma:remove-feature-well-formed}
+\end{lemma}
 
