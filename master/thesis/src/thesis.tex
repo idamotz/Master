@@ -30,33 +30,13 @@ long]
 \chapter*{Preface}
 
 \mainmatter{}
-\part{Introduction}
 
-Giving the thesis a purpose (not how, but why)
-  Mention problems in industry practice (mention software product lines)
-  Say what software product lines are for, not technicalities, why they exist
-  Talk about why planning is difficult, when the project size is increasing
-  -> Changing the plan is even more difficult, and there is a lack of automated tools for checking that the changes don't break anything
-  Drawing a picture of the domain and the problem
-  My thesis is addressing these challenges by looking at these research questions or goals
-Last part of introduction: research questions/goals (base structure of thesis on this) - 3 is a good number
-They are general. What, how, (never why)
-In this thesis, I will address these questions through these activities ...(will not tackle everything, so make the purpose clear)
-Start broader, chunk down to more detail
-Can take the goals up again in the following sections (mention the research questions when tackling them)
-How the sensor should read my master's thesis. How will she know what my contribution is, where it comes in. "In chapter 2 I will give the background, limited to the scope of my thesis". Make it clear that I'm not trying to cover everything, and give the logic/structure of the thesis.
+\input{introduction/main}
 
 \todo{Reread essay and identify useful parts}
 
-\chapter{Background} 
-Software product lines, previous publication (pinpoint what can be improved), SOS rules and operational semantics, and what is modular analysis
-Background should not contain many of my results, but rather retelling what software product lines are, what operational semantics are, existing technologies
-What is the difficulty of doing analysis on it? Just explaining the structures does not convey why it is worth spending time to solve the problems. Hint at what is coming, that this is something I will tackle in the contribution. 
-Can't be technical in the introduction, the background is where I introduce the terms and definitions and technical details. And the implications of these details.
-Explain what I mean by "modularity", explain why the previous work is not modular. 
-What do I assume, and what do I focus on
-
 \part{The project}
+\todo{Rename this part}
 
 Help the reader distinguish the plan and the change of plan (maybe in background). Make an illustration that can help convey the terminology (when I say this word, I'm in this level, etc.)
 Forskerlinjen is part of the story and research work. Can include what we did earlier, since the thesis is based on this work. Focus on the operations. Not necessary to have the rules here, but can refer to the paper. Can use it to explain what it means to be paradox-free. Can say what the plan looks like and what a sound plan is, and refer the reader to the paper for more details. Then say in this project I will look at modular modifications of a plan (the previous work does not tackle plan change). Since it is already published, the sensor does not need to evaluate that part, only the continuation which is this thesis. However, the previous work is a necessary part of the story of this thesis.
@@ -67,12 +47,11 @@ Forskerlinjen is part of the story and research work. Can include what we did ea
 
 \input{soundness/main}
 
-\chapter{Application}
+\chapter{Implementation}  
+\todo{Move to appendix}
 
 Say something about implementation without showing the code, maybe giving pseudocode. Talk about distance between formalization and implementation. Describe examples, error messages, practical applications, how it can be used, how it detects paradoxes, how warnings can be given to users.
 
-\chapter{Implementation}  
-\todo{Move to appendix}
 
 \part{Conclusion}
 How I have addressed the questions, and how I have \emph{not} addressed the questions. Based on the assumption etc. Pinpoint other work that can be done to address the questions I don't tackle.
