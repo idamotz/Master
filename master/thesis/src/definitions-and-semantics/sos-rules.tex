@@ -281,7 +281,7 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
         \textbf{removeGroup}\left( \var{groupID}\right) \text{ at } t_n \shove \\
         (\names{}, \features{}, \groups{}) \\
         \transition \\
-        \big(\lookup{\names{}}{\var{name}} \assign \var{clampInterval}(\lookup{\names{}}{\var{name}}, t_n),\\
+        \big(\names{} ,\\
           \lookup{\features{}}{\var{parentFeatureID}} \assign \var{removeGroupAt}\left(\lookup{\features}{\var{parentFeatureID}}, \var{groupID}, t_n\right) ,\\
         \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}(\lookup{\groups{}}{\var{groupID}}, t_n) \big)
       }
