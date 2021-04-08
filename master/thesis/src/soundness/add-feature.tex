@@ -1,8 +1,5 @@
-
-\section{Soundness of the Add feature rule}
-\label{sec:soundness-of-the-add-feature-rule}
-
-\todo{Use a proof environment that clearly separate definitions from proofs. The proofs should contain syntactic correctness, not semantic (that part is moved out of the proof)}
+\subsection{Soundness of the Add feature rule}
+\label{sub:soundness-of-the-add-feature-rule}
 
 See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
 Let 
@@ -91,7 +88,7 @@ According to the semantics of assignment (section \vref{sub:maps}) and $\var{set
    \lookup{F_n}{\interval{t_n}{t_m}} &= \set{\var{name}} && \text{the feature has the expected name} \tag{2} \label{add-feature2}\\
    \lookup{F_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the feature has the expected type} \tag{3} \label{add-feature3}\\
    \lookup{F_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}}  && \text{the feature has the expected parent group} \tag{4} \label{add-feature4}\\
-   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has no children} \tag{5} \label{add-feature5}
+   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has subgroups} \tag{5} \label{add-feature5}
 \end{align}
 
 Statement (\ref{add-feature1}) holds due to the line $F_e \cup \interval{t_n}{t_m}$ in $\var{setFeatureAttributes}$. The next four hold due to both premises in the rule and modifications in the function. Due to the premise $\interval{t_n}{t_m} \not \innr F_e$, which means that the feature does not previously exist at any point during the interval, and since \itbf{TFMWF8} is assumed to hold for the original model, the original feature does not have a name, type, parent group or child groups during the interval. In the function $\var{setFeatureAttributes}$, the name is added ($\lookup{F_n}{\interval{t_{start}}{t_{end}}} \assign \var{name}$), and so is the type ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{type}$) and the parent group ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{parentGroupID}$). The child groups are not modified, and so (\ref{add-feature5}) holds.

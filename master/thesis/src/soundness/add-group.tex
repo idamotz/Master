@@ -1,6 +1,6 @@
 
-\section{Soundness for the Add group rule}
-\label{sec:soundness-for-the-add-group-rule}
+\subsection{Soundness for the Add group rule}
+\label{sub:soundness-for-the-add-group-rule}
 
 See figure \vref{rule:add-group} for the \rulefont{Add-Group} rule. 
 Let 
@@ -70,7 +70,9 @@ Furthermore, we would expect the group to be listed as a child group of the pare
 \begin{equation*}
    \var{groupID} \in \bigcup \lookup{F_p}{\interval{t_n}{t_m}}
 \end{equation*}
-In the \rulefont{Add-Group} rule, $\var{addChildGroup}(\lookup{\features}{\var{parentFeatureID}}, \interval{t_n}{t_m}, \var{groupID}$ is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) adds $\var{groupID}$ to the set of child features at key $\interval{t_n}{t_m}$, so according to the semantics of $\addassign$, it is indeed true that the group is in the parent feature's set of child group in the temporal scope.
+In the \rulefont{Add-Group} rule, 
+\[\var{addChildGroup}(\lookup{\features}{\var{parentFeatureID}}, \interval{t_n}{t_m}, \var{groupID})\]
+is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) adds $\var{groupID}$ to the set of child features at key $\interval{t_n}{t_m}$, so according to the semantics of $\addassign$, it is indeed true that the group is in the parent feature's set of child group in the temporal scope.
 \\
 
 \begin{lemma}

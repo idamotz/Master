@@ -1,5 +1,5 @@
-\section{Soundness of the Remove feature rule}
-\label{sec:soundness-of-the-remove-feature-rule}
+\subsection{Soundness of the Remove feature rule}
+\label{sub:soundness-of-the-remove-feature-rule}
 
 See figure \vref{rule:remove-feature} for the \rulefont{Remove-Feature} rule. 
 Let 
@@ -19,9 +19,11 @@ As defined in section \vref{sec:define-the-scope}, the \textbf{removeFeature} ru
 \end{equation*}
    According to the semantics of $\containing{\map{IS}}{t_n}$, it is true then that $\interval{t_i}{t_j} = \interval{t_{e_1}}{t_{e_2}}$, and so the temporal scope of the rule is $\interval{t_n}{t_{e_2}} = \interval{t_n}{t_j}$. Clearly, all time points looked up in the premise of the rule are contained within this interval, but the conclusion requires further examination. The $\names{}$ map is assigned $\var{clampInterval}(\lookup{\names}{\var{name}}, t_n)$ at key $\var{name}$. In $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), the interval $\interval{t_{n_1}}{t_{n_2}}$ containing $t_n$ in $\lookup{\names}{\var{name}}$ is looked up and shortened to end at $t_n$ instead of $t_{n_2}$. This modification stays within the scope of the temporal feature model, since the interval affected here is $\interval{t_n}{t_{n_2}}$, and necessarily, $t_{n_2} \leq t_j$, since the feature cannot possibly have a name after it is removed according to \itbf{TFMWF8}. 
 
-   The $\features{}$ map is modified at key $\var{featureID}$ by assigning $\var{clampFeature}(\lookup{\features}{\var{featureID}}, t_n)$. In $\var{clampFeature}$ (figure \vref{fun:clamp-feature}), the intervals of the feature's name, type, and parent are clamped to end at $t_n$. These modifications, too, stay within the temporal scope, for the reason explained in the above paragraph. The existence interval is clamped in a similar way, and so stays within the temporal scope as well.
+   The $\features{}$ map is modified at key $\var{featureID}$ by assigning 
+   $$\var{clampFeature}(\lookup{\features}{\var{featureID}}, t_n)$$
+   . In $\var{clampFeature}$ (figure \vref{fun:clamp-feature}), the intervals of the feature's name, type, and parent are clamped to end at $t_n$. These modifications, too, stay within the temporal scope, for the reason explained in the above paragraph. The existence interval is clamped in a similar way, and so stays within the temporal scope as well.
 
-   Also, the $\groups{}$ map is assigned $\var{removeFeatureAt}(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n)$ at key $\var{parentGroupID}$. This helper function (figure \vref{fun:remove-feature-at}) modifies the parent group's table of subfeatures by calling $\var{clampIntervalValue}(G_c, t_c, \var{featureID})$, which behaves similarly to $\var{clampInterval}$ by clamping the interval containing $t_n$. The difference is that it removes only $\var{featureID}$ from the set of child groups, and adds the feature to the set of subfeatures at the shortened interval. We conclude that this modification, too, happens within the temporal scope of the operation, as looking up any time point outside of the temporal scope will return the same results as the original plan.
+   Also, the $\groups{}$ map is assigned $$\var{removeFeatureAt}(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n)$$ at key $\var{parentGroupID}$. This helper function (figure \vref{fun:remove-feature-at}) modifies the parent group's table of subfeatures by calling $$\var{clampIntervalValue}(G_c, t_c, \var{featureID})$$, which behaves similarly to $\var{clampInterval}$ by clamping the interval containing $t_n$. The difference is that it removes only $\var{featureID}$ from the set of child groups, and adds the feature to the set of subfeatures at the shortened interval. We conclude that this modification, too, happens within the temporal scope of the operation, as looking up any time point outside of the temporal scope will return the same results as the original plan.
 
    Recall that the spatial scope of the rule is the feature itself, its parent group, and its subtree. The premise
 \begin{equation*}
@@ -57,3 +59,19 @@ Under the assumption that no cycles exist in the original model, removing a feat
    \label{lemma:remove-feature-well-formed}
 \end{lemma}
 
+\paragraph{Correctness of model modification}
+The semantics of the \textbf{removeFeature} operation is that applying it should remove the feature from the plan from $t_n$ until the point at which is was originally planned to be removed. Then if $\lookup{\features}{\var{featureID}} = \feature{}$, and $\containing{F_e}{t_n} = \interval{t_i}{t_j}$, then
+\begin{align}
+   \interval{t_n}{t_m} &\notinnr F_e && \text{the feature does not exist} \tag{1} \label{remove-feature1}\\
+   \lookup{F_n}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has no name} \tag{2} \label{remove-feature2}\\
+   \lookup{F_t}{\interval{t_n}{t_m}} &= \emptyset  && \text{the feature has no type} \tag{3} \label{remove-feature3}\\
+   \lookup{F_p}{\interval{t_n}{t_m}} &= \emptyset  && \text{the feature has no parent group} \tag{4} \label{remove-feature4}\\
+   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has no subgroups} \tag{5} \label{remove-feature5}
+\end{align}
+Since we established $\interval{t_n}{t_m} \notinnr F_e$ in the above paragraph, these
+statements follow directly from lemma \vref{lemma:remove-feature-well-formed} and \itbf{TFMWF8}. It further follows that no name is associated with $\var{featureID}$ in the $\names{}$ map, and that no group in the $\groups{}$ map has the feature listed as a subfeature.
+\\
+
+\begin{lemma}
+   The \rulefont{Remove-Feature} rule updates the temporal feature model according tot he semantics of the \textbf{removeFeature} operation.
+\end{lemma}
