@@ -2,6 +2,8 @@
 \label{sec:sos-rules}
 \todo{Consider having two rules for each operation; one for validating and one for updating. Alternatively use functions on the right-hand side of $\transition$.}
 
+\todo{Instantiate rules with a concrete example for the rules and the scope}
+
 
 \todo{Remember premises = above the line}
 
@@ -46,7 +48,8 @@ $$\sossize\begin{array}{c}
         \var{addChildFeature}(\lookup{\groups{}}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID}))
     }
     \end{array}$$
-    \caption{\label{rule:add-feature}}
+    \caption{The \rulefont{Add-Feature} SOS rule}
+    \label{rule:add-feature}
 \end{figure}
 
 Figure \ref{rule:add-feature}  describes the semantics of the \textbf{addFeature} operation. 
@@ -56,12 +59,13 @@ added feature ($\forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{c
 To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (Figure \ref{fun:compatible-types}), $\var{setFeatureAttributes}$ (Figure \ref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (Figure \ref{fun:add-child-feature}). 
 
 \begin{figure}
-  \begin{minted}{text}
-compatibleTypes(AND, _) = True
-compatibleTypes(_, optional) = False
+  \begin{minted}[escapeinside=||]{text}
+compatibleTypes(|$\andtype$|, _) = True
+compatibleTypes(_, |$\optional$|) = False
 compatibleTypes(_, _) = True
   \end{minted}
-  \caption{\label{fun:compatible-types}}
+  \caption{\var{compatibleTypes}}
+  \label{fun:compatible-types}
 \end{figure}
 
 \begin{figure}
@@ -74,7 +78,8 @@ setFeatureAttributes|$(\feature$|, |$\interval{t_{start}}{t_{end}}$|, name, type
     , |$\lookup{F_p}{\interval{t_{start}}{t_{end}}}$| |$\assign$| parentGroupID
     , |$F_c \ )$|
    \end{minted}
-  \caption{\label{fun:set-feature-attributes}}
+  \caption{\var{setFeatureAttributes}}
+  \label{fun:set-feature-attributes}
 \end{figure}
 
 \begin{figure}
@@ -82,7 +87,8 @@ setFeatureAttributes|$(\feature$|, |$\interval{t_{start}}{t_{end}}$|, name, type
 addChildFeature|$(\group, \interval{t_{start}}{t_{end}}, \var{fid})$|
   = |$\left(G_e, G_t, G_p , \lookup{G_c}{\interval{t_{start}}{t_{end}}} \addassign \var{fid}\right)$|
   \end{minted}
-  \caption{\label{fun:add-child-feature}}
+  \caption{\var{addChildFeature}}
+  \label{fun:add-child-feature}
 \end{figure}
 
 \subsection{Add group rule}
@@ -108,7 +114,8 @@ The rule in figure \ref{rule:add-group} describes the conditions which must be i
              \var{setGroupAttributes}( \lookup{\groups{}}{\var{groupID}}, \var{type}, \var{parentFeatureID} )  )
       }
     \end{array}$$
-  \caption{\label{rule:add-group}}
+    \caption{The \rulefont{Add-Group} SOS rule}
+    \label{rule:add-group}
 \end{figure}
 
 \begin{figure}
@@ -120,7 +127,8 @@ setGroupAttributes|$\big(\group, \, \interval{t_{start}}{t_{end}}, \, \var{type}
     , |$\lookup{G_p}{\interval{t_{start}}{t_{end}}}$| |$\assign$| parentFeatureID
     , |$G_c )$|
      \end{minted}
-  \caption{\label{fun:set-group-attributes}}
+  \caption{\var{setGroupAttributes}}
+  \label{fun:set-group-attributes}
 \end{figure}
 
 \begin{figure}
@@ -128,7 +136,8 @@ setGroupAttributes|$\big(\group, \, \interval{t_{start}}{t_{end}}, \, \var{type}
 addChildGroup|$\left(\feature, \,\interval{t_{start}}{t_{end}}, \, \var{groupID}\right)$|
   = |$\left(F_e,\, F_n,\, F_t,\, F_p,\, \lookup{F_c}{\interval{t_{start}}{t_{end}}} \addassign \var{groupID}\right)$|
   \end{minted}
-  \caption{\label{fun:add-child-group}}
+  \caption{\var{addChildGroup}}
+  \label{fun:add-child-group}
 \end{figure}
 
 \subsection{Remove feature rule}
@@ -156,7 +165,8 @@ Figure \ref{rule:remove-feature} shows the semantics of removing a feature with 
       \lookup{\groups{}}{\var{parentGroupID}} \assign \var{removeFeatureAt}\left(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n\right)\big)
       }
     \end{array}$$
-  \caption{\label{rule:remove-feature}}
+    \caption{The \rulefont{Remove-Feature} SOS rule}
+    \label{rule:remove-feature}
 \end{figure}
 
 \begin{figure}
@@ -168,7 +178,8 @@ clampInterval|$\left( \map{map}, \, t_c \right)$|
         |$\map{map}' \assign \map{map} \remove \interval{t_{start}}{t_{end}}$|
      in |$\lookup{\map{map}'}{\interval{t_{start}}{t_c}} \assign v$|
   \end{minted}
-  \captionof{figure}{\label{fun:clamp-interval}}
+  \captionof{figure}{\var{clampInterval}}
+  \label{fun:clamp-interval}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
   \begin{minted}[escapeinside=||]{text}
@@ -178,7 +189,8 @@ clampIntervalValue|$\left( \map{map}, \, t_c ,\, v\right)$|
      in |$\lookup{\map{map}'}{\interval{t_{start}}{t_c}} \addassign v$|
     |$$|
   \end{minted}
-  \captionof{figure}{\label{fun:clamp-interval-value}}
+  \captionof{figure}{\var{clampIntervalValue}}
+  \label{fun:clamp-interval-value}
 \end{minipage}
 
 \begin{minipage}[t]{0.5\textwidth}
@@ -191,7 +203,8 @@ clampSetInterval|$\left( \map{IS}, \, t_c \right)$|
 
      |$$|
   \end{minted}
-  \captionof{figure}{\label{fun:clamp-interval-set}}
+  \captionof{figure}{\var{clampIntervalSet}}
+  \label{fun:clamp-interval-set}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
   \begin{minted}[escapeinside=||]{text}
@@ -203,7 +216,8 @@ clampFeature|$\left(\feature, \, t_c \right)$|
     |$, \var{clampInterval}(F_p, t_c)$|
     |$, F_c)$|
   \end{minted}
-  \captionof{figure}{\label{fun:clamp-feature}}
+  \captionof{figure}{\var{clampFeature}}
+  \label{fun:clamp-feature}
 \end{minipage}
 
 \begin{minipage}{0.5\textwidth}
@@ -215,7 +229,8 @@ clampGroup|$\left(\group, \, t_c \right)$|
     |$, \var{clampInterval}(G_p, t_c)$|
     |$, G_c)$|
   \end{minted}
-  \captionof{figure}{\label{fun:clamp-group}}
+  \captionof{figure}{\var{clampGroup}}
+  \label{fun:clamp-group}
 \end{minipage}
 
 \begin{minipage}{0.6\textwidth}
@@ -226,7 +241,8 @@ removeFeatureAt|$\big(\group, \var{featureID}, t_c \big)$|
   = |$\big(G_e, G_t, G_p$|
     |$,\var{clampIntervalValue}\left(G_c, t_c, \var{featureID}\right)\big)$|
   \end{minted}
-  \captionof{figure}{\label{fun:remove-feature-at}}
+  \captionof{figure}{\var{removeFeatureAt}}
+  \label{fun:remove-feature-at}
 \end{minipage}
 
 \begin{minipage}{0.6\textwidth}
@@ -237,7 +253,8 @@ removeGroupAt|$\left(\feature, \var{groupID}, t_c \right)$|
   = |$\big(F_e, F_n, F_t, F_p$|
     |$,\var{clampIntervalValue}\left(F_c, t_c, \var{groupID}\right)\big)$|
   \end{minted}
-  \captionof{figure}{\label{fun:remove-group-at}}
+  \captionof{figure}{\var{removeGroupAt}}
+  \label{fun:remove-group-at}
 \end{minipage}
 \end{figure}
 
@@ -269,7 +286,8 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
         \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}(\lookup{\groups{}}{\var{groupID}}, t_n) \big)
       }
     \end{array}$$
-  \caption{\label{rule:remove-group}}
+    \caption{The \rulefont{Remove-Group} SOS rule}
+  \label{rule:remove-group}
 \end{figure}
 
 \subsection{Algorithm for detecting cycles resulting from \textbf{move} operations}
@@ -308,7 +326,8 @@ ancestors|$\left((\names{}, \features{}, \groups{}), \, \var{groupID}, t_n \righ
      in 
         parentFeatureID : ancestors|$\left((\names{}, \features{}, groups{}), \, \var{parentFeatureID}, t_n \right)$| 
   \end{minted}
-  \caption{\label{fun:ancestors}}
+  \caption{\var{ancestors}}
+  \label{fun:ancestors}
 \end{figure}
 
 \subsection{Move feature rule}
@@ -339,7 +358,8 @@ See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature
         \assign 
       \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)}
     \end{array}$$
-  \caption{\label{rule:move-feature}}
+    \caption{The \rulefont{Move-Feature} SOS rule}
+  \label{rule:move-feature}
 \end{figure}
 
 \subsection{Move group rule}
@@ -369,7 +389,8 @@ See figure \vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
         \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, G_n,\, G_t,\, 
         \lookup{\var{clampInterval}(G_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID},\, G_c \right)}
     \end{array}$$
-  \caption{\label{rule:move-group}}
+    \caption{The \rulefont{Move-Group} SOS rule}
+  \label{rule:move-group}
 \end{figure}
 
 \todo{This is hard}
@@ -408,7 +429,8 @@ The rule in figure \vref{rule:change-feature-varation-type} shows the semantics 
         \\ \groups{})
       }
     \end{array}$$
-  \caption{\label{rule:change-feature-varation-type}}
+    \caption{The \rulefont{Change-Feature-Variation-Type} SOS rule}
+    \label{rule:change-feature-varation-type}
 \end{figure}
 
 \begin{figure}
@@ -416,7 +438,8 @@ The rule in figure \vref{rule:change-feature-varation-type} shows the semantics 
 getTypes|$\left(\group, \, \interval{t_n}{t_m} \right) = \lookup{G_t}{\interval{t_n}{t_m}}$|
 getTypes|$\left(\feature, \, \interval{t_n}{t_m} \right) = \lookup{G_t}{\interval{t_n}{t_m}}$|
   \end{minted}
-  \caption{\label{get-types}}
+  \caption{\var{getTypes}}
+  \label{get-types}
 \end{figure}
 
 \subsection{Change group variation type rule}
@@ -449,7 +472,8 @@ The rule in figure \vref{rule:change-group-varation-type} is similar to the \tex
         \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, \lookup{\var{clampInterval}(G_t, t_n)}{\interval{t_n}{t_{t_2}}} \assign \var{type},\, G_p,\, G_c \right))
       }
     \end{array}$$
-  \caption{\label{rule:change-group-varation-type}}
+    \caption{The \rulefont{Change-Group-Variation-Type} SOS rule}
+  \label{rule:change-group-varation-type}
 \end{figure}
 
 \subsection{Change feature name}
@@ -476,5 +500,6 @@ The semantics of changing the name of a feature are shown in the \rulefont{Chang
         \groups{})
       }
     \end{array}$$
-  \caption{\label{rule:change-feature-name}}
+    \caption{The \rulefont{Change-Feature-Name} SOS rule}
+  \label{rule:change-feature-name}
 \end{figure}
