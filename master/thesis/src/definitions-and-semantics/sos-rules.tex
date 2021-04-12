@@ -295,7 +295,7 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
 
 Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation results in a sound plan. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. 
 
-Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(TFM, \var{node}, \var{time})$ which takes the temporal feature model, a node and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
+Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(TFM, \var{node}, \var{time})$ which takes the temporal feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
 
 First, check whether $n \in \texttt{ancestors}(TFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
 
@@ -306,9 +306,10 @@ Let $A_n = \texttt{ancestors}(TFM, n, t_1) = [a_1, a_2, \dots, SN, \dots, r]$ an
 
 Look for the first move of one of the critical nodes. If no such moves occur until $t_e$, the operation causes no paradoxes, and the algorithm terminates successfully.  
   Suppose there is a `move` operation scheduled for $t_k$, with $t_1 < t_k < t_e$, where $c_i$ is moved to $k$. There are two possibilities:  
-
-  1. $k$ is in $n$'s subtree, which is equivalent to $n \in \texttt{ancestors}(TFM, k, t_k)$. Report that the move caused a cycle and terminate. 
-  2. $k$ is not in $n$'s subtree, so this move is safe. Let $A_k = \texttt{ancestors}(TFM, k, t_k) = [k_1, k_2, \dots, k_n, SN', \dots, r]$, with SN' the first common element of $A_k$ and $A_n$. Update the list of critical nodes to $[c_1, \dots, c_i, k_1, \dots, k_n]$.
+  \begin{enumerate}
+    \item $k$ is in $n$'s subtree, which is equivalent to $n \in \texttt{ancestors}(TFM, k, t_k)$. Report that the move caused a cycle and terminate. 
+\item $k$ is not in $n$'s subtree, so this move is safe. Let $A_k = \texttt{ancestors}(TFM, k, t_k) = [k_1, k_2, \dots, k_n, SN', \dots, r]$, with SN' the first common element of $A_k$ and $A_n$. Update the list of critical nodes to $[c_1, \dots, c_i, k_1, \dots, k_n]$.
+  \end{enumerate}
 
 \begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
@@ -342,7 +343,7 @@ See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature
         \neg \var{createsCycle} \qquad
         \containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \qquad
         \lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}} \\
-        \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
+        \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_{p_2}}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
         \lookup{\features{}}{\var{featureID}} = \feature \\
         \lookup{\groups{}}{\var{newParentID}} = \group
       }
@@ -353,10 +354,12 @@ See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature
         \big(\names,\\
         \lookup{\features{}}{\var{featureID}} \assign \left( F_e,\, F_n,\, F_t,\, 
         \lookup{\var{clampInterval}(F_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID},\, F_c \right), \\
-        \lookup{\big(\lookup{\groups{}}{\var{newParentID}} \\
-        \assign \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})\big)}{\var{oldParentID}} \\
+
+        \lookup{\big(\lookup{\groups{}}{\var{oldParentID}} \\
+        \assign \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)\big)}{\var{newParentID}} \\
         \assign 
-      \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)}
+      \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})
+        }
     \end{array}$$
     \caption{The \rulefont{Move-Feature} SOS rule}
   \label{rule:move-feature}
