@@ -30,7 +30,7 @@ We define the \textit{minimal} scope for each operation.
     Extremely similar to \textbf{removeFeature}. 
   \item \textbf{moveFeature}(\var{featureID}, \var{targetGroupID}) at $t_n$\\
   If $t_m$ is the time at which the feature is next moved in the original plan, the temporal scope is $\interval{t_n}{t_m}$, since this operation only affects the plan within this interval.\\
-  The spatial scope is discussed in more detail in the \textbf{move feature algo}. This scope is the largest and hardest to define, because we have to detect cycles. The scope is defined by the feature and its ancestors, as well as target group and its ancestors, which may change during the intervals. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common. As usual, conflicting types and removal must be considered in addition to cycles.
+  The spatial scope is discussed in more detail in the \textbf{move feature algo}. This scope is the largest and hardest to define, because we have to detect cycles. The scope is defined by the feature and its ancestors, as well as target group and its ancestors, which may change during the intervals. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common, as well as the feature and the group themselves. As usual, conflicting types and removal must be considered in addition to cycles.
   \item \textbf{moveGroup}(\var{groupID}, \var{targetFeatureID}) at $t_n$\\
     See moveFeature. Very similar.
   \item \textbf{changeFeatureVariationType}(\var{featureID}, \var{newType}) at $t_n$\\
