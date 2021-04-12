@@ -26,7 +26,7 @@ Furthermore, a feature model is a tree structure and must not contain cycles. Th
 
 These requirements can be translated into rules for temporal feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
 
-\begin{enumerate}[\itbf{TFMWF\arabic*}, itemsep=0mm]
+\begin{enumerate}[\wf{\arabic*}, itemsep=0mm]
    \item A temporal feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
 \item The root feature must be mandatory. This means that $$R_t  = \set{\intervalmapping{t_0}{\forever}{\mandatory}}$$ where $R_t$ is the types map of the root feature. 
 \item At any time $t_n \geq t_0$, each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups. Given a feature ID $\var{featureID}$, this means that if $\lookup{\features}{\var{featureID}} = \feature$ and $t_n \inn F_e$ , then
@@ -44,8 +44,8 @@ These requirements can be translated into rules for temporal feature models $(\n
 
 We must add two additional requirements:
 \begin{enumerate}[itemsep=0mm]
-   \item[\itbf{TFMWF8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
-   \item[\itbf{TFMWF9}] The temporal feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
+   \item[\wf{8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
+   \item[\wf{9}] The temporal feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
 \end{enumerate}
 
 Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original temporal feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
@@ -56,6 +56,6 @@ In the following sections, we prove that each rule is sound, and conclude that t
 For each rule, the proof for soundness includes three parts: 
 \begin{enumerate}[(i)]
    \item proving that the rule operates strictly within the previously defined temporal and spatial scopes (section \vref{sec:define-the-scope}), 
-   \item that the rule preserves well-formedness, as defined in the above requirements \itbf{TFMWF1-9}, and
+   \item that the rule preserves well-formedness, as defined in the above requirements \wf{1 \textendash{} 9}, and
    \item that the rule updates the model correctly, preserving soundness as well as respecting the semantics of the operation.
 \end{enumerate}

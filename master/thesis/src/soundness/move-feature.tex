@@ -15,6 +15,7 @@ be the initial state, and
 be the result state after applying the \rulefont{Move-Feature} rule. Recall that this operation moves the feature with ID $\var{featureID}$ to the group with ID $\var{newParentID}$.
 
 \paragraph{Scope}
+\label{par:scope}
 Recall that the temporal scope of the move-feature rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the feature is originally planned to be moved or is removed. In the rule, this scope is identified by 
    \[
       \containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}}
@@ -30,7 +31,7 @@ Recall that the temporal scope of the move-feature rule is $\interval{t_n}{t_k}$
 \end{lemma}
 
 \paragraph{Preserving well-formedness}
-Since the rule verifies that the feature has a parent group, the feature being moved is not the root. Thus \itbf{TFMWF1} and \itbf{TFMWF2} hold. The rule does not update the name, type or subgroups of the feature, so \itbf{TFMWF3} is true for the updated model. Nor does it modify the target group's type or parent feature, so \itbf{TFMWF4}, \itbf{TFMWF6}, and \itbf{TFMWF7} also hold.
+Since the rule verifies that the feature has a parent group, the feature being moved is not the root. Thus \wf{1} and \wf{2} hold. The rule does not update the name, type or subgroups of the feature, so \wf{3} is true for the updated model. Nor does it modify the target group's type or parent feature, so \wf{4}, \wf{6}, and \wf{7} also hold.
 
 The modification made to $\lookup{\features}{\var{featureID}}$ is to the parent group map $F_p$ by 
 \[
@@ -39,11 +40,15 @@ The modification made to $\lookup{\features}{\var{featureID}}$ is to the parent 
 As discussed in earlier sections (e.g. \vref{sub:soundness-of-the-remove-feature-rule}), $\var{clampInterval}$ replaces a mapping $\intervalmapping{t_i}{t_j}{v}$ by $\intervalmapping{t_i}{t_n}{v}$, with $t_n \leq t_j$. Thus $\var{clampInterval}(F_p, \, t_n)$ has no parent group during the temporal scope. The subsequent assignment of $\var{newParentID}$ to $\interval{t_n}{t_{p_2}}$ ensures that the feature has exactly one parent group during the temporal scope. This relation is reflected in the $\groups{}'$ map, with
 \begin{align*}
    \groups' &= \\
-            & \lookup{\big(\lookup{\groups{}}{\var{oldParentID}} \\
-            & \assign \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)\big)}{\var{newParentID}} \\
-            & \assign \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})
+   \lookup{&\big(\lookup{\groups{}}{\var{oldParentID}} \\
+   \assign & \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)\big)}{\var{newParentID}} \\
+   \assign& \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})
 \end{align*}
-The feature is added to the target group by $\var{addChildFeature}$ during the interval $\interval{t_n}{t_{p_2}}$. Consequently \itbf{TFMWF5} holds for the updated model. 
+The feature is added to the target group by $\var{addChildFeature}$ during the interval $\interval{t_n}{t_{p_2}}$. Consequently \wf{5} holds for the updated model. 
+
+As the rule does not alter the feature's existence set, \wf{8} is preserved. 
+
+The intention of the cycle detection algorithm in section \vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original temporal feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveFeature}$ operation introduced it, and the feature being moved must be part of the cycle. This could only happen if the feature became part of its own subtree during the temporal scope, which means that at some point, the feature occurs in its own list of ancestors. The algorithm looks at the feature's \emph{new} ancestors, meaning the ancestors that the feature does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the feature's subtree. Thus the rule preserves \wf 9.
 \\
 
 \begin{lemma}
@@ -51,4 +56,16 @@ The feature is added to the target group by $\var{addChildFeature}$ during the i
    \label{lemma:move-feature-well-formed}
 \end{lemma}
 
-As the rule does not alter the feature's existence set, $\itbf{TFMWF8}$ is preserved.
+\paragraph{Correctness of model modification}
+After applying the \rulefont{Move-Feature} rule, if $\lookup{\features'}{\var{featureID}} = \featurevar{F'}$, then 
+\[
+   \lookup{F'_p}{\interval{t_n}{t_{p_2}}} = \set{\var{newParentID}}
+\]
+meaning that the feature is moved to the group with ID $\var{newParentID}$ during the temporal scope. An argument for this can be found in the previous paragraph.
+\\
+
+\begin{lemma}
+   The \rulefont{Move-Feature} rule updates the temporal feature model according to the semantics of the \textbf{moveFeature} operation.
+   \label{lemma:move-feature-mod}
+\end{lemma}
+

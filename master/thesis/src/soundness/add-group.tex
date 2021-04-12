@@ -29,15 +29,15 @@ As for the temporal scope, the only interval looked up in the rule is $\interval
 
 \paragraph{Preserving well-formedness}
 
-If the \rulefont{Add-Group} rule is applied, the resulting temporal feature model must be well-formed according to to the well-formedness rules \itbf{TFMWF1-9}. 
+If the \rulefont{Add-Group} rule is applied, the resulting temporal feature model must be well-formed according to to the well-formedness rules \wf{1 \textendash{} 9}. 
 
-The rule does not change the root feature's existence or type, so it does not violate \itbf{TFMWF1} or \itbf{TFMWF2}. The $\names{}$ map is left unchanged, and the only change made to a feature is to the parent feature, adding $\var{groupID}$ to the set of child groups at $\interval{t_n}{t_m}$. The only feature modified is the parent feature, and only in its child groups map $F_c$. Since $\var{parentFeatureID}$ is assigned to the group's parent feature table $F_p$ at the same key $\interval{t_n}{t_m}$, \itbf{TFMWF3} holds.
+The rule does not change the root feature's existence or type, so it does not violate \wf{1} or \wf{2}. The $\names{}$ map is left unchanged, and the only change made to a feature is to the parent feature, adding $\var{groupID}$ to the set of child groups at $\interval{t_n}{t_m}$. The only feature modified is the parent feature, and only in its child groups map $F_c$. Since $\var{parentFeatureID}$ is assigned to the group's parent feature table $F_p$ at the same key $\interval{t_n}{t_m}$, \wf{3} holds.
 
-Given that \itbf{TFMWF8} holds in the original model, and as the rule premise makes certain that the group does not already exist during the interval $\interval{t_n}{t_m}$, the group does not have any types, parent features, or child features during the interval. When the rule is applied, the group is given exactly one type and parent feature, and $\interval{t_n}{t_m}$ is added to its existence set. Thus \itbf{TFMWF4}, \itbf{TFMWF6}, and \itbf{TFMWF8} hold. 
+Given that \wf{8} holds in the original model, and as the rule premise makes certain that the group does not already exist during the interval $\interval{t_n}{t_m}$, the group does not have any types, parent features, or child features during the interval. When the rule is applied, the group is given exactly one type and parent feature, and $\interval{t_n}{t_m}$ is added to its existence set. Thus \wf{4}, \wf{6}, and \wf{8} hold. 
 
-As for \itbf{TFMWF5}, this requirement holds trivially given that it holds in the original model. No feature is added or removed from any group in the \itbf{Add-Group} rule, so this condition is not affected and thus still holds.
+As for \wf{5}, this requirement holds trivially given that it holds in the original model. No feature is added or removed from any group in the \rulefont{Add-Group} rule, so this condition is not affected and thus still holds.
 
-Similarly, \itbf{TFMWF7} will hold in the altered model given that it holds in the original one, since the new group does not contain any features during the temporal scope. For the same reason, the rule does not create a cycle, and so \itbf{TFMWF9} is true for the altered model.
+Similarly, \wf{7} will hold in the altered model given that it holds in the original one, since the new group does not contain any features during the temporal scope. For the same reason, the rule does not create a cycle, and so \wf{9} is true for the altered model.
 \\
 
 \begin{lemma}
@@ -64,7 +64,7 @@ Looking up the added group's ID in the modified model should return the informat
    \lookup{G_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the group has no children} \tag{4} \label{add-group4}
 \end{align}
 
-Statement (\ref{add-group1}) holds due to the line $G_e \cup \interval{t_n}{t_m}$ in $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \itbf{TFMWF8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
+Statement (\ref{add-group1}) holds due to the line $G_e \cup \interval{t_n}{t_m}$ in $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \wf{8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
 
 Furthermore, we would expect the group to be listed as a child group of the parent feature in the modified model, so given that $\lookup{\features{}}{\var{parentFeatureID}} = \feature$, then
 \begin{equation*}
