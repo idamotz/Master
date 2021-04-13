@@ -44,7 +44,7 @@ As discussed in earlier sections (e.g. \vref{sub:soundness-of-the-remove-feature
    \assign & \var{removeFeatureAt}\left(\lookup{\groups{}}{\var{oldParentID}}, \var{featureID}, t_n\right)\big)}{\var{newParentID}} \\
    \assign& \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})
 \end{align*}
-The feature is added to the target group by $\var{addChildFeature}$ during the interval $\interval{t_n}{t_{p_2}}$. Consequently \wf{5} holds for the updated model. 
+The feature is added to the target group by $\var{addChildFeature}$ during the interval $\interval{t_n}{t_{p_2}}$, and removed from the original parent group by $\var{removeFeatureAt}$. Consequently \wf{5} holds for the updated model. 
 
 As the rule does not alter the feature's existence set, \wf{8} is preserved. 
 
@@ -57,15 +57,22 @@ The intention of the cycle detection algorithm in section \vref{sub:move-algorit
 \end{lemma}
 
 \paragraph{Correctness of model modification}
-After applying the \rulefont{Move-Feature} rule, if $\lookup{\features'}{\var{featureID}} = \featurevar{F'}$, then 
+The operation is intended to move the feature with ID $\var{featureID}$ to the group with ID $\var{newParentID}$ during the temporal scope $\interval{t_n}{t_{p_2}}$. After applying the \rulefont{Move-Feature} rule, the only differences between the original and modified temporal feature model should be
+\begin{enumerate}[(i)]
+   \item The feature's parent group should be $\var{newParentID}$ during the temporal scope \label{move-feature-parentgroup}
+   \item The feature should not appear in the original parent group's set of subfeatures during the temporal scope \label{move-feature-oldparent}
+   \item The feature should appear in the new parent group's set of subfeatures \label{move-feature-newparent}
+\end{enumerate}
+
+Given the modified map of parent groups $F'_p$ and the original map $F_p$, we have that
 \[
-   \lookup{F'_p}{\interval{t_n}{t_{p_2}}} = \set{\var{newParentID}}
+   F'_p = \lookup{\var{clampInterval}(F_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID}
 \]
-meaning that the feature is moved to the group with ID $\var{newParentID}$ during the temporal scope. An argument for this can be found in the previous paragraph.
-\\
+This statement assigns $\var{newParentID}$ to the temporal scope $\interval{t_n}{t_{p_2}}$ after applying $\var{clampInterval}(F_p, t_n)$, meaning that the original parent mapping is shortened to end at $t_n$, and a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$ is inserted. By semantics of assignment, it is clear that $\lookup{F'_p}{\interval{t_n}{t_{p_2}}} = \set{\var{newParentID}}$, which is the desired result and fulfils \ref{move-feature-parentgroup}.
+
+
 
 \begin{lemma}
    The \rulefont{Move-Feature} rule updates the temporal feature model according to the semantics of the \textbf{moveFeature} operation.
    \label{lemma:move-feature-mod}
 \end{lemma}
-

@@ -58,7 +58,7 @@ Since a premise of the rule is
    \[
       \lookup{G_c}{\interval{t_n}{t_{e_2}}} = \emptyset
    \]
-   , the group does not have any subfeatures during the temporal scope in the original temporal feature model. Due to the assumption that \wf{5} is true for the original model, no feature has $\var{groupID}$ listed as its parent group, so no feature is left without a parent group when the group is removed from the scope. It follows that \wf{5} holds for the updated temporal feature model as well. 
+   , the group does not have any subfeatures during the temporal scope in the original temporal feature model. Due to the assumption that \wf{5} is true for the original model, no feature has $\var{groupID}$ listed as its parent group, so no feature is left without a parent group when the group is removed from the temporal scope. It follows that \wf{5} holds for the updated temporal feature model as well. 
 
    As previously mentioned, $\interval{t_n}{t_j} \notinnr G'_e$, meaning that the group does not exist during the temporal scope in the modified model. For \wf{8} to hold for the updated model, we must then also have $\lookup{G'_t}{\interval{t_n}{t_j}} = \lookup{G'_p}{\interval{t_n}{t_j}} = \lookup{G'_c}{\interval{t_n}{t_j}} = \emptyset$. Recalling that $t_{e_2} = t_j$, then by definition of $\var{clampGroup}$ and the premise $\lookup{G_t}{\interval{t_n}{t_{e_2}}} = \set{\var{type}}$ in \rulefont{Add-Group}, we have that
 \begin{align*}
