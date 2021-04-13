@@ -33,6 +33,7 @@ Recall that the temporal scope of the move-group rule is $\interval{t_n}{t_k}$ (
 \]
 
 Otherwise, the only feature or group looked up or assigned to in the rule is $\lookup{features}{\var{featureID}}$, so the rule stays within the spatial scope.
+\\
 
 \begin{lemma}
    The \rulefont{Change-Feature-Variation-Type} rule operates strictly within the scope of the \textbf{changeFeatureVariationType} operation.
@@ -40,7 +41,22 @@ Otherwise, the only feature or group looked up or assigned to in the rule is $\l
 \end{lemma}
 
 \paragraph{Preserving well-formedness}
-\todo{this}
+Due to the premise $\var{featureID} \neq \var{rootID}$, the feature is not the root, so \wf{1 \textendash{} 2} hold trivially. The modification to $F_t$
+\[
+   \lookup{\var{clampInterval}(F_t, t_n)}{\interval{t_n}{t_{t_2}}} \assign \var{type}
+\]
+ensures that the feature's original type stops at $t_n$ and the new one lasts for the duration of the temporal scope $\interval{t_n}{t_{t_2}}$. Since the feature has exactly one type during the temporal scope, and no other modifications are made to the feature, \wf{3} is preserved. Because of this, and since the $\groups{}$ map is also left unchanged, \wf{4 \textendash{} 6} and \wf{8 \textendash{} 9} hold. 
+
+As discussed in the \textbf{Scope} paragraph, the premise 
+\[
+   \begin{split}
+      \forall \interval{t_{p_1}}{t_{p_2}} \in \overlapping{F_p}{t_n}{t_{t_2}}  \\ % for all parent intervals overlapping the temporal scope
+      \forall p \in \lookup{F_p}{\interval{t_{p_1}}{t_{p_2}}}  \\% for all parent groups (always exactly one) in the parent interval
+      \forall t \in \, \var{getTypes}\left(\lookup{\groups}{p}, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)  \\
+          \big(\var{compatibleTypes}(t, \var{type})\big) 
+    \end{split}
+\]
+looks up all parent mappings overlapping the temporal scope ($\intervalmapping{t_{p_1}}{t_{p_2}}{p}$), finds the types each parent group has during the scope and \emph{while} it is the parent of the feature, and verifies that those types are compatible. Thus \wf{7} is preserved.
 \\
 
 \begin{lemma}
@@ -49,7 +65,11 @@ Otherwise, the only feature or group looked up or assigned to in the rule is $\l
 \end{lemma}
 
 \paragraph{Correctness of model modification}
-\todo{this too}
+The expected result of applying the rule is that $\lookup{\features'}{\var{featureID}} = \featurevar{F'}$ has the type $\var{type}$ during the temporal scope $\interval{t_n}{t_{t_2}}$. Indeed, due to the semantics of $\var{clampInterval}$ and assignment, for any time point $t_i$ such that $t_n \leq t_i < t_{t_2}$,
+\[
+   \lookup{F'_t}{t_i} = \set{\var{type}}
+\]
+Since no other part of the temporal feature model is altered, the rule performs as desired.
 \\
 
 \begin{lemma}
