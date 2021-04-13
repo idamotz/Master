@@ -46,6 +46,18 @@ As discussed in earlier sections (e.g. \vref{sub:soundness-of-the-remove-feature
 \end{align*}
 The feature is added to the target group by $\var{addChildFeature}$ during the interval $\interval{t_n}{t_{p_2}}$, and removed from the original parent group by $\var{removeFeatureAt}$. Consequently \wf{5} holds for the updated model. 
 
+By the premise
+\[
+   \begin{split}
+      \forall \interval{t_{f_1}}{t_{f_2}} \in \overlapping{F_t}{t_n}{t_{p_2}}
+      \forall \interval{t_{g_1}}{t_{g_2}} \in \lookup{G_t}{\clamp{\interval{t_{f_1}}{t_{f_2}}}{t_n}{t_{p_2}}}_{\overlap{}} \\
+         \forall \var{ft} \in \lookup{F_t}{\interval{t_{f_1}}{t_{f_2}}}
+         \forall \var{gt} \in \lookup{G_t}{\interval{t_{g_1}}{t_{g_2}}}
+         \left(\var{compatibleTypes}(\var{gt},\, \var{ft}) \right)
+   \end{split}
+\]
+in the rule, the types of the feature and its new parent group are compatible. For each interval key in $F_t$ overlapping the temporal scope, and for each interval key in $G_t$ overlapping both the aforementioned interval \emph{and} the temporal scope, it checks whether the types they map to are compatible. To fulfil this, each type the feature has during the temporal scope must be compatible with the type the parent group has at the same time. Thus \wf{7} holds for the modified model.
+
 As the rule does not alter the feature's existence set, \wf{8} is preserved. 
 
 The intention of the cycle detection algorithm in section \vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original temporal feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveFeature}$ operation introduced it, and the feature being moved must be part of the cycle. This could only happen if the feature became part of its own subtree during the temporal scope, which means that at some point, the feature occurs in its own list of ancestors. The algorithm looks at the feature's \emph{new} ancestors, meaning the ancestors that the feature does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the feature's subtree. Thus the rule preserves \wf 9.

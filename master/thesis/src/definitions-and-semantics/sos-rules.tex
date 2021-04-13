@@ -333,7 +333,11 @@ ancestors|$\left((\names{}, \features{}, \groups{}), \, \var{groupID}, t_n \righ
 
 \subsection{Move feature rule}
 \label{sub:move-feature-rule}
-See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the algorithm described in subsection \vref{sub:move-algorithm}. The algorithm is not described as a function here, as it is easier to understand written in natural language. An implementation of it can be found in the \todo{appendix}.
+See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the algorithm described in subsection \vref{sub:move-algorithm}. The algorithm is not described as a function here, as it is easier to understand written in natural language. An implementation of it can be found in the \todo{appendix}. 
+
+The rule identifies the scope $\interval{t_n}{t_{p_2}}$ by looking up the interval in $F_p$ containing $t_n$, and looks up the ID of the original parent group $\lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}}$. The complex formula checks that the types of the feature and its new parent group are compatible at all times during the temporal scope.
+
+In the conclusion of the rule, the feature's parent map is updated to express that the feature has a new parent during the temporal scope, and the parent groups' subfeature maps are updated similarly.
 
 \begin{figure}[h]
     \renewcommand{\arraystretch}{1.1}
@@ -343,8 +347,16 @@ See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature
         \neg \var{createsCycle} \qquad
         \containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \qquad
         \lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}} \\
-        \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_{p_2}}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
-        \lookup{\features{}}{\var{featureID}} = \feature \\
+        \\
+        \begin{split}
+          \forall \interval{t_{f_1}}{t_{f_2}} \in \overlapping{F_t}{t_n}{t_{p_2}}
+          \forall \interval{t_{g_1}}{t_{g_2}} \in \lookup{G_t}{\clamp{\interval{t_{f_1}}{t_{f_2}}}{t_n}{t_{p_2}}}_{\overlap{}} \\
+          \forall \var{ft} \in \lookup{F_t}{\interval{t_{f_1}}{t_{f_2}}}
+          \forall \var{gt} \in \lookup{G_t}{\interval{t_{g_1}}{t_{g_2}}}
+          \left(\var{compatibleTypes}(\var{gt},\, \var{ft}) \right)
+        \end{split} \\
+      \\
+      \lookup{\features{}}{\var{featureID}} = \feature \\
         \lookup{\groups{}}{\var{newParentID}} = \group
       }
       {
@@ -352,7 +364,7 @@ See figure \vref{rule:move-feature} for the semantics of the \textbf{moveFeature
         (\names{}, \features{}, \groups{}) \\
         \transition \\
         \big(\names,\\
-        \lookup{\features{}}{\var{featureID}} \assign \left( F_e,\, F_n,\, F_t,\, 
+          \lookup{\features{}}{\var{featureID}} \assign \left( F_e,\, F_n,\, F_t,\, 
         \lookup{\var{clampInterval}(F_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID},\, F_c \right), \\
 
         \lookup{\big(\lookup{\groups{}}{\var{oldParentID}} \\
@@ -385,10 +397,10 @@ See figure \vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
         (\names{}, \features{}, \groups{}) \\
         \transition \\
         \big(\names,\\
-        \lookup{\big(\lookup{\features{}}{\var{newParentID}} \\
-        \assign \var{addChildGroup}(\lookup{\features{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{groupID})\big)}{\var{oldParentID}} \\
+        \lookup{\big(\lookup{\features{}}{\var{oldParentID}} \\
+        \assign \var{removeGroupAt}(\lookup{\features{}}{\var{oldParentID}}, \interval{t_n}{t_{p_2}}, \var{groupID})\big)}{\var{newParentID}} \\
         \assign 
-      \var{removeGroupAt}\left(\lookup{\features{}}{\var{oldParentID}}, \var{groupID}, t_n\right), \\
+      \var{addChildGroup}\left(\lookup{\features{}}{\var{newParentID}}, \var{groupID}, t_n\right), \\
         \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, G_n,\, G_t,\, 
         \lookup{\var{clampInterval}(G_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID},\, G_c \right)}
     \end{array}$$
