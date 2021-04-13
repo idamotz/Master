@@ -68,9 +68,10 @@ Given the modified map of parent groups $F'_p$ and the original map $F_p$, we ha
 \[
    F'_p = \lookup{\var{clampInterval}(F_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID}
 \]
-This statement assigns $\var{newParentID}$ to the temporal scope $\interval{t_n}{t_{p_2}}$ after applying $\var{clampInterval}(F_p, t_n)$, meaning that the original parent mapping is shortened to end at $t_n$, and a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$ is inserted. By semantics of assignment, it is clear that $\lookup{F'_p}{\interval{t_n}{t_{p_2}}} = \set{\var{newParentID}}$, which is the desired result and fulfils \ref{move-feature-parentgroup}.
+This statement assigns $\var{newParentID}$ to the temporal scope $\interval{t_n}{t_{p_2}}$ after applying $\var{clampInterval}(F_p, t_n)$, meaning that the original parent mapping is shortened to end at $t_n$, and a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$ is inserted. By semantics of assignment, it is clear that for $t_i$ with $t_n \leq t_i < t_{p_2}$, $\lookup{F'_p}{t_i} = \set{\var{newParentID}}$, which is the desired result and fulfils \ref{move-feature-parentgroup}.
 
-
+By lemma \vref{lemma:move-feature-well-formed} and \wf{5}, \ref{move-feature-oldparent} and \ref{move-feature-newparent} follow from \ref{move-feature-parentgroup}. In other words, since the updated temporal feature model is well-formed, and the feature's parent group during the temporal scope is $\var{newParentID}$, the feature is not in the original parent group's set of subfeatures during the temporal scope, and is in the new parent group's set of subfeatures.
+\\
 
 \begin{lemma}
    The \rulefont{Move-Feature} rule updates the temporal feature model according to the semantics of the \textbf{moveFeature} operation.

@@ -1,0 +1,64 @@
+
+\subsection{Soundness of the Move group rule}
+\label{sub:soundness-of-the-move-group-rule}
+
+See figure \vref{rule:move-group} for the \rulefont{Move-Group} rule. Let 
+\begin{equation*}
+   \begin{split}
+      \textbf{moveGroup}(\var{groupID}, \var{newParentID}) \text{ at } t_n \shove \\
+      (\names, \features, \groups)
+   \end{split}
+\end{equation*}
+be the initial state, and
+\[
+   (\names', \features', \groups')
+\]
+be the result state after applying the \rulefont{Move-Group} rule. Recall that this operation moves the group with ID $\var{groupID}$ to the feature with ID $\var{newParentID}$.
+
+\paragraph{Scope}
+\label{par:scope}
+Recall that the temporal scope of the move-group rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the group is originally planned to be moved or is removed. In the rule, this scope is identified by 
+   \[
+      \containing{G_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}}
+   \]
+   Here, the time point $t_n$ for moving the group is looked up in the group's parent map's set of interval keys, and the expected result is $\set{\interval{t_{p_1}}{t_{p_2}}}$. This means that there is a mapping $\intervalmapping{t_{p_1}}{t_{p_2}}{\var{parentFeatureID}}$ in $F_p$, with $\var{parentFeatureID}$ being the ID of the group's parent feature at time $t_n$, and this feature stops being the group's parent at $t_{p_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{p_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{p_2}}$, but it is necessary to also look at the cycle detection algorithm in section \vref{sub:move-algorithm}, since this is also referenced in the rule by $\neg \var{createsCycle}$. Here, $t_{p_2}$ is called $t_e$, and the algorithm states that it only looks at time points between $t_n$ and $t_e$. Thus the rule operates strictly within the temporal scope of the \textbf{moveGroup} operation.
+
+   The spatial scope for this operation is defined as the \emph{ancestors which the group and the target feature do not have in common}. In other words, the \emph{new} ancestors of the group after applying the rule. In the rule itself, only the group with ID $\var{groupID}$ and its new parent feature with ID $\var{newParentID}$ are looked up. However, the cycle detection algorithm must also be considered. Here, the ancestors of both the group and the feature at $t_n$ are looked up, the first ancestor they have in common identified, and the new ancestors are collected into a list. If one of them is moved before $t_e$, the list is updated. Hence the algorithm's spatial scope is indeed the group's new ancestors and the group itself, and so the rule operates within the defined spatial scope.
+\\
+
+\begin{lemma}
+   The \rulefont{Move-Group} rule operates strictly within the scope of the \textbf{moveGroup} operation.
+   \label{lemma:move-group-scope}
+\end{lemma}
+
+\paragraph{Preserving well-formedness}
+Since the rule does not remove or change the type of a feature, \wf{1} and \wf{2} hold. 
+\todo{Finish paragraph}
+\\
+
+\begin{lemma}
+   The \rulefont{Move-Group} rule preserves well-formedness of the temporal feature model. 
+   \label{lemma:move-group-well-formed}
+\end{lemma}
+
+\paragraph{Correctness of model modification}
+The operation is intended to move the group with ID $\var{groupID}$ to the feature with ID $\var{newParentID}$ during the temporal scope $\interval{t_n}{t_{p_2}}$. After applying the \rulefont{Move-Group} rule, the only differences between the original and modified temporal feature model should be
+\begin{enumerate}[(i)]
+   \item The group's parent feature should be $\var{newParentID}$ during the temporal scope \label{move-group-parentfeature}
+   \item The group should not appear in the original parent feature's set of subgroups during the temporal scope \label{move-group-oldparent}
+   \item The group should appear in the new parent feature's set of subgroups \label{move-group-newparent}
+\end{enumerate}
+
+Given the modified map of parent features $G'_p$ and the original map $G_p$, we have that
+\[
+   G'_p = \lookup{\var{clampInterval}(G_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID}
+\]
+This statement assigns $\var{newParentID}$ to the temporal scope $\interval{t_n}{t_{p_2}}$ after applying $\var{clampInterval}(G_p, t_n)$, meaning that the original parent mapping is shortened to end at $t_n$, and a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$ is inserted. By semantics of assignment, it is clear that for $t_i$ with $t_n \leq t_i < t_{p_2}$, $\lookup{G'_p}{t_i} = \set{\var{newParentID}}$, which is the desired result and fulfils \ref{move-group-parentfeature}.
+
+By lemma \vref{lemma:move-group-well-formed} and \wf{5}, \ref{move-group-oldparent} and \ref{move-group-newparent} follow from \ref{move-group-parentfeature}. In other words, since the updated temporal feature model is well-formed, and the group's parent feature during the temporal scope is $\var{newParentID}$, the group is not in the original parent feature's set of subgroups during the temporal scope, and is in the new parent feature's set of subgroups.
+\\
+
+\begin{lemma}
+   The \rulefont{Move-Group} rule updates the temporal feature model according to the semantics of the \textbf{moveGroup} operation.
+   \label{lemma:move-group-mod}
+\end{lemma}
