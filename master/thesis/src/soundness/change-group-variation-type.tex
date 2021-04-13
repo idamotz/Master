@@ -1,0 +1,81 @@
+
+
+\subsection{Soundness of the Change group variation type rule} 
+\label{sub:soundness-of-the-change-group-variation-type-rule}
+
+See figure \vref{rule:change-group-varation-type} for the \rulefont{Change-Group-Variation-Type} rule. Let 
+\begin{equation*}
+   \begin{split}
+      \textbf{changeGroupVariationType}(\var{groupID}, \var{type}) \text{ at } t_n \shove \\
+      (\names, \features, \groups)
+   \end{split}
+\end{equation*}
+be the initial state, and
+\[
+   (\names', \features', \groups')
+\]
+be the result state after applying the \rulefont{Change-Group-Variation-Type} rule. Recall that this operation changes the type of the group with ID $\var{groupID}$ to $\var{type}$.
+
+\paragraph{Scope}
+Recall that the temporal scope of the \rulefont{Change-Group-Variation-Type} rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the type is originally planned to be changed or the group is removed. In the rule, this scope is identified by 
+   \[
+      \containing{G_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}
+   \]
+   Here, the time point $t_n$ for changing the group type is looked up in the group's types map's set of interval keys, and the expected result is $\set{\interval{t_{t_1}}{t_{t_2}}}$. This means that there is a mapping $\intervalmapping{t_{t_1}}{t_{t_2}}{\var{oldType}}$ in $G_t$, with $\var{oldType}$ being the type of the group at time $t_n$, and this stops being the case at $t_{t_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{t_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{t_2}}$, so the rule operates strictly within the temporal scope of the operation.
+
+   The spatial scope for this operation is the group itself and its parent feature. The group may have several subfeatures during the temporal scope, which may both move and change their types. These features and their types are looked up in the premise
+\[
+   \begin{split}
+        \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}}\\ % for all parent intervals overlapping the temporal scope 
+        \forall c \in \, \bigcup \lookup{G_c}{\interval{t_{c_1}}{t_{c_2}}}\\ % for all child features in the child interval
+        \forall t \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right) \\ % for all the types of the child features during the temporal scope
+        \big(\var{compatibleTypes}(\var{type}, t)\big)
+   \end{split}
+\]
+
+Otherwise, the only feature or group looked up or assigned to in the rule is $\lookup{groups}{\var{groupID}}$, so the rule stays within the spatial scope.
+\\
+
+\begin{lemma}
+   The \rulefont{Change-Group-Variation-Type} rule operates strictly within the scope of the \textbf{changeGroupVariationType} operation.
+   \label{lemma:change-group-variation-type-scope}
+\end{lemma}
+
+\paragraph{Preserving well-formedness}
+
+The modification to $G_t$
+\[
+   \lookup{\var{clampInterval}(G_t, t_n)}{\interval{t_n}{t_{t_2}}} \assign \var{type}
+\]
+ensures that the group's original type stops at $t_n$ and the new one lasts for the duration of the temporal scope $\interval{t_n}{t_{t_2}}$. Since the group has exactly one type during the temporal scope, \wf{4} holds.
+
+As discussed in the \textbf{Scope} paragraph, the premise 
+\[
+   \begin{split}
+        \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}}\\ % for all parent intervals overlapping the temporal scope 
+        \forall c \in \, \bigcup \lookup{G_c}{\interval{t_{c_1}}{t_{c_2}}}\\ % for all child features in the child interval
+        \forall t \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right) \\ % for all the types of the child features during the temporal scope
+        \big(\var{compatibleTypes}(\var{type}, t)\big)
+   \end{split}
+\]
+looks up all subfeature mappings overlapping the temporal scope ($\intervalmapping{t_{c_1}}{t_{c_2}}{\set{f_1, f_2, \ldots}}$), finds the types each subfeature has during the scope and \emph{while} it is the subfeature of the group, and verifies that those types are compatible. Thus \wf{7} is preserved. 
+As no changes are made to any other part of the temporal feature model, the other requirements \wf{1\textendash 3}, \wf{5\textendash 6}, and \wf{8\textendash 9} hold trivially.
+\\
+
+\begin{lemma}
+   The \rulefont{Change-Group-Variation-Type} rule preserves well-formedness of the temporal feature model. 
+   \label{lemma:change-group-variation-type-well-formed}
+\end{lemma}
+
+\paragraph{Correctness of model modification}
+The expected result of applying the rule is that $\lookup{\groups'}{\var{groupID}} = \groupvar{G'}$ has the type $\var{type}$ during the temporal scope $\interval{t_n}{t_{t_2}}$. Indeed, due to the semantics of $\var{clampInterval}$ and assignment, for any time point $t_i$ such that $t_n \leq t_i < t_{t_2}$,
+\[
+   \lookup{G'_t}{t_i} = \set{\var{type}}
+\]
+Since no other part of the temporal feature model is altered, the rule performs as desired.
+\\
+
+\begin{lemma}
+   The \rulefont{Change-Group-Variation-Type} rule updates the temporal feature model according to the semantics of the \textbf{changeGroupVariationType} operation.
+   \label{lemma:change-group-variation-type-mod}
+\end{lemma}

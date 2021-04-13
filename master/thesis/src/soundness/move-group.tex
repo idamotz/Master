@@ -51,7 +51,7 @@ This change modifies only the subgroup maps of the original and new parent featu
 \end{align*}
 meaning that $\lookup{G'_p}{t_i} = \set{\var{newParentID}}$. Hence \wf{3} and \wf{6} hold. 
 
-As the group's types and subfeatures map are not modified, \wf{4\textendash{} 5} and \wf{7} are true for the modified model.  Similarly, since the rule does not alter the group's existence set, \wf{8} is preserved. 
+As the group's types and subfeatures map are not modified, \wf{4\textendash 5} and \wf{7} are true for the modified model.  Similarly, since the rule does not alter the group's existence set, \wf{8} is preserved. 
 
 The intention of the cycle detection algorithm in section \vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original temporal feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveGroup}$ operation introduced it, and the group being moved must be part of the cycle. This could only happen if the group became part of its own subtree during the temporal scope, which means that at some point, the group occurs in its own list of ancestors. The algorithm looks at the group's \emph{new} ancestors, meaning the ancestors that the group does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the group's subtree. Thus the rule preserves \wf 9.
 \\

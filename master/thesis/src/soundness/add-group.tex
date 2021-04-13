@@ -29,7 +29,7 @@ As for the temporal scope, the only interval looked up in the rule is $\interval
 
 \paragraph{Preserving well-formedness}
 
-If the \rulefont{Add-Group} rule is applied, the resulting temporal feature model must be well-formed according to to the well-formedness rules \wf{1 \textendash{} 9}. 
+If the \rulefont{Add-Group} rule is applied, the resulting temporal feature model must be well-formed according to to the well-formedness rules \wf{1\textendash 9}. 
 
 The rule does not change the root feature's existence or type, so it does not violate \wf{1} or \wf{2}. The $\names{}$ map is left unchanged, and the only change made to a feature is to the parent feature, adding $\var{groupID}$ to the set of child groups at $\interval{t_n}{t_m}$. The only feature modified is the parent feature, and only in its child groups map $F_c$. Since $\var{parentFeatureID}$ is assigned to the group's parent feature table $F_p$ at the same key $\interval{t_n}{t_m}$, \wf{3} holds.
 

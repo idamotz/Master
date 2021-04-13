@@ -50,7 +50,7 @@ Let
    \lookup{\features'}{\var{parentFeatureID}} &= \featurevar{F'}
 \end{align*}
 
-The \rulefont{Remove-Group} rule does not alter any feature's \textemdash{} in particular the root feature's \textemdash{} existence set or types map, and so \wf{1\textendash{} 2} hold for the modified model. It does however modify the subgroup map $F_c$, applying $\var{removeGroupAt}$ to the parent feature, the group's ID, and the removal time point. As previously argued, this function makes sure that the group ID is not in $\bigcup \lookup{F'_c}{\interval{t_n}{t_j}}$ \textemdash{} the parent feature's modified set of subgroups \textemdash{} so \wf{3} holds.
+The \rulefont{Remove-Group} rule does not alter any feature's \textemdash{} in particular the root feature's \textemdash{} existence set or types map, and so \wf{1\textendash 2} hold for the modified model. It does however modify the subgroup map $F_c$, applying $\var{removeGroupAt}$ to the parent feature, the group's ID, and the removal time point. As previously argued, this function makes sure that the group ID is not in $\bigcup \lookup{F'_c}{\interval{t_n}{t_j}}$ \textemdash{} the parent feature's modified set of subgroups \textemdash{} so \wf{3} holds.
 
 Due to the semantics of $\var{clampGroup}$ and $\var{clampIntervalSet}$, no time points in the temporal scope are contained in an interval in the modified group's existence set ($\interval{t_n}{t_j} \notinnr G'_e$), so \wf{4}, \wf{6} and \wf{7} hold trivially. 
 

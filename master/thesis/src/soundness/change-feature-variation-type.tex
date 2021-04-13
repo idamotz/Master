@@ -16,7 +16,7 @@ be the initial state, and
 be the result state after applying the \rulefont{Change-Feature-Variation-Type} rule. Recall that this operation changes the type of the feature with ID $\var{featureID}$ to $\var{type}$.
 
 \paragraph{Scope}
-Recall that the temporal scope of the move-group rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the type is originally planned to be change or the feature is removed. In the rule, this scope is identified by 
+Recall that the temporal scope of the \rulefont{Change-Feature-Variation-Type} rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the type is originally planned to be changed or the feature is removed. In the rule, this scope is identified by 
    \[
       \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}
    \]
@@ -41,11 +41,11 @@ Otherwise, the only feature or group looked up or assigned to in the rule is $\l
 \end{lemma}
 
 \paragraph{Preserving well-formedness}
-Due to the premise $\var{featureID} \neq \var{rootID}$, the feature is not the root, so \wf{1 \textendash{} 2} hold trivially. The modification to $F_t$
+Due to the premise $\var{featureID} \neq \var{rootID}$, the feature is not the root, so \wf{1\textendash 2} hold trivially. The modification to $F_t$
 \[
    \lookup{\var{clampInterval}(F_t, t_n)}{\interval{t_n}{t_{t_2}}} \assign \var{type}
 \]
-ensures that the feature's original type stops at $t_n$ and the new one lasts for the duration of the temporal scope $\interval{t_n}{t_{t_2}}$. Since the feature has exactly one type during the temporal scope, and no other modifications are made to the feature, \wf{3} is preserved. Because of this, and since the $\groups{}$ map is also left unchanged, \wf{4 \textendash{} 6} and \wf{8 \textendash{} 9} hold. 
+ensures that the feature's original type stops at $t_n$ and the new one lasts for the duration of the temporal scope $\interval{t_n}{t_{t_2}}$. Since the feature has exactly one type during the temporal scope, and no other modifications are made to the feature, \wf{3} is preserved. Because of this, and since the $\groups{}$ map is also left unchanged, \wf{4\textendash 6} and \wf{8\textendash 9} hold. 
 
 As discussed in the \textbf{Scope} paragraph, the premise 
 \[
