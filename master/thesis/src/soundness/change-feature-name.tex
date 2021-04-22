@@ -1,0 +1,71 @@
+\subsection{Soundness of the Change feature name rule} 
+\label{sub:soundness-of-the-change-feature-name-rule}
+
+See figure \vref{rule:change-feature-name} for the \rulefont{Change-Feature-Variation-Type} rule. Let 
+\begin{equation*}
+   \begin{split}
+      \textbf{changeFeatureName}(\var{featureID}, \var{name}) \text{ at } t_n \shove \\
+      (\names, \features, \groups)
+   \end{split}
+\end{equation*}
+be the initial state, and
+\[
+   (\names', \features', \groups')
+\]
+be the result state after applying the \rulefont{Change-Feature-Name} rule. Recall that this operation changes the name of the feature with ID $\var{featureID}$ to $\var{name}$.
+
+\paragraph{Scope}
+Recall that the temporal scope of the \rulefont{Change-Feature-Name} rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the name is originally planned to be changed or the feature is removed. In the rule, this scope is identified by 
+   \[
+      \containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}
+   \]
+   Here, the time point $t_n$ for changing the name is looked up in the feature's names map's set of interval keys, and the expected result is $\set{\interval{t_{n_1}}{t_{n_2}}}$. This means that there is a mapping $\intervalmapping{t_{n_1}}{t_{n_2}}{\var{oldName}}$ in $F_n$, with $\var{oldName}$ being the name of the feature at time $t_n$, and this stops being the case at $t_{n_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{n_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{n_2}}$, so the rule operates strictly within the temporal scope of the operation.
+
+   The spatial scope for this operation is the name, the feature, and its original name. The only feature looked up or assigned to is $\lookup{\features}{\var{featureID}}$, and the only names looked up or assigned to are $\var{oldName}$ and $\var{name}$. The $\groups{}$ map is not modified or looked up in by the rule. Clearly, the rule stays within the spatial scope.
+\\
+
+\begin{lemma}
+   The \rulefont{Change-Feature-Name} rule operates strictly within the scope of the \textbf{changeFeatureName} operation.
+   \label{lemma:change-feature-name-scope}
+\end{lemma}
+
+\paragraph{Preserving well-formedness}
+The rule does not modify any feature's existence set or type, so \wf{1\textendash 2} holds. Since it does change a name, we must look at that modification to make sure that \wf{3} is true for the altered model. A requirement for \wf{3} is that a feature has \emph{exactly} one name. 
+The feature is altered thus:
+\[
+   \begin{split}
+        (\lookup{\left(\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_{n_2}}} \assign \var{featureID}\right)}{\var{oldName}} \assign \\
+        \var{clampInterval}(\lookup{\names}{\var{oldName}}, t_n), \\
+   \end{split}
+\]
+This ensures that the feature's original name stops at $t_n$ and the new one lasts for the duration of the temporal scope $\interval{t_n}{t_{n_2}}$, ensuring that the feature has \emph{exactly} one name during the temporal scope.
+Moreover \wf{3} requires that the name belongs to the same feature, and no other. This is fulfilled by 
+\[
+   \begin{split}
+        \lookup{\lookup{\big(\lookup{\names{}}{\var{oldName}} \assign 
+        \var{clampInterval}\left(\lookup{\names}{\var{oldName}}, t_n\right) \big)}{\var{name}}}{\interval{t_n}{t_{n_2}}} \\
+        \assign \var{featureID} \\
+   \end{split}
+\]
+Here, the interval containing $t_n$ in $\lookup{\names}{\var{oldName}}$ is clamped to end at $t_n$, and the resulting map is assigned $\var{featureID}$ at $\var{name}$ during the temporal scope, so the new name belongs to only the feature. This fulfils \wf{3}.
+As no other part of the temporal feature is modified, $\wf{4\textendash 9}$ hold.
+\\
+
+\begin{lemma}
+   The \rulefont{Change-Feature-Name} rule preserves well-formedness of the temporal feature model. 
+   \label{lemma:change-feature-name-well-formed}
+\end{lemma}
+
+\paragraph{Correctness of model modification}
+The expected result of applying the rule is that $\lookup{\features'}{\var{featureID}} = \featurevar{F'}$ has the name $\var{name}$ during the temporal scope $\interval{t_n}{t_{n_2}}$. Indeed, due to the semantics of $\var{clampInterval}$ and assignment, for any time point $t_i$ such that $t_n \leq t_i < t_{n_2}$,
+\[
+   \lookup{F'_n}{t_i} = \set{\var{name}}
+\]
+Additionally, we should have $\lookup{\names'}{\var{name}} = \var{featureID}$. This is shown in the previous paragraph on well-formedness.
+Since no other part of the temporal feature model is altered, the rule performs as desired.
+\\
+
+\begin{lemma}
+   The \rulefont{Change-Feature-Name} rule updates the temporal feature model according to the semantics of the \textbf{changeFeatureName} operation.
+   \label{lemma:change-feature-name-mod}
+\end{lemma}

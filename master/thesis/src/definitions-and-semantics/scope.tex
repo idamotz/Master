@@ -41,7 +41,7 @@ We define the \textit{minimal} scope for each operation.
     The spatial scope are the group's child features; the possible conflict is the same as with changeFeatureType.\\
   \item \textbf{changeFeatureName}(\var{featureID}, \var{name}) at $t_n$
     Temporal scope: Same as previous.\\
-    Spatial scope: The name. If it already exists within the feature model during the interval, then the change is invalid. 
+    Spatial scope: The name, the feature, and its previous name. If it already exists within the feature model during the interval, or if the feature does not exist, then the change is invalid. 
 \end{itemize}
 
 \todo{deal with batch operations/reverting a change}: It is currently impossible to \emph{extend} an interval; If a feature exists during $\interval{t_3}{t_5}$, it is impossible to change the plan such that it exists during $\interval{t_3}{t_6}$ instead. Don't really know how to fix that, except maybe adding an operation. In Figure \vref{ex:washing-machine}, if we try to change the name of feature 1 to Dryer at $t_2$, intending to change it back before Dryer is added, then these semantics will reject the first change, as two features will have the name Dryer during $\interval{t_5}{\infty}$. The paradox would be righted once we add that the name will change back to Washer at $t_4$. There are workarounds for this, for instance changing the name of feature 2 to some temporary placeholder, making the changes to feature 1, and then changing feature 2 back. This, however, seems too cumbersome. Hopefully this use case is not common enough that most users will suffer for it, but it is definitely an example of the semantics being too strict. 

@@ -1,6 +1,14 @@
 \part{Introduction and Background}
 
 \chapter{Introduction}
+
+A software product line (SPL) capitalizes on the similarity and variability of closely related software products \cite{book:introduction-to-spl}. The similarities and variability is captured by features, which are customer-visible characteristics of a system \cite{book:introduction-to-spl}. Each product in the product line (called a \textit{variant}) comprises a selection of these features, resulting in a flexible and customizable set of variants available to customers. \todo{Example}. To model the relations between the features (which combinations are allowed, which are common to all variants, etc.), it is common to use a \emph{feature model}. \todo{Maybe move some of this to background}. A feature model is a tree-like structure where the nodes are features and groups of features. \todo{Example}. A group gives logical structure to the features, restricting the allowed combinations of the features. For instance, in an \emph{alternative} group, exactly one of the features must be selected in every variant. Moreover, the features have types (\optional{} and \mandatory{}). A \mandatory{} feature must be selected in all variants, whereas an \optional{} feature may be left out. There are several restrictions to the structure of a feature model. \todo{Finish this thought}
+
+SPLs grow large as they are more profitable the more variants they originate \cite{book:introduction-to-spl}, % page 10 (34 absolute)
+and evolve over time as requirements change. For complex projects, planning is necessary, and these plans, too, change with requirements. The research project this thesis is built upon defines \emph{feature model evolution plans} (FMEP) in terms of feature models \cite{art:consistency-preserving-evolution-planning}. A FMEP consists of the initial feature model and a sequence of edit operations. In the same project, we have devised a method to detect paradoxes in a feature model evolution plan. \todo{Elaborate.} However, when a plan is changed, this method requires that the entire plan be verified, and for large plans, this may be inefficient. This is due to the fact that the method relies on feature model change rather than FMEP change. 
+
+
+
 % Giving the thesis a purpose (not how, but why)
 %   Mention problems in industry practice (mention software product lines)
 %   Say what software product lines are for, not technicalities, why they exist
@@ -28,6 +36,8 @@ Reference previous work clearly, talk about how my work builds upon it.
 
 \section{Contributions}
 
+In this thesis, we model and create a method for validating \emph{plan} change, with the goal that only the parts of the plan which may be affected by that change are checked for paradoxes. This method may then be used as basis for an SPL planning tool. We define a representation suited for local lookup and assignment, and create a semantics for safely updating the evolution plan, in the form of structural operational semantics rules. We implement the method in a minimal tool, and give a proof that the method is sound.
+
 \input{introduction/research-questions}
 
 \chapter{Background} 
@@ -35,9 +45,22 @@ Reference previous work clearly, talk about how my work builds upon it.
 \section{Software product lines}
 \subsection{Feature models}
 \subsection{Feature model evolution plans}
+\todo{Meeting notes}
 % Software product lines, previous publication (pinpoint what can be improved), SOS rules and operational semantics, and what is modular analysis
 % Background should not contain many of my results, but rather retelling what software product lines are, what operational semantics are, existing technologies
 % % What is the difficulty of doing analysis on it? Just explaining the structures does not convey why it is worth spending time to solve the problems. Hint at what is coming, that this is something I will tackle in the contribution. 
 % Can't be technical in the introduction, the background is where I introduce the terms and definitions and technical details. And the implications of these details.
 % Explain what I mean by "modularity", explain why the previous work is not modular. 
 % What do I assume, and what do I focus on
+
+\section{Static analysis}
+% Static analysis is semantic-based analysis. Syntax-driven, but semantic-based, but also of the meaning. If we have x := 5, then it means that 5 is the value which you put into x
+% Say that I'm doing semantic-based analysis in the thesis, _analysis_, not just semantics.Can I add it or not? How much of the scope is affected? Emphasize modularity; analysis is modular. Focus on the analytical parts of the work, combined with the semantics of a feature model
+% Don't call the rules SOS rules, but "Rules for semantics-based analysis". Stop downplaying
+% Give the structure of the rules in the background. Static analysis has an environment and an effect. I'm making a calculus
+% Analysis is formalized through a set of rules, which often have this kind of structure... which also looks very much like SOS rules.
+% Emphasize that I've made an implementation as well as the theory.
+\subsection{Analysis context (rules)}
+% How a rule can represent an environment
+\subsection{Soundness}
+

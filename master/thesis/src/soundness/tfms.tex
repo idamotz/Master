@@ -1,12 +1,11 @@
 \section{Soundness for temporal feature models}
 \label{sec:soundness-for-temporal-feature-models}
-\todo{Argue that the rules are \emph{enough} to preserve soundness.}
-\todo{Show what needs to be proved for an initial model. ``correct by construction". In a well-formed structure. Lemma: What is a sound structure. Soundness theorem: Preserves soundness, using the lemma.}
-\todo{Proof for each rule should be lemma, and the whole system is a theorem or something:). Remember to number the lemmas}
-\todo{The structure of the proof should be introduced first}
-\todo{In the theorem, emphasize the structure of the proof (inductive)}
-\todo{Between the proofs, add some text; how to read the proof, how to understand etc. Also give context (how the lemmas are used later)}
-
+% \todo{Argue that the rules are \emph{enough} to preserve soundness.}
+% \todo{Show what needs to be proved for an initial model. ``correct by construction". In a well-formed structure. Lemma: What is a sound structure. Soundness theorem: Preserves soundness, using the lemma.}
+% \todo{Proof for each rule should be lemma, and the whole system is a theorem or something:). Remember to number the lemmas}
+% \todo{The structure of the proof should be introduced first}
+% \todo{In the theorem, emphasize the structure of the proof (inductive)}
+% \todo{Between the proofs, add some text; how to read the proof, how to understand etc. Also give context (how the lemmas are used later)}
 The temporal feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
 
 We must first define what it means for a temporal feature model to be sound. Essentially, it means that if we converted the temporal feature model into a sequence of time points associated with feature models, each feature model would be sound.
@@ -50,7 +49,8 @@ We must add two additional requirements:
 
 Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original temporal feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
 
-\section{Soundness of the rules}
+\section{Soundness of each rule}
+\label{sec:soundness-of-each-rule}
 In the following sections, we prove that each rule is sound, and conclude that the system is sound.
 
 For each rule, the proof for soundness includes three parts: 
