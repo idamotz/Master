@@ -2,17 +2,17 @@
 \todo{remove subsections}
 \todo{Begin this section by explaining what I need and then defining what I need}
 
-\subsection{Temporal feature model}
-\label{sub:temporal-feature-model}
+\subsection{Interval-based feature model}
+\label{sub:interval-based-feature-model}
 
-\begin{definition}[Temporal feature model]
-  A \emph{temporal feature model} is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from \emph{names} to \emph{feature IDs}, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from \emph{group IDs} to \emph{group entries}. 
-  \label{def:temporal-feature-model}
+\begin{definition}[Interval-based feature model]
+  An \emph{interval-based feature model} is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from \emph{names} to \emph{feature IDs}, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from \emph{group IDs} to \emph{group entries}. 
+  \label{def:interval-based-feature-model}
 \end{definition}
 
 The reason for this choice is efficiency and modularity. As mentioned in \todo{motivation or background or something}, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be a mistake to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations as described in \citetitle{art:consistency-preserving-evolution-planning} \parencite{art:consistency-preserving-evolution-planning}. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID is fresh.
 
-To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of temporal feature models.
+To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of interval-based feature models.
 
 \subsection{Maps}
 \label{sub:maps}
@@ -48,7 +48,7 @@ That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, w
 
 \subsection{Intervals}
 \label{sub:intervals}
-To define the map values used in temporal feature models, we must first define an \emph{interval}.
+To define the map values used in interval-based feature models, we must first define an \emph{interval}.
 \begin{definition}[Interval]
   An interval is a set of time points between a lower and an upper bound. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
   \label{def:interval}
@@ -101,7 +101,7 @@ $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 \subsection{Mapping names}
 \label{sub:mapping-names}
 
-The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the temporal feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
+The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the interval-based feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
 
 This map is mainly used when adding features or changing names. The new name and the scope of the change is then looked up in the \names{} map to verify that no other feature shares the name.
 
@@ -114,7 +114,7 @@ This information is collected into a 5-tuple $\feature$, where $F_e$ is an inter
 
 Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
-The root ID is constant for a temporal feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. 
+The root ID is constant for a interval-based feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. 
 
 The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 
@@ -126,7 +126,7 @@ The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
 \subsection{Example evolution plan}
-A small example of a temporal feature model can be found in Figure \vref{ex:washing-machine}. It contains three features and one group, and describes a temporal feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
+A small example of an interval-based feature model can be found in Figure \vref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
 
 \begin{figure}
   \begin{align*}
@@ -156,14 +156,14 @@ A small example of a temporal feature model can be found in Figure \vref{ex:wash
                          & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} ) ]\\
     \}&)\\
   \end{align*}
-  \caption{Small temporal feature model}
+  \caption{Small interval-based feature model}
   \label{ex:washing-machine}
 \end{figure}
 
 \subsection{Operations}
 \label{sub:operations}
 
-We define \emph{operations} to alter the temporal feature model. A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not enough to let a human verify a change. 
+We define \emph{operations} to alter the interval-based feature model. A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not enough to let a human verify a change. 
 
 \begin{itemize}
   \item \textbf{addFeature(featureID, parentGroupID, name, featureType)} from $t_n$ to $t_m$\\

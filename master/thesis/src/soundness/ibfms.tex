@@ -1,14 +1,14 @@
-\section{Soundness for temporal feature models}
-\label{sec:soundness-for-temporal-feature-models}
+\section{Soundness for interval-based feature models}
+\label{sec:soundness-for-interval-based-feature-models}
 % \todo{Argue that the rules are \emph{enough} to preserve soundness.}
 % \todo{Show what needs to be proved for an initial model. ``correct by construction". In a well-formed structure. Lemma: What is a sound structure. Soundness theorem: Preserves soundness, using the lemma.}
 % \todo{Proof for each rule should be lemma, and the whole system is a theorem or something:). Remember to number the lemmas}
 % \todo{The structure of the proof should be introduced first}
 % \todo{In the theorem, emphasize the structure of the proof (inductive)}
 % \todo{Between the proofs, add some text; how to read the proof, how to understand etc. Also give context (how the lemmas are used later)}
-The temporal feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
+The interval-based feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
 
-We must first define what it means for a temporal feature model to be sound. Essentially, it means that if we converted the temporal feature model into a sequence of time points associated with feature models, each feature model would be sound.
+We must first define what it means for an interval-based feature model to be sound. Essentially, it means that if we converted the interval-based feature model into a sequence of time points associated with feature models, each feature model would be sound.
 
 According to \cite{art:consistency-preserving-evolution-planning}, the structural requirements (well-formedness rules) are 
 \begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
@@ -23,10 +23,10 @@ According to \cite{art:consistency-preserving-evolution-planning}, the structura
 
 Furthermore, a feature model is a tree structure and must not contain cycles. There is an additional requirement that groups with types \xortype{} or \ortype{} must contain at least two child features, but this is not taken into account in this thesis.
 
-These requirements can be translated into rules for temporal feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
+These requirements can be translated into rules for interval-based feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
 
 \begin{enumerate}[\wf{\arabic*}, itemsep=0mm]
-   \item A temporal feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
+   \item An interval-based feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
 \item The root feature must be mandatory. This means that $$R_t  = \set{\intervalmapping{t_0}{\forever}{\mandatory}}$$ where $R_t$ is the types map of the root feature. 
 \item At any time $t_n \geq t_0$, each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups. Given a feature ID $\var{featureID}$, this means that if $\lookup{\features}{\var{featureID}} = \feature$ and $t_n \inn F_e$ , then
    \begin{enumerate}[(i)]
@@ -44,10 +44,10 @@ These requirements can be translated into rules for temporal feature models $(\n
 We must add two additional requirements:
 \begin{enumerate}[itemsep=0mm]
    \item[\wf{8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
-   \item[\wf{9}] The temporal feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
+   \item[\wf{9}] The interval-based feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
 \end{enumerate}
 
-Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original temporal feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
+Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original interval-based feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
 
 \section{Soundness of each rule}
 \label{sec:soundness-of-each-rule}

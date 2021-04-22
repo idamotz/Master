@@ -60,7 +60,7 @@ looks up all parent mappings overlapping the temporal scope ($\intervalmapping{t
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Feature-Variation-Type} rule preserves well-formedness of the temporal feature model. 
+   The \rulefont{Change-Feature-Variation-Type} rule preserves well-formedness of the interval-based feature model. 
    \label{lemma:change-feature-variation-type-well-formed}
 \end{lemma}
 
@@ -69,10 +69,10 @@ The expected result of applying the rule is that $\lookup{\features'}{\var{featu
 \[
    \lookup{F'_t}{t_i} = \set{\var{type}}
 \]
-Since no other part of the temporal feature model is altered, the rule performs as desired.
+Since no other part of the interval-based feature model is altered, the rule performs as desired.
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Feature-Variation-Type} rule updates the temporal feature model according to the semantics of the \textbf{changeFeatureVariationType} operation.
+   The \rulefont{Change-Feature-Variation-Type} rule updates the interval-based feature model according to the semantics of the \textbf{changeFeatureVariationType} operation.
    \label{lemma:change-feature-variation-type-mod}
 \end{lemma}

@@ -48,11 +48,11 @@ Moreover \wf{3} requires that the name belongs to the same feature, and no other
    \end{split}
 \]
 Here, the interval containing $t_n$ in $\lookup{\names}{\var{oldName}}$ is clamped to end at $t_n$, and the resulting map is assigned $\var{featureID}$ at $\var{name}$ during the temporal scope, so the new name belongs to only the feature. This fulfils \wf{3}.
-As no other part of the temporal feature is modified, $\wf{4\textendash 9}$ hold.
+As no other part of the interval-based feature model is modified, $\wf{4\textendash 9}$ hold.
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Feature-Name} rule preserves well-formedness of the temporal feature model. 
+   The \rulefont{Change-Feature-Name} rule preserves well-formedness of the interval-based feature model. 
    \label{lemma:change-feature-name-well-formed}
 \end{lemma}
 
@@ -62,10 +62,10 @@ The expected result of applying the rule is that $\lookup{\features'}{\var{featu
    \lookup{F'_n}{t_i} = \set{\var{name}}
 \]
 Additionally, we should have $\lookup{\names'}{\var{name}} = \var{featureID}$. This is shown in the previous paragraph on well-formedness.
-Since no other part of the temporal feature model is altered, the rule performs as desired.
+Since no other part of the interval-based feature model is altered, the rule performs as desired.
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Feature-Name} rule updates the temporal feature model according to the semantics of the \textbf{changeFeatureName} operation.
+   The \rulefont{Change-Feature-Name} rule updates the interval-based feature model according to the semantics of the \textbf{changeFeatureName} operation.
    \label{lemma:change-feature-name-mod}
 \end{lemma}

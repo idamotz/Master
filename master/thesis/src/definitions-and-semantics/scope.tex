@@ -17,7 +17,7 @@ We define the \textit{minimal} scope for each operation.
 \begin{itemize}
 
   \item \textbf{addFeature}(\var{featureID}, \var{parentGroupID}, \var{name}, \var{featureType}) from $t_n$ to $t_m$\\
-     We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the temporal feature model is affected by the change. In other words, if we look at the temporal feature model as a sequence of feature models, the only models that may break as a result of this modification, are the ones associated with time points between $t_n$ and (but not including) $t_m$. The spatial scope must be only the feature itself, the parent group and the name. If the group type of the parent changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. The name is unique, so we must also verify that no other feature is using the name during the temporal scope. 
+     We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the interval-based feature model is affected by the change. In other words, if we look at the interval-based feature model as a sequence of feature models, the only models that may break as a result of this modification, are the ones associated with time points between $t_n$ and (but not including) $t_m$. The spatial scope must be only the feature itself, the parent group and the name. If the group type of the parent changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. The name is unique, so we must also verify that no other feature is using the name during the temporal scope. 
  
 
   \item \textbf{addGroup}(\var{groupID}, \var{parentFeatureID}, \var{groupType}) from $t_n$ to $t_m$\\
@@ -25,7 +25,7 @@ We define the \textit{minimal} scope for each operation.
   \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\
     \todo{Explain why the temporal scope is the way it is}
     If the original interval containing $t_n$ in which the feature exists inside the feature model is $\interval{t_m}{t_k}$, then the temporal scope is $\interval{t_n}{t_k}$ - from the feature is removed until it would have been removed anyway \todo{rephrase}. Since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.\\
-    The spatial scope must be the feature itself, its parent group, and its subgroups. If the feature has or will have a subgroup during the interval, then it cannot be removed. Otherwise, there are no conflicts. When modifying the temporal feature model, the feature must be removed from the parent's set of subfeatures, which is why the parent group is included in the spatial scope.
+    The spatial scope must be the feature itself, its parent group, and its subgroups. If the feature has or will have a subgroup during the interval, then it cannot be removed. Otherwise, there are no conflicts. When modifying the interval-based feature model, the feature must be removed from the parent's set of subfeatures, which is why the parent group is included in the spatial scope.
   \item \textbf{removeGroup}(\var{groupID}) at $t_n$\\
     Extremely similar to \textbf{removeFeature}. 
   \item \textbf{moveFeature}(\var{featureID}, \var{targetGroupID}) at $t_n$\\

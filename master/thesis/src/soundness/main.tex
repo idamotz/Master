@@ -2,14 +2,14 @@
 \label{cha:soundness}
 % \todo{A biiiggg issue with these proofs is that I don't differentiate between the feature model before $(\names, \features, \groups)$ and modified $(\names', \features', \groups')$.}
 
-% \todo{and completeness? The operations in themselves are not complete, in the sense that there is not a one-to-one correspondence between the operations defined on temporal feature models (temporal operations) and the operations defined on feature models (model operations). However, the temporal operations are more restricted than the model operations, and any valid change within that subset to an evolution plan would be accepted by the rules. Should I try to prove completeness as well?}
+% \todo{and completeness? The operations in themselves are not complete, in the sense that there is not a one-to-one correspondence between the operations defined on interval-based feature models (temporal operations) and the operations defined on feature models (model operations). However, the temporal operations are more restricted than the model operations, and any valid change within that subset to an evolution plan would be accepted by the rules. Should I try to prove completeness as well?}
 
 \todo{Move to appendix, but keep a few (maybe 2) examples to show how they work}
 \todo{Prepare the reader for what is to come. To not overwhelm the reader with proofs, the details can be found in the appendix. Here I will emphasize how I prove things, give concrete samples, and point to where the rest of it can be found.}
 
-We use an inductive proof structure to prove soundness and modularity for the rule system (section \vref{sec:sos-rules}). The base case is a proof by construction, in which we define a sound temporal feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (section \vref{sec:define-the-scope}).
+We use an inductive proof structure to prove soundness and modularity for the rule system (section \vref{sec:sos-rules}). The base case is a proof by construction, in which we define a sound interval-based feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (section \vref{sec:define-the-scope}).
 
-\input{soundness/tfms}
+\input{soundness/ibfms}
 \todo{Summarize before moving to next section}
 
 \input{soundness/add-feature}

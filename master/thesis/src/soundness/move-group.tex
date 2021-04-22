@@ -53,16 +53,16 @@ meaning that $\lookup{G'_p}{t_i} = \set{\var{newParentID}}$. Hence \wf{3} and \w
 
 As the group's types and subfeatures map are not modified, \wf{4\textendash 5} and \wf{7} are true for the modified model.  Similarly, since the rule does not alter the group's existence set, \wf{8} is preserved. 
 
-The intention of the cycle detection algorithm in section \vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original temporal feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveGroup}$ operation introduced it, and the group being moved must be part of the cycle. This could only happen if the group became part of its own subtree during the temporal scope, which means that at some point, the group occurs in its own list of ancestors. The algorithm looks at the group's \emph{new} ancestors, meaning the ancestors that the group does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the group's subtree. Thus the rule preserves \wf 9.
+The intention of the cycle detection algorithm in section \vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original interval-based feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveGroup}$ operation introduced it, and the group being moved must be part of the cycle. This could only happen if the group became part of its own subtree during the temporal scope, which means that at some point, the group occurs in its own list of ancestors. The algorithm looks at the group's \emph{new} ancestors, meaning the ancestors that the group does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the group's subtree. Thus the rule preserves \wf 9.
 \\
 
 \begin{lemma}
-   The \rulefont{Move-Group} rule preserves well-formedness of the temporal feature model. 
+   The \rulefont{Move-Group} rule preserves well-formedness of the interval-based feature model. 
    \label{lemma:move-group-well-formed}
 \end{lemma}
 
 \paragraph{Correctness of model modification}
-The operation is intended to move the group with ID $\var{groupID}$ to the feature with ID $\var{newParentID}$ during the temporal scope $\interval{t_n}{t_{p_2}}$. After applying the \rulefont{Move-Group} rule, the only differences between the original and modified temporal feature model should be
+The operation is intended to move the group with ID $\var{groupID}$ to the feature with ID $\var{newParentID}$ during the temporal scope $\interval{t_n}{t_{p_2}}$. After applying the \rulefont{Move-Group} rule, the only differences between the original and modified interval-based feature model should be
 \begin{enumerate}[(i)]
    \item The group's parent feature should be $\var{newParentID}$ during the temporal scope \label{move-group-parentfeature}
    \item The group should not appear in the original parent feature's set of subgroups during the temporal scope \label{move-group-oldparent}
@@ -75,10 +75,10 @@ Given the modified map of parent features $G'_p$ and the original map $G_p$, we 
 \]
 This statement assigns $\var{newParentID}$ to the temporal scope $\interval{t_n}{t_{p_2}}$ after applying $\var{clampInterval}(G_p, t_n)$, meaning that the original parent mapping is shortened to end at $t_n$, and a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$ is inserted. By semantics of assignment, it is clear that for $t_i$ with $t_n \leq t_i < t_{p_2}$, $\lookup{G'_p}{t_i} = \set{\var{newParentID}}$, which is the desired result and fulfils \ref{move-group-parentfeature}.
 
-By lemma \vref{lemma:move-group-well-formed} and \wf{5}, \ref{move-group-oldparent} and \ref{move-group-newparent} follow from \ref{move-group-parentfeature}. In other words, since the updated temporal feature model is well-formed, and the group's parent feature during the temporal scope is $\var{newParentID}$, the group is not in the original parent feature's set of subgroups during the temporal scope, and is in the new parent feature's set of subgroups.
+By lemma \vref{lemma:move-group-well-formed} and \wf{5}, \ref{move-group-oldparent} and \ref{move-group-newparent} follow from \ref{move-group-parentfeature}. In other words, since the updated interval-based feature model is well-formed, and the group's parent feature during the temporal scope is $\var{newParentID}$, the group is not in the original parent feature's set of subgroups during the temporal scope, and is in the new parent feature's set of subgroups.
 \\
 
 \begin{lemma}
-   The \rulefont{Move-Group} rule updates the temporal feature model according to the semantics of the \textbf{moveGroup} operation.
+   The \rulefont{Move-Group} rule updates the interval-based feature model according to the semantics of the \textbf{moveGroup} operation.
    \label{lemma:move-group-mod}
 \end{lemma}

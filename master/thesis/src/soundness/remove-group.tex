@@ -9,7 +9,7 @@ be the initial state, and
 \[
    (\names', \features', \groups')
 \]
-be the result state after applying the \rulefont{Remove-Group} rule. Recall that this operation removes the group with ID $\var{groupID}$ from the temporal feature model $(\names, \features, \groups)$ at $t_n$. Furthermore, let $\lookup{\groups}{\var{groupID}} = \group{}$, and $\interval{t_i}{t_j} \in G_e$, with $t_i \leq t_n < t_j$. This means that the original plan added the group at time $t_i$ and removed it at $t_j$, with the possibility that $t_j = \forever$. In the latter case, there was no plan to remove the group originally.
+be the result state after applying the \rulefont{Remove-Group} rule. Recall that this operation removes the group with ID $\var{groupID}$ from the interval-based feature model $(\names, \features, \groups)$ at $t_n$. Furthermore, let $\lookup{\groups}{\var{groupID}} = \group{}$, and $\interval{t_i}{t_j} \in G_e$, with $t_i \leq t_n < t_j$. This means that the original plan added the group at time $t_i$ and removed it at $t_j$, with the possibility that $t_j = \forever$. In the latter case, there was no plan to remove the group originally.
 
 \paragraph{Scope}
 todo
@@ -58,7 +58,7 @@ Since a premise of the rule is
    \[
       \lookup{G_c}{\interval{t_n}{t_{e_2}}} = \emptyset
    \]
-   , the group does not have any subfeatures during the temporal scope in the original temporal feature model. Due to the assumption that \wf{5} is true for the original model, no feature has $\var{groupID}$ listed as its parent group, so no feature is left without a parent group when the group is removed from the temporal scope. It follows that \wf{5} holds for the updated temporal feature model as well. 
+   , the group does not have any subfeatures during the temporal scope in the original interval-based feature model. Due to the assumption that \wf{5} is true for the original model, no feature has $\var{groupID}$ listed as its parent group, so no feature is left without a parent group when the group is removed from the temporal scope. It follows that \wf{5} holds for the updated interval-based feature model as well. 
 
    As previously mentioned, $\interval{t_n}{t_j} \notinnr G'_e$, meaning that the group does not exist during the temporal scope in the modified model. For \wf{8} to hold for the updated model, we must then also have $\lookup{G'_t}{\interval{t_n}{t_j}} = \lookup{G'_p}{\interval{t_n}{t_j}} = \lookup{G'_c}{\interval{t_n}{t_j}} = \emptyset$. Recalling that $t_{e_2} = t_j$, then by definition of $\var{clampGroup}$ and the premise $\lookup{G_t}{\interval{t_n}{t_{e_2}}} = \set{\var{type}}$ in \rulefont{Add-Group}, we have that
 \begin{align*}
@@ -66,13 +66,13 @@ Since a premise of the rule is
         &= \var{clampInterval}\left(G''_t \cup \intervalmapping{t_{t_1}}{t_j}{\var{type}}, t_n\right) \\
         &= G''_t \cup \intervalmapping{t_{t_1}}{t_n}{\var{type}}
 \end{align*}
-Clearly, $\lookup{G''_t}{\interval{t_n}{t_j}} = \emptyset$.  Furthermore, since $\interval{t_{t_1}}{t_n}$ does not overlap $\interval{t_n}{t_j}$, $\lookup{G'_t}{\interval{t_n}{t_j}} = \emptyset$. An analogous argument can be made for $\lookup{G'_p}{\interval{t_n}{t_j}} = \emptyset$. From the definition of $\var{clampGroup}$, $G_c = G'_c$, so by the premise $\lookup{G_c}{\interval{t_n}{t_j}} = \emptyset$ in the rule, $\lookup{G_c'}{\interval{t_n}{t_j}} = \emptyset$. Consequently \wf{8} holds for the altered temporal feature model.
+Clearly, $\lookup{G''_t}{\interval{t_n}{t_j}} = \emptyset$.  Furthermore, since $\interval{t_{t_1}}{t_n}$ does not overlap $\interval{t_n}{t_j}$, $\lookup{G'_t}{\interval{t_n}{t_j}} = \emptyset$. An analogous argument can be made for $\lookup{G'_p}{\interval{t_n}{t_j}} = \emptyset$. From the definition of $\var{clampGroup}$, $G_c = G'_c$, so by the premise $\lookup{G_c}{\interval{t_n}{t_j}} = \emptyset$ in the rule, $\lookup{G_c'}{\interval{t_n}{t_j}} = \emptyset$. Consequently \wf{8} holds for the altered interval-based feature model.
 
 Given that no cycles exist in the original model, removing a group does not create a new one, so \wf{9} holds.
 \\
 
 \begin{lemma}
-   The \rulefont{Remove-Group} rule preserves well-formedness of the temporal feature model.
+   The \rulefont{Remove-Group} rule preserves well-formedness of the interval-based feature model.
    \label{lemma:remove-group-well-formed}
 \end{lemma}
 
@@ -85,6 +85,6 @@ The semantics of the \textbf{removeGroup} operation dictate that the group shoul
 \\
 
 \begin{lemma}
-   The \rulefont{Remove-Group} rule updates the temporal feature model according to the semantics of the \textbf{removeGroup} operation.
+   The \rulefont{Remove-Group} rule updates the interval-based feature model according to the semantics of the \textbf{removeGroup} operation.
    \label{lemma:remove-group-mod}
 \end{lemma}

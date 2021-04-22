@@ -18,7 +18,7 @@ $$\sossize\begin{array}{c}
     \text{Premises}}
     { S \transition S'}
   \end{array}$$
-  where $S$ is the state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In this thesis, the state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the temporal feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. 
+  where $S$ is the state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In this thesis, the state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. 
 
 \subsection{Add feature rule}
 \label{sub:add-feature-rule}
@@ -141,7 +141,7 @@ addChildGroup|$\left(\feature, \,\interval{t_{start}}{t_{end}}, \, \var{groupID}
 \end{figure}
 
 \subsection{Remove feature rule}
-Figure \ref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{featureID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ set $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($\lookup{F_c}{\interval{t_{n}}{t_{e_2}}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the temporal feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$. 
+Figure \ref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{featureID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ set $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($\lookup{F_c}{\interval{t_{n}}{t_{e_2}}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the interval-based feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$. 
 
 \begin{figure}
     \renewcommand{\arraystretch}{1.1}
@@ -260,9 +260,9 @@ removeGroupAt|$\left(\feature, \var{groupID}, t_c \right)$|
 
 \subsection{Remove group rule}
 \label{sub:remove-group-rule}
-The $\rulefont{Remove-Group}$ rule in figure \vref{rule:remove-group} describes the semantics of removing a group in a temporal feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group may not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
+The $\rulefont{Remove-Group}$ rule in figure \vref{rule:remove-group} describes the semantics of removing a group in an interval-based feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group may not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
 
-We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clampIntervalValue}$ (figure \vref{fun:clamp-interval-value}), and $\var{clampGroup}$ (figure \ref{fun:clamp-group} \todo{make sure this is not a page boundary}) helper functions to update the temporal feature model.  The $\var{clampInterval}$ function takes an interval map with non-overlapping keys and a time point $t_c$, and updates the interval key containing $t_c$ to end at $t_c$. $\var{clampIntervalValue}$ does the same, but for interval maps with overlapping keys and set values. It takes an interval map, a time point $t_c$, and a value $v$, and shortens the interval key containing $t_c$ and $v$ to end at $t_c$. $\var{clampSetInterval}$ takes an interval set with non-overlapping values and a time point $t_c$, and shortens the interval containing $t_c$. 
+We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clampIntervalValue}$ (figure \vref{fun:clamp-interval-value}), and $\var{clampGroup}$ (figure \ref{fun:clamp-group} \todo{make sure this is not a page boundary}) helper functions to update the interval-based feature model.  The $\var{clampInterval}$ function takes an interval map with non-overlapping keys and a time point $t_c$, and updates the interval key containing $t_c$ to end at $t_c$. $\var{clampIntervalValue}$ does the same, but for interval maps with overlapping keys and set values. It takes an interval map, a time point $t_c$, and a value $v$, and shortens the interval key containing $t_c$ and $v$ to end at $t_c$. $\var{clampSetInterval}$ takes an interval set with non-overlapping values and a time point $t_c$, and shortens the interval containing $t_c$. 
 
 
 \begin{figure}[h]
@@ -283,7 +283,7 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
         \transition \\
         \big(\names{} ,\\
           \lookup{\features{}}{\var{parentFeatureID}} \assign \var{removeGroupAt}\left(\lookup{\features}{\var{parentFeatureID}}, \var{groupID}, t_n\right) ,\\
-        \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}(\lookup{\groups{}}{\var{groupID}}, t_n) \big)
+        \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}\left(\lookup{\groups{}}{\var{groupID}}, t_n\right) \big)
       }
     \end{array}$$
     \caption{The \rulefont{Remove-Group} SOS rule}
@@ -295,20 +295,20 @@ We use the $\var{clampInterval}$ (figure \vref{fun:clamp-interval}), $\var{clamp
 
 Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation results in a sound plan. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. 
 
-Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(TFM, \var{node}, \var{time})$ which takes the temporal feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
+Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ which takes the interval-based feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
 
-First, check whether $n \in \texttt{ancestors}(TFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
+First, check whether $n \in \texttt{ancestors}(IBFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
 
 Next, find a list of critical nodes. 
-Let $A_n = \texttt{ancestors}(TFM, n, t_1) = [a_1, a_2, \dots, SN, \dots, r]$ and $A_{c_1} = \texttt{ancestors}(TFM, c_1, t_1) = [c_2, c_3, \dots, c_n, SN, \dots, r]$ with $SN$ the first common ancestor of $n$ and $c_1$. The list of critical nodes is then $C = [c_1, c_2, \dots, c_n]$, which is essentially the list of $n$'s new ancestors after the move. 
+Let $A_n = \texttt{ancestors}(IBFM, n, t_1) = [a_1, a_2, \dots, SN, \dots, r]$ and $A_{c_1} = \texttt{ancestors}(IBFM, c_1, t_1) = [c_2, c_3, \dots, c_n, SN, \dots, r]$ with $SN$ the first common ancestor of $n$ and $c_1$. The list of critical nodes is then $C = [c_1, c_2, \dots, c_n]$, which is essentially the list of $n$'s new ancestors after the move. 
 
 \textbf{Repeat this step until the algorithm terminates:}
 
 Look for the first move of one of the critical nodes. If no such moves occur until $t_e$, the operation causes no paradoxes, and the algorithm terminates successfully.  
   Suppose there is a `move` operation scheduled for $t_k$, with $t_1 < t_k < t_e$, where $c_i$ is moved to $k$. There are two possibilities:  
   \begin{enumerate}
-    \item $k$ is in $n$'s subtree, which is equivalent to $n \in \texttt{ancestors}(TFM, k, t_k)$. Report that the move caused a cycle and terminate. 
-\item $k$ is not in $n$'s subtree, so this move is safe. Let $A_k = \texttt{ancestors}(TFM, k, t_k) = [k_1, k_2, \dots, k_n, SN', \dots, r]$, with SN' the first common element of $A_k$ and $A_n$. Update the list of critical nodes to $[c_1, \dots, c_i, k_1, \dots, k_n]$.
+    \item $k$ is in $n$'s subtree, which is equivalent to $n \in \texttt{ancestors}(IBFM, k, t_k)$. Report that the move caused a cycle and terminate. 
+\item $k$ is not in $n$'s subtree, so this move is safe. Let $A_k = \texttt{ancestors}(IBFM, k, t_k) = [k_1, k_2, \dots, k_n, SN', \dots, r]$, with SN' the first common element of $A_k$ and $A_n$. Update the list of critical nodes to $[c_1, \dots, c_i, k_1, \dots, k_n]$.
   \end{enumerate}
 
 \begin{figure}[h]

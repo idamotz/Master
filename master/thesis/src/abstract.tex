@@ -10,12 +10,11 @@ Large projects such as an SPL require long-term planning, and plans for SPLs may
 As business requirements often change, FMEPs should support intermediate change. Such changes may cause paradoxes in an FMEP,  e.g. a node left without a parent, making the plan impossible to realise. The complex nature of FMEPs makes detecting paradoxes by hand impractical. Current tools exist to validate FMEPs, but require analysis of the entire plan even when a modification affects only small parts of it. For larger FMEPs, this is inefficient. Thus, there is a need for a method which detects such paradoxes in a more efficient way.
 
 % Contribution (What you did)
-In this thesis, we present a representation for FMEPs, called a temporal feature model (TFM). This representation enables local validation, by which we mean validating only the parts of the plan that are affected by the change. We further define operations for updating a TFM, and methods for detecting paradoxes resulting from an operation. Moreover, we give a proof of correctness for the method and an implementation as proof of concept.
+In this thesis, we present a representation for FMEPs, called an interval-based feature model (IBFM). This representation enables local validation, by which we mean validating only the parts of the plan that are affected by the change. We further define operations for updating an IBFM, and methods for detecting paradoxes resulting from an operation. Moreover, we give a proof of correctness for the method and an implementation as proof of concept.
  
 % Benefit (Why is it cool)
 Using these methods, it is possible to create an efficient soundness checker for modification of FMEPs. This may be used as basis for an SPL planning tool and will contribute to productivity. 
 
 % Positive Closing (Usually case study/evaluation)
 
-\todo{Change temporal feature model to interval-based feature model}
 \todo{Citing: it's okay not to cite in the abstract, but remember to back up everything in the introduction}

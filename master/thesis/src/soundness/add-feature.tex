@@ -10,7 +10,7 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \wf{1-9}.
+be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the interval-based feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \wf{1-9}.
 
 \todo{Show that the feature model outside the scope is unchanged}
 
@@ -31,12 +31,12 @@ In the rule, we look up only the feature ID, the parent group ID, and the name, 
 
 If the rule is applied, the well-formedness requirements must hold for the updated feature model. 
 
-Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \wf{1} and \wf{2} hold for the updated temporal feature model.
+Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \wf{1} and \wf{2} hold for the updated interval-based feature model.
 
 Because we assume that \wf{8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
 Consequently, \wf{3} holds.
 
-The rule does not modify the parent group's variation type, so \wf{4} is preserved in the modified temporal feature model.
+The rule does not modify the parent group's variation type, so \wf{4} is preserved in the modified interval-based feature model.
 
 Similarly to the argument for \wf{3}, the parent group ID is uniquely defined for the feature in \var{setFeatureAttributes}, and \var{featureID} is added to the parent group's set of child features, so the new feature is part of exactly one group. Since we do not remove any other feature IDs from the parent group's set of features, and as we already established that the new feature is not the root feature, \wf{5} is preserved.
 
@@ -50,19 +50,19 @@ It is furthermore impossible that adding this feature creates a cycle in the mod
 
 As the rule operates within the scope (lemma \vref{lemma:add-feature-scope}), it does not affect any other part of the plan.
 
-We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the temporal feature model, according to well-formedness rules \wf{1-9}. 
+We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the interval-based feature model, according to well-formedness rules \wf{1-9}. 
 \\
 \begin{lemma}
-   The \rulefont{{Add-Feature}} rule preserves well-formedness of the temporal feature model.
+   The \rulefont{{Add-Feature}} rule preserves well-formedness of the interval-based feature model.
    \label{lemma:add-feature-well-formed}
 \end{lemma}
 
 \todo{Mention that the scope part ensures that no other part of the plan is affected}
 \paragraph{Correctness of model modification}
 
-The operation is intended to add the feature with ID \var{featureID} to the temporal feature model during the interval $\interval{t_n}{t_m}$. 
+The operation is intended to add the feature with ID \var{featureID} to the interval-based feature model during the interval $\interval{t_n}{t_m}$. 
 
-After adding the feature to the temporal feature model, looking up the name $\var{name}$ in the $\names{}$ map at interval key $\interval{t_n}{t_m}$ should give the value $\var{featureID}$. Indeed, since the $\names{}$ map is updated thus:
+After adding the feature to the interval-based feature model, looking up the name $\var{name}$ in the $\names{}$ map at interval key $\interval{t_n}{t_m}$ should give the value $\var{featureID}$. Indeed, since the $\names{}$ map is updated thus:
 \[
    \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID}
 \]
@@ -101,7 +101,7 @@ The child features of the group must also be updated according to the semantics 
 \\
 
 \begin{lemma}
-   The \rulefont{Add-Feature} rule updates the temporal feature model according to the semantics of the \textbf{addFeature} operation.
+   The \rulefont{Add-Feature} rule updates the interval-based feature model according to the semantics of the \textbf{addFeature} operation.
    \label{lemma:add-feature-mod}
 \end{lemma}
 

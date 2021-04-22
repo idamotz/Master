@@ -11,13 +11,13 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation adds the group with ID \var{groupID} to the temporal feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. 
+be the initial state. Recall that this operation adds the group with ID \var{groupID} to the interval-based feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. 
 
 \paragraph{Scope}
 
 Recall from section \vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the group itself and the parent feature.
 
-In the premise of the rule, only $\var{groupID}$ and $\var{parentFeatureID}$ are looked up in the temporal feature model. Consequently, the premise stays within the spatial scope of the rule. In the conclusion of the rule, $\features{}$ are assigned to and looked up at $\var{parentFeatureID}$, and $\groups{}$ at $\var{groupID}$. The helper functions $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) and $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}) do not take the temporal feature model as argument, and so only affects the parent feature and the group itself, respectively.
+In the premise of the rule, only $\var{groupID}$ and $\var{parentFeatureID}$ are looked up in the interval-based feature model. Consequently, the premise stays within the spatial scope of the rule. In the conclusion of the rule, $\features{}$ are assigned to and looked up at $\var{parentFeatureID}$, and $\groups{}$ at $\var{groupID}$. The helper functions $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) and $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}) do not take the interval-based feature model as input, and so only affects the parent feature and the group itself, respectively.
 
 As for the temporal scope, the only interval looked up in the rule is $\interval{t_n}{t_m}$. Hence the rule operates only within the defined temporal scope.
 \\
@@ -29,7 +29,7 @@ As for the temporal scope, the only interval looked up in the rule is $\interval
 
 \paragraph{Preserving well-formedness}
 
-If the \rulefont{Add-Group} rule is applied, the resulting temporal feature model must be well-formed according to to the well-formedness rules \wf{1\textendash 9}. 
+If the \rulefont{Add-Group} rule is applied, the resulting interval-based feature model must be well-formed according to to the well-formedness rules \wf{1\textendash 9}. 
 
 The rule does not change the root feature's existence or type, so it does not violate \wf{1} or \wf{2}. The $\names{}$ map is left unchanged, and the only change made to a feature is to the parent feature, adding $\var{groupID}$ to the set of child groups at $\interval{t_n}{t_m}$. The only feature modified is the parent feature, and only in its child groups map $F_c$. Since $\var{parentFeatureID}$ is assigned to the group's parent feature table $F_p$ at the same key $\interval{t_n}{t_m}$, \wf{3} holds.
 
@@ -41,13 +41,13 @@ Similarly, \wf{7} will hold in the altered model given that it holds in the orig
 \\
 
 \begin{lemma}
-   The \rulefont{Add-Group} rule preserves well-formedness of the temporal feature model.
+   The \rulefont{Add-Group} rule preserves well-formedness of the interval-based feature model.
    \label{lemma:add-group-well-formed}
 \end{lemma}
 
 \paragraph{Correctness of model modification}
 
-The operation is intended to add the group with ID $\var{groupID}$ to the temporal feature model during the interval $\interval{t_n}{t_m}$. Since groups have no names, this operation should not affect the $\names{}$ map. Indeed, the rule reflects this, as the map is not changed in the transition.
+The operation is intended to add the group with ID $\var{groupID}$ to the interval-based feature model during the interval $\interval{t_n}{t_m}$. Since groups have no names, this operation should not affect the $\names{}$ map. Indeed, the rule reflects this, as the map is not changed in the transition.
 
 However, the operation does naturally add information to the $\groups{}$ map, assigning
 \begin{equation*}
@@ -76,7 +76,7 @@ is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{a
 \\
 
 \begin{lemma}
-   The \rulefont{Add-Group} rule updates the temporal feature model according to the semantics of the \textbf{addGroup} operation.
+   The \rulefont{Add-Group} rule updates the interval-based feature model according to the semantics of the \textbf{addGroup} operation.
    \label{lemma:add-group-mod}
 \end{lemma}
 
