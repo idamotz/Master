@@ -11,34 +11,34 @@ import Types
 toSetOf :: Ord a => Getting (Endo [a]) s a -> s -> S.Set a
 toSetOf l = S.fromList . toListOf l
 
-toTreeSequence :: TemporalFeatureModel -> TreeSequence
-toTreeSequence tfm =
-  let tps = filter (/= Forever) . S.toAscList $ getTimePoints tfm
-   in zip tps $ treeAt tfm <$> tps
+toTreeSequence :: IntervalBasedFeatureModel -> TreeSequence
+toTreeSequence ibfm =
+  let tps = filter (/= Forever) . S.toAscList $ getTimePoints ibfm
+   in zip tps $ treeAt ibfm <$> tps
 
-treeAt :: TemporalFeatureModel -> TimePoint -> FeatureModel
-treeAt tfm tp = FeatureModel . fromJust . convertFeature tfm tp $ tfm ^. rootID
+treeAt :: IntervalBasedFeatureModel -> TimePoint -> FeatureModel
+treeAt ibfm tp = FeatureModel . fromJust . convertFeature ibfm tp $ ibfm ^. rootID
 
-convertFeature :: TemporalFeatureModel -> TimePoint -> FeatureID -> Maybe Feature
-convertFeature tfm tp fid = do
-  FeatureValidity _ names types _ childGroups <- tfm ^? featureValidities . ix fid
+convertFeature :: IntervalBasedFeatureModel -> TimePoint -> FeatureID -> Maybe Feature
+convertFeature ibfm tp fid = do
+  FeatureValidity _ names types _ childGroups <- ibfm ^? featureValidities . ix fid
   (_, name) <- lookupTP tp names
   (_, typ) <- lookupTP tp types
   let childIDs = foldMap S.toList . IM.elems $ IM.containing childGroups tp
-  return . Feature fid name typ $ mapMaybe (convertGroup tfm tp) childIDs
+  return . Feature fid name typ $ mapMaybe (convertGroup ibfm tp) childIDs
 
-convertGroup :: TemporalFeatureModel -> TimePoint -> GroupID -> Maybe Group
-convertGroup tfm tp gid = do
-  GroupValidity _ types _ childFeatures <- tfm ^? groupValidities . ix gid
+convertGroup :: IntervalBasedFeatureModel -> TimePoint -> GroupID -> Maybe Group
+convertGroup ibfm tp gid = do
+  GroupValidity _ types _ childFeatures <- ibfm ^? groupValidities . ix gid
   (_, typ) <- lookupTP tp types
   let childIDs = foldMap S.toList . IM.elems $ IM.containing childFeatures tp
-  return . Group gid typ $ mapMaybe (convertFeature tfm tp) childIDs
+  return . Group gid typ $ mapMaybe (convertFeature ibfm tp) childIDs
 
 validityToList :: Validity -> [TimePoint]
 validityToList (Validity s e) = [s, e]
 
-getTimePoints :: TemporalFeatureModel -> S.Set TimePoint
-getTimePoints (TemporalFeatureModel _ _ features groups) =
+getTimePoints :: IntervalBasedFeatureModel -> S.Set TimePoint
+getTimePoints (IntervalBasedFeatureModel _ _ features groups) =
   toSetOf (folded . existenceValidities . timePoints) features
     <> toSetOf (folded . nameValidities . timePoints) features
     <> toSetOf (folded . typeValidities . timePoints) features

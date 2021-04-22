@@ -14,9 +14,9 @@ f = FeatureID
 g :: String -> GroupID
 g = GroupID
 
-exampleValidities :: TemporalFeatureModel
+exampleValidities :: IntervalBasedFeatureModel
 exampleValidities =
-  TemporalFeatureModel
+  IntervalBasedFeatureModel
     (f "feature:car")
     -- Name validities --
     ( M.fromList

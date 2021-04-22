@@ -4,8 +4,8 @@ import Apply (apply)
 import Types
 import Validate (validate)
 
-validateAndApply :: TimeOperation -> TemporalFeatureModel -> Either [ValidationError] TemporalFeatureModel
-validateAndApply o tfm = choose (validate o tfm) (apply o tfm)
+validateAndApply :: TimeOperation -> IntervalBasedFeatureModel -> Either [ValidationError] IntervalBasedFeatureModel
+validateAndApply o ibfm = choose (validate o ibfm) (apply o ibfm)
   where
     choose [] x = Right x
     choose es _ = Left es

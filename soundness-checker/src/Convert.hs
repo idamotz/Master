@@ -9,17 +9,17 @@ import qualified Data.Map.Strict as M
 import Helpers
 import Types
 
-convert :: EvolutionPlan -> TemporalFeatureModel
+convert :: EvolutionPlan -> IntervalBasedFeatureModel
 convert (EvolutionPlan initModel startTime operations) =
   foldl
     (flip apply)
     (convertInitModel initModel startTime)
     operations
 
-convertInitModel :: FeatureModel -> TimePoint -> TemporalFeatureModel
-convertInitModel (FeatureModel r) tp = execState (convertFeature tp Nothing r) (TemporalFeatureModel (_featureID r) M.empty M.empty M.empty)
+convertInitModel :: FeatureModel -> TimePoint -> IntervalBasedFeatureModel
+convertInitModel (FeatureModel r) tp = execState (convertFeature tp Nothing r) (IntervalBasedFeatureModel (_featureID r) M.empty M.empty M.empty)
 
-convertFeature :: TimePoint -> Maybe GroupID -> Feature -> State TemporalFeatureModel ()
+convertFeature :: TimePoint -> Maybe GroupID -> Feature -> State IntervalBasedFeatureModel ()
 convertFeature tp mParentID (Feature fid name ftype children) = do
   modify $ insertEmptyFeature fid
   let validity = Validity tp Forever
@@ -38,7 +38,7 @@ convertFeature tp mParentID (Feature fid name ftype children) = do
     _ -> return ()
   traverse_ (convertGroup tp fid) children
 
-convertGroup :: TimePoint -> FeatureID -> Group -> State TemporalFeatureModel ()
+convertGroup :: TimePoint -> FeatureID -> Group -> State IntervalBasedFeatureModel ()
 convertGroup tp parentID (Group gid gtype children) = do
   modify $ insertEmptyGroup gid
   let validity = Validity tp Forever

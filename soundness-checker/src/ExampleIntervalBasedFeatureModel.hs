@@ -1,4 +1,4 @@
-module ExampleTemporalFeaturemodel (exampleTemporalFeatureModel) where
+module ExampleIntervalBasedFeatureModel (exampleIntervalBasedFeatureModel) where
 
 import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
@@ -24,9 +24,9 @@ set :: Ord a => [a] -> S.Set a
 set = S.fromList
 
 -- This is the output of `convert exampleEvolutionPlan`
-exampleTemporalFeatureModel :: TemporalFeatureModel
-exampleTemporalFeatureModel =
-  TemporalFeatureModel
+exampleIntervalBasedFeatureModel :: IntervalBasedFeatureModel
+exampleIntervalBasedFeatureModel =
+  IntervalBasedFeatureModel
     (f "feature:car")
     ( M.fromList
         [ ("Android Auto", im [(v (TP 1) (∞), f "feature:android-auto")])

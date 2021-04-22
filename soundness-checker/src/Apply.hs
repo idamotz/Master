@@ -5,7 +5,7 @@ import qualified Data.IntervalMap.Generic.Strict as IM
 import Helpers
 import Types
 
-apply :: TimeOperation -> TemporalFeatureModel -> TemporalFeatureModel
+apply :: TimeOperation -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 apply (AddOperation validity (AddFeature fid name fType parentID)) =
   insertName name validity fid
     . over
@@ -34,11 +34,11 @@ apply (AddOperation validity (AddGroup gid gType parentID)) =
             & parentValidities %~ IM.insert validity parentID
       )
     . insertEmptyGroup gid
-apply (ChangeOperation tp (RemoveFeature fid)) = \tfm ->
-  let (FeatureValidity fe fn ft fp fc) = tfm ^?! featureValidities . ix fid
+apply (ChangeOperation tp (RemoveFeature fid)) = \ibfm ->
+  let (FeatureValidity fe fn ft fp fc) = ibfm ^?! featureValidities . ix fid
       Just (_, name) = lookupTP tp fn
       Just (_, parentID) = lookupTP tp fp
-   in tfm
+   in ibfm
         & nameValidities . ix name %~ clampIntervalEnd tp
         & featureValidities . ix fid
         .~ FeatureValidity
@@ -48,10 +48,10 @@ apply (ChangeOperation tp (RemoveFeature fid)) = \tfm ->
           (clampIntervalEnd tp fp)
           fc
           & groupValidities . ix parentID . childValidities %~ clampIntervalEndValue tp fid
-apply (ChangeOperation tp (RemoveGroup gid)) = \tfm ->
-  let (GroupValidity ge gt gp gc) = tfm ^?! groupValidities . ix gid
+apply (ChangeOperation tp (RemoveGroup gid)) = \ibfm ->
+  let (GroupValidity ge gt gp gc) = ibfm ^?! groupValidities . ix gid
       Just (_, parentID) = lookupTP tp gp
-   in tfm
+   in ibfm
         & groupValidities . ix gid
         .~ GroupValidity
           (clampIntervalEnd tp ge)
@@ -59,9 +59,9 @@ apply (ChangeOperation tp (RemoveGroup gid)) = \tfm ->
           (clampIntervalEnd tp gp)
           gc
           & featureValidities . ix parentID . childValidities %~ clampIntervalEndValue tp gid
-apply (ChangeOperation tp (MoveFeature fid newParent)) = \tfm ->
-  let Just (Validity _ e, oldParent) = tfm ^?! featureValidities . ix fid . parentValidities . to (lookupTP tp)
-   in tfm
+apply (ChangeOperation tp (MoveFeature fid newParent)) = \ibfm ->
+  let Just (Validity _ e, oldParent) = ibfm ^?! featureValidities . ix fid . parentValidities . to (lookupTP tp)
+   in ibfm
         & groupValidities . ix oldParent . childValidities
         %~ clampIntervalEndValue tp fid
         & groupValidities . ix newParent . childValidities
@@ -69,9 +69,9 @@ apply (ChangeOperation tp (MoveFeature fid newParent)) = \tfm ->
         & featureValidities . ix fid . parentValidities
         %~ clampIntervalEnd tp
           . IM.insert (Validity tp e) newParent
-apply (ChangeOperation tp (MoveGroup gid newParent)) = \tfm ->
-  let Just (Validity _ e, oldParent) = tfm ^?! groupValidities . ix gid . parentValidities . to (lookupTP tp)
-   in tfm
+apply (ChangeOperation tp (MoveGroup gid newParent)) = \ibfm ->
+  let Just (Validity _ e, oldParent) = ibfm ^?! groupValidities . ix gid . parentValidities . to (lookupTP tp)
+   in ibfm
         & featureValidities . ix oldParent . childValidities
         %~ clampIntervalEndValue tp gid
         & featureValidities . ix newParent . childValidities
@@ -79,25 +79,25 @@ apply (ChangeOperation tp (MoveGroup gid newParent)) = \tfm ->
         & groupValidities . ix gid . parentValidities
         %~ clampIntervalEnd tp
           . IM.insert (Validity tp e) newParent
-apply (ChangeOperation tp (ChangeFeatureType fid newType)) = \tfm ->
-  let types = tfm ^?! featureValidities . ix fid . typeValidities
+apply (ChangeOperation tp (ChangeFeatureType fid newType)) = \ibfm ->
+  let types = ibfm ^?! featureValidities . ix fid . typeValidities
       Just (containingKey@(Validity s e), oldType) = lookupTP tp types
-   in tfm
+   in ibfm
         & featureValidities . ix fid . typeValidities
         %~ IM.insert (Validity tp e) newType
           . IM.insert (Validity s tp) oldType
           . IM.delete containingKey
-apply (ChangeOperation tp (ChangeGroupType gid newType)) = \tfm ->
-  let types = tfm ^?! groupValidities . ix gid . typeValidities
+apply (ChangeOperation tp (ChangeGroupType gid newType)) = \ibfm ->
+  let types = ibfm ^?! groupValidities . ix gid . typeValidities
       Just (containingKey@(Validity s e), oldType) = lookupTP tp types
-   in tfm
+   in ibfm
         & groupValidities . ix gid . typeValidities
         %~ IM.insert (Validity tp e) newType
           . IM.insert (Validity s tp) oldType
           . IM.delete containingKey
-apply (ChangeOperation tp (ChangeFeatureName fid newName)) = \tfm ->
-  let Just (Validity _ e, oldName) = tfm ^?! featureValidities . ix fid . nameValidities . to (lookupTP tp)
-   in tfm
+apply (ChangeOperation tp (ChangeFeatureName fid newName)) = \ibfm ->
+  let Just (Validity _ e, oldName) = ibfm ^?! featureValidities . ix fid . nameValidities . to (lookupTP tp)
+   in ibfm
         & nameValidities . ix oldName
           %~ clampIntervalEnd tp
         & id

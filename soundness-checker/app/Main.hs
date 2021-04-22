@@ -1,9 +1,9 @@
 module Main where
 
-import ExampleTemporalFeaturemodel
+import ExampleIntervalBasedFeatureModel
 import Text.Pretty.Simple (pPrint)
 import TreeSequence
 
 main :: IO ()
 main =
-  pPrint $ toTreeSequence exampleTemporalFeatureModel
+  pPrint $ toTreeSequence exampleIntervalBasedFeatureModel

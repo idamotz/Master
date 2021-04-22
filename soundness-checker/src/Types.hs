@@ -53,7 +53,7 @@ instance IM.Interval Validity TimePoint where
 instance Semigroup Validity where
   Validity s1 e1 <> Validity s2 e2 = Validity (min s1 s2) (max e1 e2)
 
-data TemporalFeatureModel = TemporalFeatureModel
+data IntervalBasedFeatureModel = IntervalBasedFeatureModel
   { _rootID :: RootID
   , _nameValidities :: NameValidities
   , _featureValidities :: FeatureValidities
@@ -151,7 +151,7 @@ data ValidationError
 makePrisms ''GroupType
 makePrisms ''TimePoint
 makeFieldsNoPrefix ''Validity
-makeFieldsNoPrefix ''TemporalFeatureModel
+makeFieldsNoPrefix ''IntervalBasedFeatureModel
 makeFieldsNoPrefix ''FeatureValidity
 makeFieldsNoPrefix ''GroupValidity
 makePrisms ''FeatureType

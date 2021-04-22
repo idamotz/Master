@@ -62,35 +62,35 @@ validityOverlap :: Validity -> Validity -> Validity
 validityOverlap (Validity s1 e1) (Validity s2 e2) = Validity (max s1 s2) (min e1 e2)
 
 ---------------------------------
--- TemporalFeatureModel lookup --
+-- IntervalBasedFeatureModel lookup --
 ---------------------------------
 
-lookupFeature :: FeatureID -> TemporalFeatureModel -> Maybe FeatureValidity
+lookupFeature :: FeatureID -> IntervalBasedFeatureModel -> Maybe FeatureValidity
 lookupFeature fid = M.lookup fid . _featureValidities
 
-lookupGroup :: GroupID -> TemporalFeatureModel -> Maybe GroupValidity
+lookupGroup :: GroupID -> IntervalBasedFeatureModel -> Maybe GroupValidity
 lookupGroup gid = M.lookup gid . _groupValidities
 
-lookupFeatureDefault :: FeatureID -> TemporalFeatureModel -> FeatureValidity
+lookupFeatureDefault :: FeatureID -> IntervalBasedFeatureModel -> FeatureValidity
 lookupFeatureDefault fid = M.findWithDefault (FeatureValidity mempty mempty mempty mempty mempty) fid . view featureValidities
 
-lookupGroupDefault :: GroupID -> TemporalFeatureModel -> GroupValidity
+lookupGroupDefault :: GroupID -> IntervalBasedFeatureModel -> GroupValidity
 lookupGroupDefault gid = M.findWithDefault (GroupValidity mempty mempty mempty mempty) gid . view groupValidities
 
-lookupNameDefault :: Name -> TemporalFeatureModel -> ValidityMap FeatureID
+lookupNameDefault :: Name -> IntervalBasedFeatureModel -> ValidityMap FeatureID
 lookupNameDefault name = M.findWithDefault mempty name . view nameValidities
 
-lookupNode :: Either FeatureID GroupID -> TemporalFeatureModel -> Maybe (Either FeatureValidity GroupValidity)
+lookupNode :: Either FeatureID GroupID -> IntervalBasedFeatureModel -> Maybe (Either FeatureValidity GroupValidity)
 lookupNode nid vs = either (fmap Left . (`lookupFeature` vs)) (fmap Right . (`lookupGroup` vs)) nid
 
-parentGroup :: FeatureID -> TimePoint -> Fold TemporalFeatureModel GroupID
+parentGroup :: FeatureID -> TimePoint -> Fold IntervalBasedFeatureModel GroupID
 parentGroup fid tp =
   featureValidities . ix fid . parentValidities
     . to (lookupTP tp)
     . _Just
     . _2
 
-parentFeature :: GroupID -> TimePoint -> Fold TemporalFeatureModel FeatureID
+parentFeature :: GroupID -> TimePoint -> Fold IntervalBasedFeatureModel FeatureID
 parentFeature gid tp =
   groupValidities . ix gid . parentValidities
     . to (lookupTP tp)
@@ -102,29 +102,29 @@ compatibleTypes And _ = True
 compatibleTypes _ Optional = True
 compatibleTypes _ _ = False
 
-lookupNameInterval :: Name -> Validity -> TemporalFeatureModel -> ValidityMap FeatureID
+lookupNameInterval :: Name -> Validity -> IntervalBasedFeatureModel -> ValidityMap FeatureID
 lookupNameInterval name validity =
   maybe mempty (`IM.intersecting` validity)
     . M.lookup name
     . view nameValidities
 
 ---------------------------------------
--- TemporalFeatureModel modification --
+-- IntervalBasedFeatureModel modification --
 ---------------------------------------
 
 insertSingleton :: Ord a => Validity -> a -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
 insertSingleton validity x = IM.insertWith (<>) validity (S.singleton x)
 
-insertName :: Name -> Validity -> FeatureID -> TemporalFeatureModel -> TemporalFeatureModel
+insertName :: Name -> Validity -> FeatureID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 insertName name validity fid =
   over nameValidities $
     M.insertWith (const $ IM.insert validity fid) name $ IM.singleton validity fid
 
-insertEmptyFeature :: FeatureID -> TemporalFeatureModel -> TemporalFeatureModel
+insertEmptyFeature :: FeatureID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 insertEmptyFeature fid =
   over featureValidities $ M.insertWith (const id) fid (FeatureValidity mempty mempty mempty mempty mempty)
 
-insertEmptyGroup :: GroupID -> TemporalFeatureModel -> TemporalFeatureModel
+insertEmptyGroup :: GroupID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 insertEmptyGroup gid =
   over groupValidities $ M.insertWith (const id) gid (GroupValidity mempty mempty mempty mempty)
 
@@ -150,7 +150,7 @@ clampIntervalEndValue tp v vmap =
 -- Move algorithm --
 --------------------
 
-ancestors :: NodeID -> TimePoint -> TemporalFeatureModel -> [NodeID]
+ancestors :: NodeID -> TimePoint -> IntervalBasedFeatureModel -> [NodeID]
 ancestors (Left fid) _ vs | fid == _rootID vs = []
 ancestors (Left fid) tp vs =
   let pgid = vs ^?! parentGroup fid tp
@@ -159,7 +159,7 @@ ancestors (Right gid) tp vs =
   let pfid = vs ^?! parentFeature gid tp
    in Left pfid : ancestors (Left pfid) tp vs
 
-hasCycles :: NodeID -> NodeID -> Validity -> TemporalFeatureModel -> Bool
+hasCycles :: NodeID -> NodeID -> Validity -> IntervalBasedFeatureModel -> Bool
 hasCycles n c interval@(Validity tstart _) vs =
   let an = ancestors n tstart vs
       ac = ancestors c tstart vs
@@ -181,7 +181,7 @@ hasCycles n c interval@(Validity tstart _) vs =
 nextMove :: HasParentValidities s (ValidityMap a) => TimePoint -> Fold s (Validity, a)
 nextMove tp = parentValidities . to (lookupTP tp) . _Just
 
-firstMove :: [NodeID] -> Validity -> TemporalFeatureModel -> Maybe (TimePoint, NodeID, NodeID)
+firstMove :: [NodeID] -> Validity -> IntervalBasedFeatureModel -> Maybe (TimePoint, NodeID, NodeID)
 firstMove xs (Validity tstart tend) featureModel =
   minimumByMay (comparing $ view _1) $ mapMaybe getMove xs
   where
