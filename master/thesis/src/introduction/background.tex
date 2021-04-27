@@ -12,7 +12,9 @@
 \subsection{Feature models}
 \label{sub:feature-models}
 \begin{figure}
-   \includegraphics[width=\textwidth]{CoffeeMachine1.pdf}
+   \begin{center}
+      \includegraphics[width=0.6\textwidth]{CoffeeMachine1.pdf}
+   \end{center}
    \caption[Example feature model for a coffee machine]{Example feature model for a coffee machine \protect\footnotemark}
    \label{ex:fm-coffee1}
 \end{figure}
@@ -23,10 +25,46 @@ A group gives logical structure to the features, restricting the allowed combina
 
 Feature models often also allow \emph{cross-tree constraints}. These are similar to the parent-child relation in the feature model, but are independent of the tree structure. For instance, one could imagine that the producer would always include an automatic grinder if the Built-In feature is selected, because the built-in feature does not work unless the machine grinds the coffee automatically. This cross-tree constraint could be expressed as "Built-In requires Grinder``. Although cross-tree constraints are commonly used, we disregard them in this thesis. This is due to the fact that the cross-tree constraints add unwanted complexity, and we wish to exploit the tree structure of a feature model.
 
+\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
 \subsection{Feature model evolution plans}
 \label{sub:feature-model-evolution-plans}
-The evolution of an SPL can be planned using a \emph{feature model evolution plan}. Software product lines often grow very large, and it is crucial to plan ahead.
+The evolution of an SPL can be planned using a \emph{feature model evolution plan}. Software product lines often grow very large, and it is crucial to plan ahead. There exists tools for evolution planning, such as DarwinSPL\footnote{\url{https://gitlab.com/DarwinSPL/DarwinSPL}}. An intuitive way to think of an evolution plan is a sequence of feature models associated with the time points when they are planned to be realized. For instance, imagine that the first coffee machines in the software product line are represented by the feature model in figure \vref{ex:fm-coffee1}. They are controlled by buttons, but as touch interfaces become more common, the manager decides to add coffee machines with a touch pad. Furthermore, voice commands are becoming trendy, and she feels that the feature model should have options for controlling it by voice, too. This modification is included in figure \vref{ex:fm-coffee2}.
 
+\begin{figure}
+   \begin{center}
+      \includegraphics[width=0.9\textwidth]{CoffeeMachine2.pdf}
+   \end{center}
+   \caption[Coffee machine with added touch interface]{Coffee machine with added touch interface \footnotemark}
+   \label{ex:fm-coffee2}
+\end{figure}
+
+\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
+
+In the LTEP research project, we have formalized evolution plans as an initial model combined with a list of time points (points in time \todo{hm}) associated with edit operations, e.g. change type of Beverages to \optional{}. In the formalized feature model, each feature and group has a unique ID, and the edit operations use these IDs to identify the features and groups to be added, removed, or modified. A simplified formalization of the evolution plan is shown in figure \vref{ex:formal-evolution-plan}. In the examples, IDs are not used, and types of new groups and features are not specified. In the formal definitions, such details are included in the operations. Applying the operations in order results in the feature model shown in figure \vref{ex:fm-coffee2}.
+
+\begin{figure}
+   \begin{center}
+      \includegraphics[height=0.5\textwidth]{CoffeeMachine1}
+      \bigskip
+
+      \scriptsize
+      \begin{minipage}{0.7\textwidth}
+         \begin{enumerate}[$t_1$]
+            \item 
+               \begin{enumerate}[ ]
+               \item Add new feature ``Interface"
+               \item Add an \xortype{} group to ``Interface"
+               \item Add new feature ``Button interface" to the new group
+               \item Add new feature ``Touch interface"  to the new group
+            \end{enumerate}
+         \end{enumerate}
+      \end{minipage}
+      \caption{Formalized feature model evolution plan}
+      \label{ex:formal-evolution-plan}
+   \end{center}
+\end{figure}
+
+Furthermore, we have published a semantics for these edit operations, letting us define a \emph{sound} plan. A sound plan is an evolution plan in which applying each operation in order results in a structurally sound feature model for each step. Using this semantics on a modified plan allows for validation of change. When changing a feature model evolution plan, soundness of the updated plan can be checked by modifying the list of edit operations and checking that the resulting plan is sound using the semantics. However, this approach models change to \emph{feature models}, whereas the goal of this thesis is to model and analyse change to a \emph{feature model evolution plan}.
 
 \section{Static analysis}
 \label{sec:static-analysis}
@@ -37,7 +75,6 @@ In static analysis of programs, it is impossible to have both soundness, complet
 
 Unlike programs, it is possible to get full overview of a feature model evolution plan. It is always possible to find the correct answer given the question "Does feature A exist at time 5?". An operational representation finds the answer by applying operations to the initial model until time 5 is complete, and checks if feature A exists in the resulting feature model. For intuition on why this must be true, imagine a (correct) program where we know all statements are assignment. This program terminates for a certainty, since there is no branching. The same goes for an operational feature model evolution plan. There are no conditional statements and thus no branching. Since we know that every operational feature model evolution plan ``terminates", we avoid the halting problem which is at the core of all static analysis of programs, which must always over- or under-approximate a solution to be certain that the analysis terminates.
 
-\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
 % Static analysis is semantic-based analysis. Syntax-driven, but semantic-based, but also of the meaning. If we have x := 5, then it means that 5 is the value which you put into x
 % Say that I'm doing semantic-based analysis in the thesis, _analysis_, not just semantics.Can I add it or not? How much of the scope is affected? Emphasize modularity; analysis is modular. Focus on the analytical parts of the work, combined with the semantics of a feature model
 % Don't call the rules SOS rules, but "Rules for semantics-based analysis". Stop downplaying
