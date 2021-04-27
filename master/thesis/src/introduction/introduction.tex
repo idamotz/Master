@@ -1,0 +1,40 @@
+\chapter{Introduction}
+
+A software product line (SPL) capitalizes on the similarity and variability of closely related software products \cite{book:introduction-to-spl}. The similarities and variability is captured by features, which are customer-visible characteristics of a system \cite{book:introduction-to-spl}. Each product in the product line (called a \textit{variant}) comprises a selection of these features, resulting in a flexible and customizable set of variants available to customers. To model an SPL it is common to use a feature model, a tree-like structure with nodes representing features. From this model, a variant can be derived by selecting features. The feature model's structure creates restrictions for which variants are allowed, while they also make it possible to model all possible variants at once.
+
+SPLs grow large as they are more profitable the more variants they originate \cite{book:introduction-to-spl}, % page 10 (34 absolute)
+and evolve over time as requirements change. For complex projects, planning is necessary, and these plans, too, change with requirements. The research project this thesis is built upon defines \emph{feature model evolution plans} (FMEP) in terms of feature models \cite{art:consistency-preserving-evolution-planning}. A FMEP consists of the initial feature model and a sequence of edit operations. In the same project, we have devised a method to detect paradoxes in a feature model evolution plan. \todo{Elaborate.} However, when a plan is changed, this method requires that the entire plan be verified, and for large plans, this may be inefficient. This is due to the fact that the method relies on feature model change rather than FMEP change. 
+
+
+
+% Giving the thesis a purpose (not how, but why)
+%   Mention problems in industry practice (mention software product lines)
+%   Say what software product lines are for, not technicalities, why they exist
+%   Talk about why planning is difficult, when the project size is increasing
+%   -> Changing the plan is even more difficult, and there is a lack of automated tools for checking that the changes don't break anything
+%   Drawing a picture of the domain and the problem
+%   My thesis is addressing these challenges by looking at these research questions or goals
+% Last part of introduction: research questions/goals (base structure of thesis on this) - 3 is a good number
+% They are general. What, how, (never why)
+% In this thesis, I will address these questions through these activities ...(will not tackle everything, so make the purpose clear)
+% Start broader, chunk down to more detail
+% Can take the goals up again in the following sections (mention the research questions when tackling them)
+% How the sensor should read my master's thesis. How will she know what my contribution is, where it comes in. "In chapter 2 I will give the background, limited to the scope of my thesis". Make it clear that I'm not trying to cover everything, and give the logic/structure of the thesis.
+
+Storyline: SPLs -> planning -> existing solution (LTEP) -> problem with that solution -> goal
+
+High-level introduction to software product lines
+
+Can talk about static analysis in terms of related work or background.
+-> Semantic-based analysis
+-> Forward analysis and scope (live variable analysis etc)
+- Bring up research questions after this
+
+Reference previous work clearly, talk about how my work builds upon it.
+
+\section{Contributions}
+
+In this thesis, we model and create a method for validating \emph{plan} change, with the goal that only the parts of the plan which may be affected by that change are checked for paradoxes. This method may then be used as basis for an SPL planning tool. We define a representation suited for local lookup and assignment, and create analysis rules for safely updating the evolution plan. We implement the method in a minimal tool, and give a proof that the method is sound.
+
+\input{introduction/research-questions}
+

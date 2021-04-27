@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ASCII"?>
+<operation:DwEvolutionOperationModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:operation="http://www.darwinspl.de/feature/operation/2.0">
+  <evolutionOperations xsi:type="operation:DwFeatureCreateOperation" id="_03780225-031c-4d69-9baa-b150abab167f" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com">
+    <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+    <feature href="CoffeeMachine.tfm#_4d4b6838-4372-4e69-8333-87007144fc31"/>
+    <featureAddOperation id="_208f4eb4-40cc-4562-a6e4-7f07ae9086f3" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com" forceCreateParentGroup="true">
+      <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+      <feature href="CoffeeMachine.tfm#_4d4b6838-4372-4e69-8333-87007144fc31"/>
+      <parent href="CoffeeMachine.tfm#_cd89558d-dda9-421e-a759-9e20ae113184"/>
+      <groupCreateOperation id="_4bd5db16-0e1c-48de-ae97-eabb32d19313" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com">
+        <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+        <group href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+        <groupAddOperation id="_2f309bf9-8d8b-460f-9d92-2b7116cb19ea" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com">
+          <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+          <group href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+          <parentFeature href="CoffeeMachine.tfm#_cd89558d-dda9-421e-a759-9e20ae113184"/>
+        </groupAddOperation>
+      </groupCreateOperation>
+      <groupTypeChangeOperation id="_5684ee7f-6cc2-4d18-98ac-3935b9cceaca" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com">
+        <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+        <group href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+      </groupTypeChangeOperation>
+      <groupToAddTo href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+    </featureAddOperation>
+  </evolutionOperations>
+  <evolutionOperations xsi:type="operation:DwFeatureRenameOperation" id="_d10c42e8-49b3-4b00-92f3-8c8a0d39f7aa" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com" newNameString="TouchDisplay" oldNameString="NewFeature1">
+    <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+    <feature href="CoffeeMachine.tfm#_4d4b6838-4372-4e69-8333-87007144fc31"/>
+  </evolutionOperations>
+  <evolutionOperations xsi:type="operation:DwFeatureCreateOperation" id="_62789b1c-4f2c-470d-b32c-5c1ba67ee030" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com">
+    <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+    <feature href="CoffeeMachine.tfm#_2563953a-cdd4-4e59-b54a-ca34b96fb956"/>
+    <featureAddOperation id="_f07a4b2c-d53a-496a-8f22-f37feb4bf28a" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com">
+      <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+      <feature href="CoffeeMachine.tfm#_2563953a-cdd4-4e59-b54a-ca34b96fb956"/>
+      <parent href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+      <groupToAddTo href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+    </featureAddOperation>
+  </evolutionOperations>
+  <evolutionOperations xsi:type="operation:DwGroupTypeChangeOperation" id="_4974ccdd-9aef-4946-89b1-60fa93cac809" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com" newGroupTypeEnum="ALTERNATIVE">
+    <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+    <group href="CoffeeMachine.tfm#_b909a669-fa28-42be-8e8d-4e99c247315b"/>
+  </evolutionOperations>
+  <evolutionOperations xsi:type="operation:DwFeatureRenameOperation" id="_79ce8c60-5b84-45e7-8ec6-ff61cc48e9b5" operationDate="2021-04-23T00:00:00.000+0200" contributor="idasm2399%40someone.com" newNameString="ButtonInterface" oldNameString="NewFeature1">
+    <featureModel href="CoffeeMachine.tfm#_66256157-003a-4963-8409-9eb41ac7fe25"/>
+    <feature href="CoffeeMachine.tfm#_2563953a-cdd4-4e59-b54a-ca34b96fb956"/>
+  </evolutionOperations>
+  <contributors id="idasm2399%40someone.com" name="idasm"/>
+</operation:DwEvolutionOperationModel>
