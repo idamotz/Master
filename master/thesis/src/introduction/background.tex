@@ -9,6 +9,9 @@
 
 \section{Software product lines}
 \label{sec:software-product-lines}
+
+\todo{Write yet \emph{another} introduction to software product lines..}
+
 \subsection{Feature models}
 \label{sub:feature-models}
 \begin{figure}
@@ -18,6 +21,7 @@
    \caption[Example feature model for a coffee machine]{Example feature model for a coffee machine \protect\footnotemark}
    \label{ex:fm-coffee1}
 \end{figure}
+\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
 
 To model the relations between the features (which combinations are allowed, which are common to all variants, etc.), it is common to use a \emph{feature model}. A feature model is a tree-like structure where the nodes are features and groups of features. See figure \vref{ex:fm-coffee1} for an example of a feature model. A feature cannot be selected in a variant unless its parent feature is also selected.
 
@@ -25,7 +29,6 @@ A group gives logical structure to the features, restricting the allowed combina
 
 Feature models often also allow \emph{cross-tree constraints}. These are similar to the parent-child relation in the feature model, but are independent of the tree structure. For instance, one could imagine that the producer would always include an automatic grinder if the Built-In feature is selected, because the built-in feature does not work unless the machine grinds the coffee automatically. This cross-tree constraint could be expressed as "Built-In requires Grinder``. Although cross-tree constraints are commonly used, we disregard them in this thesis. This is due to the fact that the cross-tree constraints add unwanted complexity, and we wish to exploit the tree structure of a feature model.
 
-\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
 \subsection{Feature model evolution plans}
 \label{sub:feature-model-evolution-plans}
 The evolution of an SPL can be planned using a \emph{feature model evolution plan}. Software product lines often grow very large, and it is crucial to plan ahead. There exists tools for evolution planning, such as DarwinSPL\footnote{\url{https://gitlab.com/DarwinSPL/DarwinSPL}}. An intuitive way to think of an evolution plan is a sequence of feature models associated with the time points when they are planned to be realized. For instance, imagine that the first coffee machines in the software product line are represented by the feature model in figure \vref{ex:fm-coffee1}. They are controlled by buttons, but as touch interfaces become more common, the manager decides to add coffee machines with a touch pad. Furthermore, voice commands are becoming trendy, and she feels that the feature model should have options for controlling it by voice, too. This modification is included in figure \vref{ex:fm-coffee2}.
@@ -40,23 +43,27 @@ The evolution of an SPL can be planned using a \emph{feature model evolution pla
 
 \footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
 
-In the LTEP research project, we have formalized evolution plans as an initial model combined with a list of time points (points in time \todo{hm}) associated with edit operations, e.g. change type of Beverages to \optional{}. In the formalized feature model, each feature and group has a unique ID, and the edit operations use these IDs to identify the features and groups to be added, removed, or modified. A simplified formalization of the evolution plan is shown in figure \vref{ex:formal-evolution-plan}. In the examples, IDs are not used, and types of new groups and features are not specified. In the formal definitions, such details are included in the operations. Applying the operations in order results in the feature model shown in figure \vref{ex:fm-coffee2}.
+In the LTEP research project, we have formalized evolution plans as an initial model combined with a list of time points (points in time \todo{hm}) associated with edit operations, e.g. change type of ``Beverages" to \optional{}. In the formalized feature model, each feature and group has a unique ID, and the edit operations use these IDs to identify the features and groups to be added, removed, or modified. A simplified formalization of the evolution plan is shown in figure \vref{ex:formal-evolution-plan}. The initial model associated with time $t_0$ is the one shown in figure \vref{ex:fm-coffee1}. Applying the operations under $t_1$ results in the feature model shown in \vref{ex:fm-coffee2}. In the examples, IDs are not used, and the operations are simplified for readability. In the formal definitions, such details are included in the operations.
 
 \begin{figure}
+   \footnotesize
    \begin{center}
-      \includegraphics[height=0.5\textwidth]{CoffeeMachine1}
+      \begin{minipage}{0.98\textwidth}
+         \begin{enumerate}[{\small $t_0$}]
+            \item 
+         \end{enumerate}
+      \end{minipage}
+      \includegraphics[width=0.7\textwidth]{CoffeeMachine1}
       \bigskip
 
-      \scriptsize
-      \begin{minipage}{0.7\textwidth}
-         \begin{enumerate}[$t_1$]
+      \begin{minipage}{0.98\textwidth}
+         \begin{enumerate}[{\small $t_1$}]
             \item 
                \begin{enumerate}[ ]
-               \item Add new feature ``Interface"
-               \item Add an \xortype{} group to ``Interface"
-               \item Add new feature ``Button interface" to the new group
-               \item Add new feature ``Touch interface"  to the new group
-            \end{enumerate}
+                  \item Add new \mandatory{} feature ``Interface" to ``CoffeeMachine" \andtype{} group
+                  \item Add new \xortype{} group to ``Interface"
+                  \item Add new feature ``Button interface" to ``Interface" \xortype{} group
+                  \item Add new feature ``Touch interface"  to ``Interface" \xortype{} group               \end{enumerate}
          \end{enumerate}
       \end{minipage}
       \caption{Formalized feature model evolution plan}
@@ -69,11 +76,42 @@ Furthermore, we have published a semantics for these edit operations, letting us
 \section{Static analysis}
 \label{sec:static-analysis}
 
-Give static analysis \emph{way of thinking} as background, not the exact methods used to analyse programs, but the principles such as may/must analysis etc. Explain how it is communicated (rules), how scope is a factor and discuss soundness in static analysis context (this is the same as the soundness I talk about). 
-
-In static analysis of programs, it is impossible to have both soundness, completeness, and automation. Thus one must prioritize. For some kinds of analysis, it is better with false positives than false negatives, which gives us completeness but we sacrifice soundness. In other cases, it is better to have false negatives than false positives, in which case we sacrifice completeness but gain soundness.
+Static analysis attempts to predict the behaviour of a program without executing it. Due to the halting problem, it is impossible for an algorithm to accomplish this completely, but there exist several methods to safely approximate information. For instance, live variable analysis discovers which variables \emph{may} still be ``alive" (meaning used in the future) at a certain point of the program. Live variable analysis is done for optimization of memory allocation for variables. If a variable is known not to be live, it is safe to overwrite it with another variable. If a variable \emph{may} be live, it should not be overwritten. This makes live variable analysis a \emph{may analysis}. It is also a backward analysis, since information about whether a variable is used in the future is carried backwards. There also exist \emph{must analyses} and \emph{forward analyses}. A must analysis looks for the greatest solution of things that \emph{must} be true. In a forward analysis, the information flows forward; meaning that what has happened earlier in the program influences the analysis at later points in the program.
 
 Unlike programs, it is possible to get full overview of a feature model evolution plan. It is always possible to find the correct answer given the question "Does feature A exist at time 5?". An operational representation finds the answer by applying operations to the initial model until time 5 is complete, and checks if feature A exists in the resulting feature model. For intuition on why this must be true, imagine a (correct) program where we know all statements are assignment. This program terminates for a certainty, since there is no branching. The same goes for an operational feature model evolution plan. There are no conditional statements and thus no branching. Since we know that every operational feature model evolution plan ``terminates", we avoid the halting problem which is at the core of all static analysis of programs, which must always over- or under-approximate a solution to be certain that the analysis terminates.
+
+Since static analysis deals with undecidable problems (properties of programs), it would be unwise to apply the methods from static analysis directly to soundness checking of feature model evolution plans. However, the terminology and syntax can still be applicable to a problem of less complex nature. May and must analyses always deal with \emph{scope}. When asking if a variable is live, we are also defining the scope of the variable, meaning which parts of the program the variable may be part of. Furthermore, the method for \emph{defining} the static program analyses can be applied to other domains. For instance, it is common to define these analyses in terms of rules on the form
+
+\begin{prooftree}
+   \AxiomC{$Conditions$}
+   \UnaryInfC{$State \transition State'$}
+\end{prooftree}
+
+, where $State$ is the context when the rule is applied, and the $Conditions$ consists of propositions concerning the $State$. After the rule is applied, $State'$ is the result, usually a modified version of $State$. For instance, the semantics of an \textbf{if}-statement may be defined by the rules
+
+\begin{minipage}{0.5\textwidth}
+   \footnotesize
+\begin{prooftree}
+   \AxiomC{$\lookup{\Gamma}{b} = \top $}
+   \RightLabel{$\textsc{If}_1$}
+   \UnaryInfC{$\langle \Gamma, \, \textbf{ if } b \textbf{ then } S \textbf{ else } S' \rangle \transition \langle \Gamma ,\, S \rangle$}
+\end{prooftree}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+   \footnotesize
+\begin{prooftree}
+   \AxiomC{$\lookup{\Gamma}{b} = \bot $}
+   \RightLabel{$\textsc{If}_2$}
+   \UnaryInfC{$\langle \Gamma, \, \textbf{ if } b \textbf{ then } S \textbf{ else } S' \rangle \transition \langle \Gamma ,\, S' \rangle$}
+\end{prooftree}
+\end{minipage}
+
+Here, $\Gamma$ is the context treated as a map from variable names to values, and $\lookup{\Gamma}{b}$ returns the value of $b$ at the time when the statement is executed, which is either $\top$ (true) or $\bot$ (false). If the expression $b$ is true, then the next statement to be executed is $S$. If not, then the next statement is $S'$. Notice that there is no rule that defines the program behaviour if value of $b$ is neither $\top$ nor $\bot$. This means that anything other than $\top$ or $\bot$ is an error, and an implementation of the language will provide an error message for such a case. This is a useful property of these rules, as there are often many ways to write an incorrect program, and all of these can be captured by \emph{not} fitting the correct cases.
+
+The syntax-driven, unambiguous, and compact nature of such rules make them popular for formally defining type systems and analysis tools. Here, they give both the behaviour of the if-statement (semantics) using the syntax of the language, and, implicitly, they provide a method for checking correctness of an if-statement. If the expression is neither true nor false, then the program is incorrect. In this thesis, we largely exploit this property of only defining the correct cases when giving rules for soundness analysis of modifying feature model evolution plans.
+
+% Give static analysis \emph{way of thinking} as background, not the exact methods used to analyse programs, but the principles such as may/must analysis etc. Explain how it is communicated (rules), how scope is a factor and discuss soundness in static analysis context (this is the same as the soundness I talk about). 
+
 
 % Static analysis is semantic-based analysis. Syntax-driven, but semantic-based, but also of the meaning. If we have x := 5, then it means that 5 is the value which you put into x
 % Say that I'm doing semantic-based analysis in the thesis, _analysis_, not just semantics.Can I add it or not? How much of the scope is affected? Emphasize modularity; analysis is modular. Focus on the analytical parts of the work, combined with the semantics of a feature model
