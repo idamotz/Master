@@ -1,18 +1,10 @@
 ## TODOs:
-Lage feature model evolution plans i haskell
-
-Done: Deal with subtrees and add/remove move operations. The remove move operation is especially tricky. 
-
-  - TODO: Formalize steps for REMOVE move operation. 
-  - TODO: With current representation (maps of validities), the order of operations is lost. What needs to be checked minimally? What follows from the soundness assumption here?
-  - TODO: Look at input: Initially, will focus only on input as an initial plan + one meta operation. Eventually look at several changes to a plan (compound changes). If one operation causes a paradox, does another (in the same change) fix it? In that case, the plan changes should ideally be accepted
-  - TODO: Convert an initial plan to maps of validities
-  - TODO: What do I need from an example/use case? 
-  - TODO: Presentation (use essay)
-    - Goal/Challenge
-    - How to get there
-    - Starting point (concretely)
-    - What use cases/examples do I need from Germany to be able to validate
+- Fullføre introduction og background
+- Finne kilder å sitere
+- Skrive konklusjon
+- Se over scope-seksjon og liste over operasjoner, gi litt mer forklaring og eksempler for disse
+- Sy sammen teksten med eksempler og forklaringer
+- Flytte de fleste av bevisene ned i appendix og velg hvilke som er representative for resten.
 
 ## What to check on ADD operation to plan
 

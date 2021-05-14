@@ -1,7 +1,7 @@
 \subsection{Soundness of the Add feature rule}
 \label{sub:soundness-of-the-add-feature-rule}
 
-See figure \vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
+See Figure~\vref{rule:add-feature} for the \rulefont{Add-Feature} rule.
 Let 
 \begin{equation*}
    \begin{split}
@@ -16,7 +16,7 @@ be the initial state. Recall that this operation adds the feature with ID \var{f
 
 \paragraph{Scope}
 
-Recall from section \vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the feature itself, the parent group and the name. 
+Recall from Section~\vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the feature itself, the parent group and the name. 
 
 In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation.
 \\
@@ -48,7 +48,7 @@ Since the rule adds the temporal scope to the new feature's existence table, and
 
 It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no subgroups, so it cannot be part of a cycle. Because of the assumption that \wf{9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
 
-As the rule operates within the scope (lemma \vref{lemma:add-feature-scope}), it does not affect any other part of the plan.
+As the rule operates within the scope (Lemma~\vref{lemma:add-feature-scope}), it does not affect any other part of the plan.
 
 We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for the interval-based feature model, according to well-formedness rules \wf{1-9}. 
 \\
@@ -66,7 +66,7 @@ After adding the feature to the interval-based feature model, looking up the nam
 \[
    \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID}
 \]
-, then due to the semantics of map assignment (definition \vref{def:map}), and lookup in interval maps (definition \vref{def:interval-map}),
+, then due to the semantics of map assignment (Definition~\vref{def:map}), and lookup in interval maps (Definition~\vref{def:interval-map}),
 \[
    \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} = \set{\var{featureID}}
 \]
@@ -82,7 +82,7 @@ Similarly, if we wish to lookup information about the feature during the interva
 
 to $\lookup{\features}{\var{featureID}}$. 
 
-According to the semantics of assignment (section \vref{sub:maps}) and $\var{setFeatureAttributes}$ (figure \vref{fun:set-feature-attributes}), and given that $\lookup{\features}{\var{featureID}} = \feature$, then 
+According to the semantics of assignment (Section~\vref{sub:maps}) and $\var{setFeatureAttributes}$ (Figure~\vref{fun:set-feature-attributes}), and given that $\lookup{\features}{\var{featureID}} = \feature$, then 
 \begin{align}
    \interval{t_n}{t_m} &\in F_e && \text{the feature exists} \tag{1} \label{add-feature1}\\
    \lookup{F_n}{\interval{t_n}{t_m}} &= \set{\var{name}} && \text{the feature has the expected name} \tag{2} \label{add-feature2}\\
@@ -97,7 +97,7 @@ The child features of the group must also be updated according to the semantics 
 \[
    \var{featureID} \in \bigcup \lookup{G_c}{\interval{t_n}{t_m}}
 \]
-, meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see figure \vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
+, meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see Figure~\vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
 \\
 
 \begin{lemma}

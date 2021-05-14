@@ -1,7 +1,7 @@
 \subsection{Soundness of the Change feature name rule} 
 \label{sub:soundness-of-the-change-feature-name-rule}
 
-See figure \vref{rule:change-feature-name} for the \rulefont{Change-Feature-Variation-Type} rule. Let 
+See Figure~\vref{rule:change-feature-name} for the \rulefont{Change-Feature-Variation-Type} rule. Let 
 \begin{equation*}
    \begin{split}
       \textbf{changeFeatureName}(\var{featureID}, \var{name}) \text{ at } t_n \shove \\
@@ -15,7 +15,7 @@ be the initial state, and
 be the result state after applying the \rulefont{Change-Feature-Name} rule. Recall that this operation changes the name of the feature with ID $\var{featureID}$ to $\var{name}$.
 
 \paragraph{Scope}
-Recall that the temporal scope of the \rulefont{Change-Feature-Name} rule is $\interval{t_n}{t_k}$ (section \vref{sec:define-the-scope}), where $t_k$ is the time point at which the name is originally planned to be changed or the feature is removed. In the rule, this scope is identified by 
+Recall that the temporal scope of the \rulefont{Change-Feature-Name} rule is $\interval{t_n}{t_k}$ (Section~\vref{sec:define-the-scope}), where $t_k$ is the time point at which the name is originally planned to be changed or the feature is removed. In the rule, this scope is identified by 
    \[
       \containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}
    \]

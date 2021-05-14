@@ -1,7 +1,7 @@
 \subsection{Soundness of the Remove group rule}
 \label{sub:soundness-of-the-remove-group-rule}
 This proof is analogous to the one for the \rulefont{Remove-Feature} rule.
-See figure \vref{rule:remove-group} for the \rulefont{Remove-Group} rule. Let
+See Figure~\vref{rule:remove-group} for the \rulefont{Remove-Group} rule. Let
 \[
       \textbf{removeGroup}(\var{groupID}) \text{ at } t_n \shove (\names, \features, \groups)
 \]
@@ -16,7 +16,7 @@ todo
 \\
 \todo{Ask if it is necessary to include this paragraph or if it is enough to say that this is very similar to the Scope section of Remove-Feature}
 
-As defined in section \vref{sec:define-the-scope}, the \textbf{removeGroup} operation's temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time point in which the group was originally planned to be removed. We can see from the description above that $t_k = t_j$; the end point in the group's existence set containing $t_n$. We then have that the scope is defined as $\interval{t_n}{t_j}$. In the rule, we find the interval $\interval{t_i}{t_j}$ by looking up
+As defined in Section~\vref{sec:define-the-scope}, the \textbf{removeGroup} operation's temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time point in which the group was originally planned to be removed. We can see from the description above that $t_k = t_j$; the end point in the group's existence set containing $t_n$. We then have that the scope is defined as $\interval{t_n}{t_j}$. In the rule, we find the interval $\interval{t_i}{t_j}$ by looking up
 \[
    \containing{G_e}{t_n} = \set{\interval{t_{e_1}}{t_{e_2}}}.
 \]
@@ -24,9 +24,9 @@ According to the semantics of $\containing{\map{IS}}{t_n}$, it is true then that
 
    The $\groups{}$ map is modified at key $\var{groupID}$ by assigning 
    $$\var{clampGroup}(\lookup{\groups}{\var{groupID}}, t_n)$$
-   . In $\var{clampGroup}$ (figure \vref{fun:clamp-group}), the intervals of the group's type and parent feature are clamped to end at $t_n$. These modifications stay within the temporal scope, as $\var{clampInterval}(\map{MAP}, t_c)$ clamps the mapping with an interval key containing $t_c$ to end at $t_c$. Due to \wf{8}, it is impossible that the group has a type or parent feature after $t_j$, which is the time point when the group was originally planned to be removed. Furthermore, the premise of the rule requires that $\lookup{G_t}{\interval{t_n}{t_j}} = \set{\var{type}}$ and $\lookup{G_p}{\interval{t_n}{t_j}} = \set{\var{parentFeatureID}}$, meaning that the group does not change its type or move during the temporal scope. Thus there is only one key in each of the group's type and parent feature maps containing $t_n$, and so the changed interval for these maps is $\interval{t_n}{t_j}$; the temporal scope. The existence interval is clamped in a similar way, and so stays within the temporal scope as well.
+   . In $\var{clampGroup}$ (Figure~\vref{fun:clamp-group}), the intervals of the group's type and parent feature are clamped to end at $t_n$. These modifications stay within the temporal scope, as $\var{clampInterval}(\map{MAP}, t_c)$ clamps the mapping with an interval key containing $t_c$ to end at $t_c$. Due to \wf{8}, it is impossible that the group has a type or parent feature after $t_j$, which is the time point when the group was originally planned to be removed. Furthermore, the premise of the rule requires that $\lookup{G_t}{\interval{t_n}{t_j}} = \set{\var{type}}$ and $\lookup{G_p}{\interval{t_n}{t_j}} = \set{\var{parentFeatureID}}$, meaning that the group does not change its type or move during the temporal scope. Thus there is only one key in each of the group's type and parent feature maps containing $t_n$, and so the changed interval for these maps is $\interval{t_n}{t_j}$; the temporal scope. The existence interval is clamped in a similar way, and so stays within the temporal scope as well.
 
-   Also, the $\features{}$ map is assigned $$\var{removeGroupAt}(\lookup{\features}{\var{parentFeatureID}}, \var{groupID}, t_n)$$ at key $\var{parentFeatureID}$. This helper function (figure \vref{fun:remove-group-at}) modifies the parent feature's set of subgroups by calling $$\var{clampIntervalValue}(F_c, t_c, \var{groupID})$$, which behaves similarly to $\var{clampInterval}$ by clamping the interval containing $t_n$. The difference is that it removes only $\var{groupID}$ from the set of child groups, and adds the group to the set of subgroups at the shortened interval. We conclude that this modification, too, happens within the temporal scope of the operation, as looking up any time point outside of the temporal scope will return the same results as the original plan.
+   Also, the $\features{}$ map is assigned $$\var{removeGroupAt}(\lookup{\features}{\var{parentFeatureID}}, \var{groupID}, t_n)$$ at key $\var{parentFeatureID}$. This helper function (Figure~\vref{fun:remove-group-at}) modifies the parent feature's set of subgroups by calling $$\var{clampIntervalValue}(F_c, t_c, \var{groupID})$$, which behaves similarly to $\var{clampInterval}$ by clamping the interval containing $t_n$. The difference is that it removes only $\var{groupID}$ from the set of child groups, and adds the group to the set of subgroups at the shortened interval. We conclude that this modification, too, happens within the temporal scope of the operation, as looking up any time point outside of the temporal scope will return the same results as the original plan.
 
    Recall that the spatial scope of the rule is the group itself, its parent feature, and its subfeatures. The premise
 \begin{equation*}

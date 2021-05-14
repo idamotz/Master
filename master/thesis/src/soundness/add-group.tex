@@ -2,7 +2,7 @@
 \subsection{Soundness for the Add group rule}
 \label{sub:soundness-for-the-add-group-rule}
 
-See figure \vref{rule:add-group} for the \rulefont{Add-Group} rule. 
+See Figure~\vref{rule:add-group} for the \rulefont{Add-Group} rule. 
 Let 
 \begin{equation*}
    \begin{split}
@@ -15,9 +15,9 @@ be the initial state. Recall that this operation adds the group with ID \var{gro
 
 \paragraph{Scope}
 
-Recall from section \vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the group itself and the parent feature.
+Recall from Section~\vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the group itself and the parent feature.
 
-In the premise of the rule, only $\var{groupID}$ and $\var{parentFeatureID}$ are looked up in the interval-based feature model. Consequently, the premise stays within the spatial scope of the rule. In the conclusion of the rule, $\features{}$ are assigned to and looked up at $\var{parentFeatureID}$, and $\groups{}$ at $\var{groupID}$. The helper functions $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) and $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}) do not take the interval-based feature model as input, and so only affects the parent feature and the group itself, respectively.
+In the premise of the rule, only $\var{groupID}$ and $\var{parentFeatureID}$ are looked up in the interval-based feature model. Consequently, the premise stays within the spatial scope of the rule. In the conclusion of the rule, $\features{}$ are assigned to and looked up at $\var{parentFeatureID}$, and $\groups{}$ at $\var{groupID}$. The helper functions $\var{addChildGroup}$ (Figure~\vref{fun:add-child-group}) and $\var{setGroupAttributes}$ (Figure~\vref{fun:set-group-attributes}) do not take the interval-based feature model as input, and so only affects the parent feature and the group itself, respectively.
 
 As for the temporal scope, the only interval looked up in the rule is $\interval{t_n}{t_m}$. Hence the rule operates only within the defined temporal scope.
 \\
@@ -64,7 +64,7 @@ Looking up the added group's ID in the modified model should return the informat
    \lookup{G_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the group has no children} \tag{4} \label{add-group4}
 \end{align}
 
-Statement (\ref{add-group1}) holds due to the line $G_e \cup \interval{t_n}{t_m}$ in $\var{setGroupAttributes}$ (figure \vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \wf{8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
+Statement (\ref{add-group1}) holds due to the line $G_e \cup \interval{t_n}{t_m}$ in $\var{setGroupAttributes}$ (Figure~\vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \wf{8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
 
 Furthermore, we would expect the group to be listed as a child group of the parent feature in the modified model, so given that $\lookup{\features{}}{\var{parentFeatureID}} = \feature$, then
 \begin{equation*}
@@ -72,7 +72,7 @@ Furthermore, we would expect the group to be listed as a child group of the pare
 \end{equation*}
 In the \rulefont{Add-Group} rule, 
 \[\var{addChildGroup}(\lookup{\features}{\var{parentFeatureID}}, \interval{t_n}{t_m}, \var{groupID})\]
-is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{addChildGroup}$ (figure \vref{fun:add-child-group}) adds $\var{groupID}$ to the set of child features at key $\interval{t_n}{t_m}$, so according to the semantics of $\addassign$, it is indeed true that the group is in the parent feature's set of child group in the temporal scope.
+is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{addChildGroup}$ (Figure~\vref{fun:add-child-group}) adds $\var{groupID}$ to the set of child features at key $\interval{t_n}{t_m}$, so according to the semantics of $\addassign$, it is indeed true that the group is in the parent feature's set of child group in the temporal scope.
 \\
 
 \begin{lemma}

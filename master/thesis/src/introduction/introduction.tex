@@ -1,9 +1,9 @@
 \chapter{Introduction}
 
-A software product line (SPL) capitalizes on the similarity and variability of closely related software products \cite{book:introduction-to-spl}. The similarities and variability is captured by features, which are customer-visible characteristics of a system \cite{book:introduction-to-spl}. Each product in the product line (called a \textit{variant}) comprises a selection of these features, resulting in a flexible and customizable set of variants available to customers. To model an SPL it is common to use a feature model, a tree-like structure with nodes representing features. From this model, a variant can be derived by selecting features. The feature model's structure creates restrictions for which variants are allowed, while they also make it possible to model all possible variants at once.
+A software product line (SPL) capitalizes on the similarity and variability of closely related software products \cite{book:introduction-to-spl}. The similarities and variability is captured by features, which are customer-visible characteristics of a system \cite{book:introduction-to-spl}. Each product in the product line (called a \textit{variant}) comprises a selection of these features, resulting in a flexible and customizable set of variants available to customers. To model an SPL it is common to use a feature model, a tree-like structure with nodes representing features. From this model, a variant can be derived by selecting features. The feature model's structure creates restrictions for which variants are allowed, while they also make it possible to model all possible variants at once \cite{art:feature-models-grammars-and-propositional-formulas}.
 
 SPLs grow large as they are more profitable the more variants they originate \cite{book:introduction-to-spl}, % page 10 (34 absolute)
-and evolve over time as requirements change. For complex projects, planning is necessary, and these plans, too, change with requirements. The research project this thesis is built upon defines \emph{feature model evolution plans} (FMEP) in terms of feature models \cite{art:consistency-preserving-evolution-planning}. A FMEP consists of the initial feature model and a sequence of edit operations. In the same project, we have devised a method to detect paradoxes in a feature model evolution plan. \todo{Elaborate.} However, when a plan is changed, this method requires that the entire plan be verified, and for large plans, this may be inefficient. This is due to the fact that the method relies on feature model change rather than FMEP change. 
+and evolve over time as requirements change. For complex projects, planning is necessary, and these plans, too, change with requirements. \todo{Si noe mer om hva planlegging innebærer eller betyr på en intuitiv måte før jeg går over til den tekniske forklaringen} The research project this thesis is built upon defines \emph{feature model evolution plans} (FMEP) in terms of feature models \cite{art:consistency-preserving-evolution-planning}. \todo{Belys en forskjell på en plan og en planendring} A FMEP consists of the initial feature model and a sequence of edit operations. In the same project, we have devised a method to detect paradoxes in a feature model evolution plan. \todo{Beskriv paradoxes} However, when a plan is changed, this method requires that the entire plan be verified, and for large plans, this may be inefficient. This is due to the fact that the method relies on feature model change rather than FMEP change. 
 
 
 
@@ -21,20 +21,29 @@ and evolve over time as requirements change. For complex projects, planning is n
 % Can take the goals up again in the following sections (mention the research questions when tackling them)
 % How the sensor should read my master's thesis. How will she know what my contribution is, where it comes in. "In chapter 2 I will give the background, limited to the scope of my thesis". Make it clear that I'm not trying to cover everything, and give the logic/structure of the thesis.
 
-Storyline: SPLs -> planning -> existing solution (LTEP) -> problem with that solution -> goal
+% Storyline: SPLs -> planning -> existing solution (LTEP) -> problem with that solution -> goal
 
-High-level introduction to software product lines
+% High-level introduction to software product lines
 
-Can talk about static analysis in terms of related work or background.
--> Semantic-based analysis
--> Forward analysis and scope (live variable analysis etc)
-- Bring up research questions after this
+% Can talk about static analysis in terms of related work or background.
+% -> Semantic-based analysis
+% -> Forward analysis and scope (live variable analysis etc)
+% - Bring up research questions after this
 
-Reference previous work clearly, talk about how my work builds upon it.
+% Reference previous work clearly, talk about how my work builds upon it.
+
+\section{Research questions}
+\label{sec:research-questions}
+
+\begin{enumerate}[\itbf{RQ\arabic*}, itemsep=0mm]
+   \item Which operations are useful for modifying a feature model evolution plan?
+   \item How can we capture all the states of a feature model evolution plan in such a way that the scope of each operation can be isolated?
+   \item How can we ensure soundness of change?
+\end{enumerate}
+
+\todo{Describe the goals in more detail}
+\todo{It should be clear to the reader that I have soundness proofs}
 
 \section{Contributions}
 
-In this thesis, we model and create a method for validating \emph{plan} change, with the goal that only the parts of the plan which may be affected by that change are checked for paradoxes. This method may then be used as basis for an SPL planning tool. We define a representation suited for local lookup and assignment, and create analysis rules for safely updating the evolution plan. We implement the method in a minimal tool, and give a proof that the method is sound.
-
-\input{introduction/research-questions}
-
+In this thesis, we model and create an analysis method for validating \emph{plan} change, with the goal that only the parts of the plan which may be affected by that change are checked for paradoxes. This method may then be used as basis for an SPL planning tool. We define a representation suited for local lookup and assignment \todo{of and for what?}, and create analysis rules for safely updating the evolution plan. We implement the method in a prototype, and give a proof that the method is sound.
