@@ -10,20 +10,8 @@ The interval-based feature model can be viewed as a sequence of feature models a
 
 We must first define what it means for an interval-based feature model to be sound. Essentially, it means that if we converted the interval-based feature model into a sequence of time points associated with feature models, each feature model would be sound.
 
-According to \cite{art:consistency-preserving-evolution-planning}, the structural requirements (well-formedness rules) are 
-\begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
-   \item A feature model has exactly one root feature.
-   \item The root feature must be mandatory.
-   \item Each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups.
-   \item Features are organized in groups that have exactly one variation type.
-   \item Each feature, except for the root feature, must be part of exactly one group.
-   \item Each group must have exactly one parent feature.
-   \item Groups with types \xortype{} or \ortype{} must not contain \mandatory{} features.
-\end{enumerate}
 
-Furthermore, a feature model is a tree structure and must not contain cycles. There is an additional requirement that groups with types \xortype{} or \ortype{} must contain at least two child features, but this is not taken into account in this thesis.
-
-These requirements can be translated into rules for interval-based feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
+The well-formedness requirements listed in Section \vref{sub:feature-models} can be translated into rules for interval-based feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
 
 \begin{enumerate}[\wf{\arabic*}, itemsep=0mm]
    \item An interval-based feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
