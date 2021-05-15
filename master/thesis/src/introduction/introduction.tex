@@ -41,25 +41,25 @@ and evolve over time as requirements change. Complex projects require planning. 
 % I artikkelen er dette integrert i DarwinSPL slik at man kan gjøre planendringer. 
 % Mitt bidrag skal oppfylle M3, som er en measure i prosjektbeskrivelsen til LTEP. Få fram at dette er en konkret del i et fundet forskningsprosjekt
 
-The research project this thesis is built upon (see Section~\vref{sec:the-ltep-project}) defines \emph{feature model evolution plans} (FMEP) in terms of feature models \cite{art:consistency-preserving-evolution-planning}. \todo{Belys en forskjell på en plan og en planendring} A FMEP consists of the initial feature model and a sequence of edit operations. In the same project, we have devised a method to detect paradoxes in a feature model evolution plan. \todo{Beskriv paradoxes} However, when a plan is changed, this method requires that the entire plan be verified, and for large plans, this may be inefficient. This is due to the fact that the method relies on feature model change rather than FMEP change. 
+The research project this thesis is built upon (see Section~\vref{sec:the-ltep-project}) defines \emph{feature model evolution plans} (FMEP) in terms of feature models~\cite{art:consistency-preserving-evolution-planning}. \todo{Belys en forskjell på en plan og en planendring} A FMEP consists of the initial feature model and a sequence of edit operations. In the same project, we have devised a method to detect paradoxes in a feature model evolution plan. \todo{Beskriv paradoxes} However, when a plan is changed, this method requires that the entire plan be verified, and for large plans, this may be inefficient. This is due to the fact that the method relies on feature model change rather than FMEP change. 
 
 \section{Objective}
 \label{sec:objective}
 
 \todo{write}
-% Utvikle en analysemetode som utnytter at planendringer ikke påvirker alle deler av planen, og dermed få en mer modulær analyse
+Develop an analysis method that exploits how plan changes do not affect all parts of the plan, thus achieving a more modular analysis than the one defined in~\cite{art:consistency-preserving-evolution-planning}.
 
 \section{Research questions}
 \label{sec:research-questions}
 
-In order to reach the objective, we have devised some research questions that will be addressed in the conclusion of the thesis.
+In order to reach the objective, we present research questions that will be addressed in the conclusion of the thesis.
 
 \begin{enumerate}[\itbf{RQ\arabic*}, itemsep=0mm]
    \item \textit{Which operations are useful for modifying a feature model evolution plan?} In the LTEP project, we defined operations for modifying a feature model, but not a feature model evolution plan. \label{rq1}
-   \item \textit{How can we capture all the states of a feature model evolution plan in such a way that the scope of each operation can be isolated?} Modifying a feature model evolution plan does not necessarily affect the entire plan. We wish to identify which parts of the plan \emph{may} be affected by applying an operation, i.e. the \emph{scope} of each operation. This problem requires a representation for feature model evolution plan that allows us to isolate the scope and analyse the effects of applying an operation \emph{locally}. \label{rq2}
-   \item \textit{How can we ensure soundness of change?} 
+   \item \textit{How can we capture all the states of a feature model evolution plan in such a way that the scope of each operation can be isolated?} Modifying a feature model evolution plan does not necessarily affect the entire plan. We wish to identify which parts of the plan \emph{may} be affected by applying an operation, i.e. the \emph{scope} of each operation. This problem requires a representation for feature model evolution plans that allows us to isolate the scope and analyse the effects of applying an operation \emph{locally}. \label{rq2}
+   \item \textit{How can we analyse change to ensure soundness?} 
       Changing an intermediate stage of a feature model evolution plan may cause \emph{paradoxes} \textemdash{} structural violations of the feature model \textemdash{} at a later stage of the plan. 
-      We aim to create an analysis method which ensures that any paradox arising from plan change is discovered and reported. \label{rq3}
+      We aim to create an analysis method which ensures that any paradox arising from plan change is discovered and reported. This analysis method should be verifiably sound and possible to automate. \label{rq3}
 \end{enumerate}
 
 \section{Contributions}

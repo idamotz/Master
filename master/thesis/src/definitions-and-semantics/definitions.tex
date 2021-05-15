@@ -82,6 +82,11 @@ $\containing{\map{IM}}{t_n}$ returns the set of keys containing time point $t_n$
 
 We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns all the interval keys in the map $\map{IM}$ overlapping the interval $\interval{t_n}{t_m}$. 
 
+Assigning a value $v$ to an empty interval in a map $\map{IM}$ returns the same map, i.e. it is a no-op. Formally,
+\[
+  \lookup{\map{IM}}{\interval{t_n}{t_n}} \assign v = \map{IM}
+\]
+
 \subsection{Interval sets}
 \label{sub:interval-sets}
 

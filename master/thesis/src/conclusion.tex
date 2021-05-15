@@ -1,0 +1,30 @@
+\chapter{Conclusion and future work}
+
+In this chapter, we begin by reviewing the research questions, discussing to which degree we met our goals. Moreover, we suggest further improvements to our solution and future work. Lastly, we summarize our contributions in the conclusion.
+
+\section{Addressing the research questions}
+We presented our research question in the introduction, Section \vref{sec:research-questions}. We now discuss how our solution addresses these questions.
+
+\begin{enumerate}
+
+   \item[\ref{rq1}] \textit{Which operations are useful for modifying a feature model evolution plan?} 
+      We have chosen a set of edit operations (i.e. \textbf{addFeature(\ldots)} at $\interval{t_n}{t_m}$) to edit a feature model evolution plan (see Section~\vref{sub:operations}). These operations allow us to add, remove, and move features and groups, as well as change their types and features' names. In other words, they can be used to alter all aspects of the features and groups, i.e., the \emph{spatial} aspects of the feature model evolution plan. However, some alterations concerning \emph{time} are not possible to achieve using these operations. For instance, if a feature exists from time $t_1$ to $t_3$, it is impossible to directly change the start of the feature's existence to $t_0$ without ending up with both the interval $\interval{t_0}{t_1}$ and $\interval{t_1}{t_3}$. However, we feel that the operations we have provided give a useful basis for a complete analysis tool for feature model evolution planning. 
+
+   \item[\ref{rq2}]\textit{How can we capture all the states of a feature model evolution plan in such a way that the scope of each operation can be isolated?} 
+      The representation we have devised \textemdash{} the interval-based feature model, defined in Section~\vref{sub:interval-based-feature-model} \textemdash{} aims to address this research question. The interval-based feature model lets us look up the state of any feature or group at any point in time given its ID, and the names used. This can be done without traversing the entire plan due to its use of maps, and the scope of each operation can be readily looked up. However, this solution gives quite a lot of redundancy, as all parent-child and feature-name relations are doubly present in the model. The redundancy makes updating the model more cumbersome, but it ensures that no operation requires a traversal of the entire plan. Ultimately, we feel that the trade-off is worth it, as the aim is to make sure that scopes can be isolated.
+
+   \item[\ref{rq3}] \textit{How can we analyse change to ensure soundness?} 
+      We have given rules for analysis of change in Section~\vref{sec:sos-rules}. The rules rely on the assumption that the initial plan is sound, and as proven in Chapter~\vref{cha:soundness}, they do guarantee that the resulting plan is sound if a rule can be applied. Furthermore, the prototype \todo{GitHub} shows that the process can be automated. However, there are cases for which the rules may be too strict. Some sequences of operations may, applied in order, result in a sound plan, even though the plan is unsound after applying just one operation. For instance, suppose that a feature with ID \var{featureA} has the name ``FeatureName" from time $t_3$ to $t_4$, but we wish for the feature with ID \var{featureB} to have the same name from $t_1$ to $t_2$. If we attempt to apply \textbf{changeFeatureName}(\var{featureB}, ``FeatureName") at $t_1$, then the \rulefont{ChangeFeatureName} rule will not apply, as \var{featureA} and \var{featureB} have the same name at time $t_3$. However, after applying \textbf{changeFeatureName}(\var{featureB}, ``OldFeatureName") at $t_2$, the resulting plan would be sound.
+      Nevertheless, this case is contrived and not likely to appear naturally. 
+      
+\end{enumerate}
+
+\section{Future work}
+
+As mentioned in the previous section, there are aspects of our solution that can be improved upon. For an engineer to have complete freedom over her feature model evolution plan, one could create operations which let us extend and restrict the intervals in the interval-based feature model in all directions, not just for removal. Furthermore, the operations are not revertible. If we change the type of a feature from \mandatory{} to \optional{} at time $t_n$, and later wish to undo this change, we would apply the operation \textbf{changeFeatureVariationType} and change the type from \optional{} to \mandatory{}. This would result in a types map containing the mapping $\intervalmapping{t_n}{t_n}{\optional{}}$, i.e. an empty interval. An improvement for this is ignoring such mappings in the definition of the interval maps.
+
+% Supporting batch operations
+% Integrating the analysis in a tool such as DarwinSPL.
+% Presenting the output to the user
+
+\section{Conclusion}

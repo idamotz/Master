@@ -1,7 +1,5 @@
 \section{SOS rules}
 \label{sec:sos-rules}
-\todo{Consider having two rules for each operation; one for validating and one for updating. Alternatively use functions on the right-hand side of $\transition$.}
-
 \todo{Instantiate rules with a concrete example for the rules and the scope}
 
 
@@ -30,7 +28,8 @@ $$\sossize\begin{array}{c}
       {\\
         \interval{t_n}{t_m} \not \innr F_e \qquad
         \interval{t_n}{t_m} \inn G_e \qquad
-        \lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset \\
+        \lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset \qquad
+        t_n < t_m \\
         \lookup{\features{}}{\var{featureID}} = \feature \\
         \lookup{\groups{}}{\var{parentGroupID}} = \group\\
         \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
@@ -54,7 +53,7 @@ $$\sossize\begin{array}{c}
 
 Figure \ref{rule:add-feature}  describes the semantics of the \textbf{addFeature} operation. 
 To add a feature during the interval $\interval{t_n}{t_m}$, its ID cannot exist exist during the interval ($\interval{t_n}{t_m} \not \innr F_e$). The parent feature must exist ($\interval{t_n}{t_m} \inn G_e$), and the types it has during the interval must be compatible with the type of the 
-added feature ($\forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must not be in use during the interval ($\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. 
+added feature ($\forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must not be in use during the interval ($\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset$), and the interval must start before it ends ($t_n < t_m$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. 
 
 To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (Figure \ref{fun:compatible-types}), $\var{setFeatureAttributes}$ (Figure \ref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (Figure \ref{fun:add-child-feature}). 
 
@@ -93,14 +92,15 @@ addChildFeature|$(\group, \interval{t_{start}}{t_{end}}, \var{fid})$|
 
 \subsection{Add group rule}
 \label{sub:add-group-rule}
-The rule in figure \ref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval ($\interval{t_n}{t_m}$). The group must not already exist in the plan during the interval ($\interval{t_n}{t_m} \notinnr G_e$), and the parent feature must exist for the duration of the interval ($\interval{t_n}{t_m} \inn F_e$). The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map.
+The rule in figure \ref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval ($\interval{t_n}{t_m}$). The group must not already exist in the plan during the interval ($\interval{t_n}{t_m} \notinnr G_e$), and the parent feature must exist for the duration of the interval ($\interval{t_n}{t_m} \inn F_e$). The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map. Lastly, the interval must fulfil the condition $t_n < t_m$, meaning that it starts before it ends.
 
 \begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Add-Group}
       {\\
-        \interval{t_n}{t_m} \notinnr G_e \qquad \interval{t_n}{t_m} \inn F_e \\
+        \interval{t_n}{t_m} \notinnr G_e \qquad \interval{t_n}{t_m} \inn F_e \qquad
+        t_n < t_m\\
         \lookup{\groups{}}{\var{groupID}} = \group \\
         \lookup{\features{}}{\var{parentFeatureID}} = \feature 
       }
