@@ -2,7 +2,6 @@
 \label{sec:soundness-for-interval-based-feature-models}
 % \todo{Argue that the rules are \emph{enough} to preserve soundness.}
 % \todo{Show what needs to be proved for an initial model. ``correct by construction". In a well-formed structure. Lemma: What is a sound structure. Soundness theorem: Preserves soundness, using the lemma.}
-% \todo{Proof for each rule should be lemma, and the whole system is a theorem or something:). Remember to number the lemmas}
 % \todo{The structure of the proof should be introduced first}
 % \todo{In the theorem, emphasize the structure of the proof (inductive)}
 % \todo{Between the proofs, add some text; how to read the proof, how to understand etc. Also give context (how the lemmas are used later)}
@@ -11,7 +10,7 @@ The interval-based feature model can be viewed as a sequence of feature models a
 We must first define what it means for an interval-based feature model to be sound. Essentially, it means that if we converted the interval-based feature model into a sequence of time points associated with feature models, each feature model would be sound.
 
 
-The well-formedness requirements listed in Section \vref{sub:feature-models} can be translated into rules for interval-based feature models $(\names, \features, \groups)$. We assume that the first time point in the plan is $t_0$.
+The well-formedness requirements listed in Section \vref{sub:feature-models} can be translated into rules for interval-based feature models $(\names,\allowbreak \features, \allowbreak \groups)$. We assume that the first time point in the plan is $t_0$.
 
 \begin{enumerate}[\wf{\arabic*}, itemsep=0mm]
    \item An interval-based feature model has exactly one root feature. We assume that the root ID is $\var{rootID}$, and that $\lookup{\features}{\var{rootID}} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
@@ -39,7 +38,7 @@ Together, these requirements form the basis of the soundness proofs. We assume t
 
 \section{Soundness of each rule}
 \label{sec:soundness-of-each-rule}
-In the following sections, we prove that each rule is sound, and conclude that the system is sound.
+In the following sections, we prove that each rule is sound, and conclude that the system is sound. We rely upon the above defined well-formedness requirements \wf{1\textendash 9} to show this.
 
 For each rule, the proof for soundness includes three parts: 
 \begin{enumerate}[(i)]
@@ -47,3 +46,5 @@ For each rule, the proof for soundness includes three parts:
    \item that the rule preserves well-formedness, as defined in the above requirements \wf{1\textendash 9}, and
    \item that the rule updates the model correctly, preserving soundness as well as respecting the semantics of the operation.
 \end{enumerate}
+
+These parts are concluded with a lemma for each rule, and the lemmas are finally used to show that the entire rule system is correct.

@@ -12,13 +12,11 @@ Let
 \end{equation*}
 be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the interval-based feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \wf{1-9}.
 
-\todo{Show that the feature model outside the scope is unchanged}
-
 \paragraph{Scope}
 
 Recall from Section~\vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the feature itself, the parent group and the name. 
 
-In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation.
+In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up or assigned to in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation.
 \\
 
 \begin{lemma}
@@ -57,7 +55,6 @@ We conclude that the \rulefont{Add-Feature} rule preserves well-formedness for t
    \label{lemma:add-feature-well-formed}
 \end{lemma}
 
-\todo{Mention that the scope part ensures that no other part of the plan is affected}
 \paragraph{Correctness of model modification}
 
 The operation is intended to add the feature with ID \var{featureID} to the interval-based feature model during the interval $\interval{t_n}{t_m}$. 

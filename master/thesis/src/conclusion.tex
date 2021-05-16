@@ -21,10 +21,12 @@ We presented our research question in the introduction, Section \vref{sec:resear
 
 \section{Future work}
 
-As mentioned in the previous section, there are aspects of our solution that can be improved upon. For an engineer to have complete freedom over her feature model evolution plan, one could create operations which let us extend and restrict the intervals in the interval-based feature model in all directions, not just for removal. Furthermore, the operations are not revertible. If we change the type of a feature from \mandatory{} to \optional{} at time $t_n$, and later wish to undo this change, we would apply the operation \textbf{changeFeatureVariationType} and change the type from \optional{} to \mandatory{}. This would result in a types map containing the mapping $\intervalmapping{t_n}{t_n}{\optional{}}$, i.e. an empty interval. An improvement for this is ignoring such mappings in the definition of the interval maps.
+As mentioned in the previous section, there are aspects of our solution that can be improved upon. For an engineer to have complete freedom over her feature model evolution plan, one could create operations that let us extend and restrict the intervals in the interval-based feature model in all directions, not just for removal. A solution supporting batch operations \textemdash{} sequences of operations treated as a single operation \textemdash{} could also be useful in a complete implementation. 
 
-% Supporting batch operations
-% Integrating the analysis in a tool such as DarwinSPL.
-% Presenting the output to the user
+Hopefully, this analysis method can be applied in existing evolution planning tools such as DarwinSPL. For the benefits of modularity to shine, it should ideally be integrated tightly into the tool's representation. An implementation could also exploit the fact that this analysis has the potential for detailed error messages, since \emph{change} is the subject of analysis, and not the entire plan.
 
 \section{Conclusion}
+
+We have created a modular method for soundness analysis of change to feature model evolution plans. The analysis leverages the assumption of an initially sound evolution plan, and checks only those parts of the plan that \emph{may} be affected by change. The representation we have created, the interval-based feature model, lets us isolate the scope of each operation, thus contributing to the modularity of the solution. We have given proofs of soundness and correctness for the analysis, and a prototype as proof of concept.
+
+This analysis method may be implemented in an evolution planning tool and can help engineers to update evolution plans more securely and confidently.
