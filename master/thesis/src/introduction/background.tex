@@ -1,4 +1,5 @@
 \chapter{Background} 
+\label{cha:background}
 \todo{Meeting notes}
 % Software product lines, previous publication (pinpoint what can be improved), SOS rules and operational semantics, and what is modular analysis
 % Background should not contain many of my results, but rather retelling what software product lines are, what operational semantics are, existing technologies
@@ -7,12 +8,12 @@
 % Explain what I mean by "modularity", explain why the previous work is not modular. 
 % What do I assume, and what do I focus on
 
-\section{Software product lines}
+\section{Software Product Lines}
 \label{sec:software-product-lines}
 
 \todo{Write yet \emph{another} introduction to software product lines..}
 
-\subsection{Feature models}
+\subsection{Feature Models}
 \label{sub:feature-models}
 
 \begin{figure}
@@ -43,7 +44,7 @@ The formal structural requirements (well-formedness rules) to a feature model, a
 
 Furthermore, a feature model is a tree structure and must not contain cycles. There is an additional requirement that groups with types \xortype{} or \ortype{} must contain at least two child features, but this is not taken into account in this thesis.
 
-\subsection{Feature model evolution plans}
+\subsection{Feature Model Evolution Plans}
 \label{sub:feature-model-evolution-plans}
 The evolution of an SPL can be planned using a \emph{feature model evolution plan}. Software product lines often grow very large, and it is crucial to plan ahead. 
 There exists tools for evolution planning, such as DarwinSPL\footnote{\url{https://gitlab.com/DarwinSPL/DarwinSPL}}. An intuitive way to think of an evolution plan is a sequence of feature models associated with the time points when they are planned to be realized. For instance, imagine that the first coffee machines in the software product line are represented by the feature model in Figure~\vref{ex:fm-coffee1}. They are controlled by buttons, but as touch interfaces become more common, the manager decides to add coffee machines with a touch screen. This modification is included in Figure~\vref{ex:fm-coffee2}.
@@ -89,7 +90,7 @@ In the LTEP research project, we have formalized evolution plans as an initial m
 
 Furthermore, we have published a semantics for these edit operations along with a formal definition of a feature model, letting us define a \emph{sound} plan. The semantics is formalized as a set of structural operational semantic rules, detailing exactly which conditions must be fulfilled for an operation to be applied, and the way to construct the resulting feature model after applying it. A sound plan is an evolution plan in which applying each operation in order results in a structurally sound feature model for each step. Using this semantics on a modified plan allows for validation of change. When changing a feature model evolution plan, soundness of the updated plan can be checked by modifying the list of edit operations and checking that the resulting plan is sound using the semantics. However, this approach models change to \emph{feature models}, whereas the goal of this thesis is to model and analyse change to a \emph{feature model evolution plan}.
 
-\section{Static analysis}
+\section{Static Analysis}
 \label{sec:static-analysis}
 
 \todo{Give more introduction to the general characteristics of static analysis and its approach before mentioning specific analysis}
@@ -136,7 +137,7 @@ The syntax-driven, unambiguous, and compact nature of such rules make them popul
 % Give the structure of the rules in the background. Static analysis has an environment and an effect. I'm making a calculus
 % Analysis is formalized through a set of rules, which often have this kind of structure... which also looks very much like SOS rules.
 % Emphasize that I've made an implementation as well as the theory.
-\subsection{Analysis context (rules)}
+\subsection{Analysis Context (rules)}
 \label{sub:analysis-context}
 % How a rule can represent an environment
 \subsection{Soundness}

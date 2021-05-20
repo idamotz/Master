@@ -2,7 +2,7 @@
 \todo{remove subsections}
 \todo{Begin this section by explaining what I need and then defining what I need}
 
-\subsection{Interval-based feature model}
+\subsection{Interval-Based Feature Model}
 \label{sub:interval-based-feature-model}
 
 \begin{definition}[Interval-based feature model]
@@ -63,7 +63,7 @@ We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains
 
 For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{\textbf{max}(t_{start}, t_l)}{\textbf{min}(t_{end}, t_r)}$.
 
-\subsection{Interval maps}
+\subsection{Interval Maps}
 \label{sub:interval-maps}
 \begin{definition}[Interval map]
 An \emph{interval map} is a map where the key is an interval (Definition~\vref{def:interval}). 
@@ -96,7 +96,7 @@ Likewise, the empty mapping $\intervalmapping{t_n}{t_n}{v}$ is ignored, such tha
   \map{IM} \cup \set{\intervalmapping{t_n}{t_n}{v}} = \map{IM}
 \]
 
-\subsection{Interval sets}
+\subsection{Interval Sets}
 \label{sub:interval-sets}
 
 \begin{definition}[Interval set]
@@ -112,16 +112,16 @@ We also define these predicates for time points $t_n$, so that $t_n \inn \map{IS
 $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 
 \todo{The three following sections should be grouped together in a logical context}
-\subsection{Map entries}
+\subsection{Map Entries}
 \label{sub:map-entries}
-\subsubsection{Mapping names}
+\subsubsection{Mapping Names}
 \label{ssub:mapping-names}
 
 The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the interval-based feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
 
 This map is mainly used when adding features or changing names. The new name and the scope of the change is then looked up in the \names{} map to verify that no other feature shares the name.
 
-\subsubsection{Mapping features}
+\subsubsection{Mapping Features}
 \label{ssub:mapping-features}
 
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
@@ -134,14 +134,14 @@ The root ID is constant for a interval-based feature model. We assume that it ha
 
 The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 
-\subsubsection{Mapping groups}
+\subsubsection{Mapping Groups}
 \label{ssub:mapping-groups}
 
 The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $\group$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is an interval map with the group's types, $G_p$ is an interval map with parent feature IDs, and $G_c$ is an interval map with child feature ID set values, the interval keys possibly overlapping.
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
-\subsection{How to use the interval-based feature model}
+\subsection{How to Use the Interval-Based Feature Model}
 \label{sub:how-to-use-the-interval-based-feature-model}
 To provide intuition, we give some examples of how to use the interval-based feature model.
 
@@ -193,7 +193,7 @@ We often want to know what is true for an \emph{interval}, not just a time point
 \]
 This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}{t_2}$. If we had that $\interval{t_1}{t_3} \in F_e$, the above predicate would be false, since both intervals contain the time point $t_1$.
 
-\subsection{Example evolution plan}
+\subsection{Example Evolution Plan}
 A small example of an interval-based feature model can be found in Figure~\vref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
 
 \begin{figure}

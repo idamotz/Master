@@ -56,7 +56,7 @@ A simple example of a paradox can be seen in Figure~\vref{ex:simple-paradox}. He
 
 Notice also the difference between \emph{feature model change}, i.e. planning to remove $A$ at time $5$, and \emph{plan change}, i.e. modifying the original plan by introducing $B$ at time 3. A plan may contain many changes to a feature model, but an evolution process will change the plans themselves. In this thesis we focus on plan changes.
 
-\section{The LTEP project}
+\section{The LTEP Project}
 \label{sec:the-ltep-project}
 % Se prosjektbeskrivelsen, kanskje i søknaden til NFR og DAAD. (project proposal)
 This thesis is part of the LTEP research project, which was initiated in 2019 to address the lack of methodology and tooling for planning the long-term evolution of software product lines. It is a collaboration between the University of Oslo and the German university Technische Universität Braunschweig. The overarching goal of the project is to create methodology for the long-term evolution planning of SPLs, and we have published a paper~\cite{art:consistency-preserving-evolution-planning} giving methods for verifying soundness of \emph{feature model evolution plans} (FMEPs). 
@@ -85,7 +85,7 @@ This method requires us to analyse the entire plan each time a change to the pla
 \todo{write}
 Develop an analysis method that exploits how plan changes do not affect all parts of the plan, thus achieving a more modular analysis than the one defined in~\cite{art:consistency-preserving-evolution-planning}.
 
-\section{Research questions}
+\section{Research Questions}
 \label{sec:research-questions}
 
 In order to reach the objective, we present research questions that will be addressed in the conclusion of the thesis.
@@ -101,3 +101,18 @@ In order to reach the objective, we present research questions that will be addr
 \section{Contributions}
 
 In this thesis, we present a set of edit operations for changing feature model evolution plans. We furthermore define the scope of each of these operations, meaning that we deduce exactly which parts of a plan may be affected by each operation. A representation for feature model evolution plan is devised with the aim to easily isolate a scope for analysis. Based on the scope and representations, we create an analysis method for validation and application of the edit operations. The analysis is formalized as a set of rules, giving detailed specification of when an operation may be applied to the evolution plan, and how to apply the modification. We implement a prototype\footnote{\todo{Create a repo}} of the analysis as proof of concept. Finally, we give an inductive proof that the rule set is sound by showing that each rule preserves soundness, that each rule stays within the specified scope, and that it updates the evolution plan correctly according to the semantics of the operation applied.
+
+\section{Chapter Overview}
+\label{sec:chapter-overview}
+
+\textbf{Chapter~\ref{cha:background}} gives background on software product lines, feature models, and feature model evolution plans, which form the basis of this thesis. Moreover, we give some background on static analysis, as the problems we deal with here bear similarity to those in static analysis.
+
+\textbf{Chapter~\ref{cha:definitions-and-semantics}} provides the definitions used throughout the thesis. These include the representation we use for feature model evolution plans \textemdash{} the interval-based feature model \textemdash{} as well as the operations we define for modifying them. 
+
+\textbf{Chapter~\ref{cha:a-rule-system-for-analysis-of-plan-change}} defines rules for how to apply the operations to an interval-based feature model, and requirements for when an operation may be defined.
+
+\textbf{Chapter~\ref{cha:soundness}} details a proof for soundness of the rule system defined in Chapter~\vref{cha:a-rule-system-for-analysis-of-plan-change}.
+
+\textbf{Chapter~\ref{cha:implementation}} describes the implementation. We discuss the distance between formalization and implementation, and describe examples, error messages, and practical applications; how it can be used, how it detects paradoxes, and how warnings can be given to users.
+
+\textbf{Chapter~\ref{cha:conclusion-and-future-work}} addresses our research questions, present possible improvements and future work, and concludes the thesis.

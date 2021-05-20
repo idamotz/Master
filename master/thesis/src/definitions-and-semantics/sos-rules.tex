@@ -1,5 +1,5 @@
-\chapter{A rule system for analysis of plan change}
-\label{sec:a-rule-system-for-analysis-of-plan-change}
+\chapter{A Rule System for Analysis of Plan Change}
+\label{cha:a-rule-system-for-analysis-of-plan-change}
 \todo{Instantiate rules with a concrete example for the rules and the scope}
 
 
@@ -18,7 +18,7 @@ $$\sossize\begin{array}{c}
   \end{array}$$
   where $S$ is the state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In this thesis, the state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. 
 
-\section{Add feature rule}
+\section{Add Feature Rule}
 \label{sec:add-feature-rule}
 
 \begin{figure}[h]
@@ -90,7 +90,7 @@ addChildFeature|$(\group, \interval{t_{start}}{t_{end}}, \var{fid})$|
   \label{fun:add-child-feature}
 \end{figure}
 
-\section{Add group rule}
+\section{Add Group Rule}
 \label{sec:add-group-rule}
 The rule in figure \ref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval ($\interval{t_n}{t_m}$). The group must not already exist in the plan during the interval ($\interval{t_n}{t_m} \notinnr G_e$), and the parent feature must exist for the duration of the interval ($\interval{t_n}{t_m} \inn F_e$). The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map. Lastly, the interval must fulfil the condition $t_n < t_m$, meaning that it starts before it ends.
 
@@ -140,7 +140,7 @@ addChildGroup|$\left(\feature, \,\interval{t_{start}}{t_{end}}, \, \var{groupID}
   \label{fun:add-child-group}
 \end{figure}
 
-\section{Remove feature rule}
+\section{Remove Feature Rule}
 \label{sec:remove-feature-rule}
 
 Figure \ref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{featureID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ set $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($\lookup{F_c}{\interval{t_{n}}{t_{e_2}}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the interval-based feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$. 
@@ -260,7 +260,7 @@ removeGroupAt|$\left(\feature, \var{groupID}, t_c \right)$|
 \end{minipage}
 \end{figure}
 
-\section{Remove group rule}
+\section{Remove Group Rule}
 \label{sec:remove-group-rule}
 The $\rulefont{Remove-Group}$ rule in Figure~\vref{rule:remove-group} describes the semantics of removing a group in an interval-based feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group may not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
 
@@ -293,7 +293,7 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
 \end{figure}
 
 
-\section{Move feature rule}
+\section{Move Feature Rule}
 \label{sec:move-feature-rule}
 \begin{figure}[h]
     \renewcommand{\arraystretch}{1.1}
@@ -335,7 +335,7 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
 
 See Figure~\vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the algorithm described in Section~\vref{sub:move-algorithm}. The algorithm is not described as a function here, as it is easier to understand written in natural language. An implementation of it can be found in the \todo{appendix}. 
 
-\subsection{Algorithm for detecting cycles resulting from \textbf{move} operations}
+\subsection{Algorithm for Detecting Cycles Resulting from \textbf{Move} Operations}
 \label{sub:move-algorithm}
 
 Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation results in a sound plan. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. 
@@ -380,7 +380,7 @@ The rule identifies the scope $\interval{t_n}{t_{p_2}}$ by looking up the interv
 
 In the conclusion of the rule, the feature's parent map is updated to express that the feature has a new parent during the temporal scope, and the parent groups' subfeature maps are updated similarly.
 
-\section{Move group rule}
+\section{Move Group Rule}
 \label{sec:move-group-rule}
 See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} operation. The semantics is similar to the one for the \textbf{moveFeature} operation, but it differs in that it does not have a check for types. This is because there can only be a conflict between a parent group and a child feature, not a parent feature and a child group. Since only the latter relation changes in this rule, it is not necessary to check that the types are compatible.
 
@@ -413,7 +413,7 @@ See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
 
 \todo{This is hard}
 
-\section{Change feature variation type rule}
+\section{Change Feature Variation Type Rule}
 \label{sec:change-feature-variation-type-rule}
 The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{featureID}$ at time $t_n$. The first expression above the line ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. The next line may be hard to read, but its intent is easier to understand. It checks that all the types a parent group has \emph{while it is the parent of the feature} has a type which is compatible with the new type of the feature. If everything above the line is true, then the $\features{}$ map is updated at $\var{featureID}$ by shortening the interval key for the original type at $t_n$, and assigning the new type to the affected interval $\interval{t_n}{t_{t_2}}$. 
 
@@ -460,7 +460,7 @@ getTypes|$\left(\feature, \, \interval{t_n}{t_m} \right) = \lookup{G_t}{\interva
   \label{get-types}
 \end{figure}
 
-\section{Change group variation type rule}
+\section{Change Group Variation Type Rule}
 \label{sec:change-group-variation-type-rule}
 The rule in Figure~\vref{rule:change-group-varation-type} is similar to the \textbf{changeFeatureVariationType} rule in Figure~\vref{rule:change-feature-varation-type}, and shows the semantics of changing the type of a group. In a similar way to the aforementioned \textbf{changeFeatureVariationType} rule, it verifies that the types of all the child groups during the affected interval are compatible with the new group type.
 
@@ -494,7 +494,7 @@ The rule in Figure~\vref{rule:change-group-varation-type} is similar to the \tex
   \label{rule:change-group-varation-type}
 \end{figure}
 
-\section{Change feature name}
+\section{Change Feature Name}
 \label{sec:change-feature-name}
 
 The semantics of changing the name of a feature are shown in the \rulefont{Change-Feature-Name} rule in Figure~\vref{rule:change-feature-name}. The old name and the next planned name change are identified on the first line ($\lookup{F_n}{t_n} = \set{\var{oldName}}$ and $\containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}$ respectively). Since the name must not be in use during the temporal scope, we verify that looking up the new name in the $\names{}$ map returns an empty set. The $\names{}$ map is updated by shortening the interval for the old name to end at $t_n$, and assigning the feature ID to the new name during the temporal scope. Furthermore, the $\features{}$ map is updated at the feature ID, shortening the interval for the old name and assigning the new name to the temporal scope. 
