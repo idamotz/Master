@@ -52,7 +52,7 @@ and evolve over time as requirements change~\cite{art:context-aware-reconfigurat
    \label{ex:simple-paradox}
 \end{figure}
 
-A simple example of a paradox can be seen in Figure~\vref{ex:simple-paradox}. Here, a feature model is illustrated as a normal tree for simplicity. In the original plan, a node $A$ exists in time $1$ and is removed at time $5$. We modify the plan by adding a child node $B$ to $A$ at time $3$. This change causes a paradox in time $5$, since node $B$ is left without a parent node. In this case, it would be simple to detect this paradox by hand, but given a plan with hundreds of nodes and points in time, paradoxes may be harder to locate.  Thus, there is a need for tooling that support safe retroactive change to feature model evolution plans. 
+A simple example of a paradox can be seen in Figure~\vref{ex:simple-paradox}. Here, a feature model is illustrated as a normal tree for simplicity. In the original plan, a node $A$ exists in time $1$ and is removed at time $5$. We modify the plan by adding a child node $B$ to $A$ at time $3$. This change causes a paradox in time $5$, since node $B$ is left without a parent node. In this case, it would be simple to detect this paradox by hand, but given a plan with hundreds of nodes and points in time, paradoxes may be harder to locate.  Thus, there is a need for tooling that supports safe retroactive change to feature model evolution plans. 
 
 Notice also the difference between \emph{feature model change}, i.e. planning to remove $A$ at time $5$, and \emph{plan change}, i.e. modifying the original plan by introducing $B$ at time 3. A plan may contain many changes to a feature model, but an evolution process will change the plans themselves. In this thesis we focus on plan changes.
 

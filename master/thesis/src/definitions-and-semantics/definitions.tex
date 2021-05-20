@@ -28,12 +28,17 @@ Following is the syntax for looking up a value at the key $k$ in map \map{map}:
 \]
 
 This query would give us $v$ if $\mapping{k}{v} \in \map{map}$. If we wish to assign a value $v'$ to key $k$, this is the syntax:
-
 \[
 \lookup{\map{map}}{k} \assign v'
 \]
+The semantics of assignment is given by the following:
+\begin{align*}
+  \lookup{\left(\map{map} \cup \set{\mapping{k}{v}}\right)}{k} \assign v' &= \map{map} \cup \set{\mapping{k}{v'}} &&\\
+  \lookup{\map{map}}{k} \assign v' &= \map{map} \cup \set{\mapping{k}{v'}} && \text{if $k$ is not a key in \map{map}}
+\end{align*}
+Note that we do not mutate maps, but rather obtain a new map when assigning a value to a key. 
 
-This also works if $k$ is not already in the map. We assume $O(1)$ \todo{$\leftarrow$ maybe not?} for lookup and insertion. For maps with set values, we define an additional operator $\addassign$. If $\lookup{\map{map}}{k} = S$ then 
+For maps with set values, we define an additional operator $\addassign$. If $\lookup{\map{map}}{k} = S$ then 
 \[\lookup{\map{map}}{k} \addassign v = \lookup{\map{map}}{k} \assign S \cup \{v\}\]
 To remove a mapping with key $k$, we use $\map{map} \setminus k$. For maps with set values, we additionally define $\removevalue{v}$, where $v$ is some value. Let $\map{map}$ be a map with set values containing the mapping $\mapping{k}{\{v\} \cup S}$. Then $\removevalue{v}$ is defined as follows:
 
@@ -65,14 +70,14 @@ An \emph{interval map} is a map where the key is an interval (Definition~\vref{d
   \label{def:interval-map}
 \end{definition}
 
-To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{i} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure~\vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
+To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{IM} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure~\vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
 
 \begin{figure}[h]
   \begin{align*}
-    & \lookup{\map{i}}{t_1} \\
-    & \lookup{\map{i}}{t_3} \\
-    & \lookup{\map{i}}{\interval{t_1}{t_5}} \\
-    & \lookup{\map{i}}{\interval{t_2}{t_4}}
+    & \lookup{\map{IM}}{t_1} \\
+    & \lookup{\map{IM}}{t_3} \\
+    & \lookup{\map{IM}}{\interval{t_1}{t_5}} \\
+    & \lookup{\map{IM}}{\interval{t_2}{t_4}}
   \end{align*}
   \caption{Interval map example}
   \label{ex:interval-map}
@@ -85,6 +90,10 @@ We furthermore define function $\overlapping{\map{IM}}{t_n}{t_m}$ which returns 
 Assigning a value $v$ to an empty interval in a map $\map{IM}$ returns the same map, i.e. it is a no-op. Formally,
 \[
   \lookup{\map{IM}}{\interval{t_n}{t_n}} \assign v = \map{IM}
+\]
+Likewise, the empty mapping $\intervalmapping{t_n}{t_n}{v}$ is ignored, such that
+\[
+  \map{IM} \cup \set{\intervalmapping{t_n}{t_n}{v}} = \map{IM}
 \]
 
 \subsection{Interval sets}
@@ -126,9 +135,61 @@ The reasoning behind the choice of interval sets and maps here is in large part 
 \subsection{Mapping groups}
 \label{sub:mapping-groups}
 
-The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. It may also be removed and re-added These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $\group$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is a map with the group's types, $G_p$ is a map with feature IDs, and $G_c$ is a map with feature ID values, the interval keys possibly overlapping.
+The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $\group$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is an interval map with the group's types, $G_p$ is an interval map with parent feature IDs, and $G_c$ is an interval map with child feature ID set values, the interval keys possibly overlapping.
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
+
+\subsection{How to use the interval-based feature model}
+\label{sub:how-to-use-the-interval-based-feature-model}
+To provide intuition, we give some examples of how to use the interval-based feature model.
+
+If a group with ID $\var{groupID}$ with $\lookup{\groups}{\var{groupID}} = \group{}$ has the type \xortype{} at time $t_2$, then
+\[
+  \lookup{G_t}{t_2} = \set{\xortype{}}
+\]
+The result is a set due to the nature of the interval keys; $t_2$ is contained within some interval key in $G_t$. 
+
+Suppose we have a feature with ID $\var{featureID}$ with $\lookup{\features}{\var{featureID}} = \feature{}$. To check whether the feature exists at the time point $t_5$, we look up the time point in the feature's existence set $F_e$. Recall that $F_e$ is an interval set. Then
+\[
+  t_5 \inn F_e
+\]
+means that $t_5$ is contained within some interval in $F_e$, so the feature does exist at time $t_5$. We use the operator $\inn$ because the elements in $F_e$ are intervals, and we wish to know whether $t_5$ is contained within one of those intervals. To get the feature's parent group ID at time $t_5$, we look up the time point in the feature's parent map $F_p$:
+\[
+  \lookup{F_p}{t_5} = \set{\var{parentGroupID}}
+\]
+This is exactly the same as how we previously used $\lookup{G_t}{t_2}$. The resulting set $\set{\var{parentGroupID}}$ means that the only parent group the feature has at time $t_5$ is $\var{parentGroupID}$. Since the model is assumed to be sound, it makes sense that a feature which exists has exactly one parent group. If the feature did not exist, it would not have a parent group. The result would then be
+\[
+  \lookup{F_p}{t_5} = \emptyset
+\]
+Although a feature always has exactly one parent group if it exists, it may have several child groups. Recall that the child group map $F_c$ has set values, meaning that the values are sets of group IDs. Furthermore, the keys may overlap, since a feature may have 3 groups from $t_3$ to $t_6$, but 1 in the interval $\interval{t_4}{t_6}$. Thus, to obtain the set of child groups at time $t_5$, we must take the union of the result after looking up $t_5$ in the child group map $F_c$.
+\[
+  \bigcup{\lookup{F_c}{t_5}} = \set{\var{childGroup1}, \var{childGroup2}, \var{childGroup3}, \var{childGroup4}}
+\]
+If we did not take the union, we would get something like
+\[
+  \lookup{F_c}{t_5} = \set{\set{\var{childGroup1}, \var{childGroup2}, \var{childGroup3},} \set{\var{childGroup4}}}
+\]
+This is why, later in the thesis, we see expressions like
+\[
+  \var{groupID} \in \bigcup{\lookup{F_c}{t_n}}
+\]
+This expression means that the group with ID $\var{groupID}$ is a child group of our feature at time $t_n$.
+
+Furthermore, we sometimes wish to locate the time when something ends; for instance, when a feature stops existing. If we want to find out when our feature is next removed after $t_5$, we can look it up in the existence set:
+\[
+  \containing{F_e}{t_5} = \set{\interval{t_2}{\forever}}
+\]
+The result set means that the feature is added at $t_2$, and is never removed. The syntax looks exactly the same for interval maps. If we want to know when the feature is next moved (after $t_5$), we use the same operator with the parent group map:
+\[
+  \containing{F_p}{t_5} = \set{\interval{t_3}{t_6}}
+\]
+The feature was moved to its current parent group at $t_3$, and will be moved next at $t_6$.
+
+We often want to know what is true for an \emph{interval}, not just a time point. In particular, we may want to check that the feature does not exist during some interval, for instance $\interval{t_0}{t_2}$. We then use the negated overlapping member operator $\notinnr$:
+\[
+  \interval{t_0}{t_2} \notinnr F_e
+\]
+This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}{t_2}$. If we had that $\interval{t_1}{t_3} \in F_e$, the above predicate would be false, since both intervals contain the time point $t_1$.
 
 \subsection{Example evolution plan}
 A small example of an interval-based feature model can be found in Figure~\vref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
