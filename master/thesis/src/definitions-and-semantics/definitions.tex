@@ -112,15 +112,17 @@ We also define these predicates for time points $t_n$, so that $t_n \inn \map{IS
 $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 
 \todo{The three following sections should be grouped together in a logical context}
-\subsection{Mapping names}
-\label{sub:mapping-names}
+\subsection{Map entries}
+\label{sub:map-entries}
+\subsubsection{Mapping names}
+\label{ssub:mapping-names}
 
 The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the interval-based feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
 
 This map is mainly used when adding features or changing names. The new name and the scope of the change is then looked up in the \names{} map to verify that no other feature shares the name.
 
-\subsection{Mapping features}
-\label{sub:mapping-features}
+\subsubsection{Mapping features}
+\label{ssub:mapping-features}
 
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
 A feature has a name, a type, a parent group, and zero or more child groups. Furthermore, a feature may be removed and re-added during the course of the plan, so we also need information about when the feature exists.
@@ -132,8 +134,8 @@ The root ID is constant for a interval-based feature model. We assume that it ha
 
 The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 
-\subsection{Mapping groups}
-\label{sub:mapping-groups}
+\subsubsection{Mapping groups}
+\label{ssub:mapping-groups}
 
 The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $\group$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is an interval map with the group's types, $G_p$ is an interval map with parent feature IDs, and $G_c$ is an interval map with child feature ID set values, the interval keys possibly overlapping.
 
