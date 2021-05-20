@@ -2,7 +2,6 @@
 \label{sec:soundness-for-interval-based-feature-models}
 % \todo{Argue that the rules are \emph{enough} to preserve soundness.}
 % \todo{Show what needs to be proved for an initial model. ``correct by construction". In a well-formed structure. Lemma: What is a sound structure. Soundness theorem: Preserves soundness, using the lemma.}
-% \todo{The structure of the proof should be introduced first}
 % \todo{In the theorem, emphasize the structure of the proof (inductive)}
 % \todo{Between the proofs, add some text; how to read the proof, how to understand etc. Also give context (how the lemmas are used later)}
 The interval-based feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
