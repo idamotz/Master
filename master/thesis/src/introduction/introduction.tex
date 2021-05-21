@@ -68,7 +68,7 @@ This method lets us detect paradoxes in a feature model evolution plan, and has 
    \item Analyse the entire new plan
    \item Locate the paradox that occurs at time 5, when we attempt to remove $A$ even though it has a child node $B$.
 \end{enumerate}
-This method requires us to analyse the entire plan each time a change to the plan is made, even though a change often does not affect much of the plan. In this example, only $A$ is affected by the modification, and only between times 3 and 5. This thesis aims to remedy this by analysing \emph{plan change} instead of entire plans, leveraging the knowledge that a change may only affect a small part of the plan. We can then exploit that adding $B$ only affects its parent node $A$ during the time between 3 and 5, ignoring the $Root$ node and time $1$. The added benefit in this example is small, but for larger plans, ignoring hundreds of features and points in time should gain us 
+This method requires us to analyse the entire plan each time a change to the plan is made, even though a change often does not affect much of the plan. In this example, only $A$ is affected by the modification, and only between times 3 and 5. This thesis aims to remedy this by analysing \emph{plan change} instead of entire plans, leveraging the knowledge that a change may only affect a small part of the plan. We can then exploit that adding $B$ only affects its parent node $A$ during the time between 3 and 5, ignoring the $Root$ node and time $1$. The added benefit in this example is small, but for larger plans, ignoring hundreds of features and points in time should gain us an advantage.
 
 % Overordnet om prosjektet;
 % Når det begynte
@@ -78,12 +78,6 @@ This method requires us to analyse the entire plan each time a change to the pla
 % Forskerlinjen, Eirik og sommerprosjektet (sommeren 2019). Planla, gjennomførte og skrev en rapport med forskning som senere ble bearbeidet videre til en publisert artikkel (referanse). Vi lagde en formell semantikk for endring av feature models og implementerte den i Maude. I tillegg lagde vi et query language for å beskrive temporale egenskaper ved feature models, samt en modellsjekker som kan verfisere at disse egenskapene eksisterer. \footnote{\url{githubgreier}}
 % I artikkelen er dette integrert i DarwinSPL slik at man kan gjøre planendringer. 
 % Mitt bidrag skal oppfylle M3, som er en measure i prosjektbeskrivelsen til LTEP. Få fram at dette er en konkret del i et fundet forskningsprosjekt
-
-\section{Objective}
-\label{sec:objective}
-
-\todo{write}
-Develop an analysis method that exploits how plan changes do not affect all parts of the plan, thus achieving a more modular analysis than the one defined in~\cite{art:consistency-preserving-evolution-planning}.
 
 \section{Research Questions}
 \label{sec:research-questions}

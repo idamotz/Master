@@ -13,7 +13,7 @@ Let
 be the initial state. Recall that this operation removes the feature with ID \var{featureID} from the interval-based feature model $(\names{}, \features{}, \groups{})$ at $t_n$. Furthermore, let $\lookup{\features}{\var{featureID}} = \feature$, and $\interval{t_i}{t_j} \in F_e$, with $t_i \leq t_n < t_j$. This means that the original plan added the feature at time $t_i$ and removed it at $t_j$, with the possibility that $t_j = \forever$. In the latter case, there was no plan to remove the feature originally.
 
 \paragraph{Scope}
-As defined in Section~\vref{sec:define-the-scope}, the \textbf{removeFeature} operation's temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time point in which the feature was originally planned to be removed. We can see from the description above that $t_k = t_j$; the end point in the feature's existence set containing $t_n$. We then have that the scope is defined as $\interval{t_n}{t_j}$. In the rule, we find the interval $\interval{t_i}{t_j}$ by looking up
+As defined in Section~\vref{sec:scope}, the \textbf{removeFeature} operation's temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time point in which the feature was originally planned to be removed. We can see from the description above that $t_k = t_j$; the end point in the feature's existence set containing $t_n$. We then have that the scope is defined as $\interval{t_n}{t_j}$. In the rule, we find the interval $\interval{t_i}{t_j}$ by looking up
 \begin{equation*}
    \containing{F_e}{t_n} = \set{\interval{t_{e_1}}{t_{e_2}}}
 \end{equation*}

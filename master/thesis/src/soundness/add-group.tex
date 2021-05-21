@@ -15,7 +15,7 @@ be the initial state. Recall that this operation adds the group with ID \var{gro
 
 \paragraph{Scope}
 
-Recall from Section~\vref{sec:define-the-scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the group itself and the parent feature.
+Recall from Section~\vref{sec:scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the group itself and the parent feature.
 
 In the premise of the rule, only $\var{groupID}$ and $\var{parentFeatureID}$ are looked up in the interval-based feature model. Consequently, the premise stays within the spatial scope of the rule. In the conclusion of the rule, $\features{}$ are assigned to and looked up at $\var{parentFeatureID}$, and $\groups{}$ at $\var{groupID}$. The helper functions $\var{addChildGroup}$ (Figure~\vref{fun:add-child-group}) and $\var{setGroupAttributes}$ (Figure~\vref{fun:set-group-attributes}) do not take the interval-based feature model as input, and so only affects the parent feature and the group itself, respectively.
 
