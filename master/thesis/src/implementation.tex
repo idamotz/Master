@@ -1,0 +1,25 @@
+\chapter{Implementation}  
+\label{cha:implementation}
+
+% Say something about implementation without showing the code, maybe giving pseudocode. Talk about distance between formalization and implementation. Describe examples, error messages, practical applications, how it can be used, how it detects paradoxes, how warnings can be given to users.
+In this chapter, we present the implementation by first giving an overview of the types to provide intuition. We also discuss the distance between the formalization and the implementation.
+
+
+\section{Overview}
+\label{sec:overview}
+We have created a prototype for implementing the analysis rules. The implementation can be found on GitHub\footnote{\todo{github}}. The prototype is implemented in Haskell\footnote{\url{https://www.haskell.org/}}, which is a strongly typed, purely functional programming language. We chose the language since a functional language corresponds closely to the mathematical nature of our analysis rules. Moreover, Haskell has an implementation of interval maps\footnote{\url{https://hackage.haskell.org/package/IntervalMap}} which are easily adapted to our purposes. The implementation is not meant to be integrated directly into a tool, but serves as a proof of concept that our analysis method is realisable in practice.
+
+The most important modules are \texttt{Types}, \texttt{Helpers}, \texttt{Validate}, and \texttt{Apply}. 
+
+\subsection{The \texttt{Types} module}
+\label{sub:the-types-module}
+
+In the \texttt{Types} module we define all the types used throughout the project, corresponding closely with our definitions (Section~\vref{sec:definitions}). Our time points are implemented as an abstract data type \texttt{TimePoint}. The possible \texttt{TimePoints} are \texttt{TP n}, where \texttt{n} is an integer, or \texttt{Forever}, which corresponds to $\forever$. For all integers \texttt{n}, we have that \texttt{TP n < Forever}. Our notion of intervals are translated to an abstract data type \texttt{Validity}. Using
+\[
+   \texttt{Validity (TP 3) (TP 5)}
+\]
+gives us the interval $\interval{3}{5}$. Similarly, \texttt{Validity (TP 1) Forever} corresponds to the interval $\interval{1}{\forever}$. 
+
+We base our implementation of the interval maps on the Haskell module \texttt{IntervalMap}. To customise it to our needs, we name our representation \texttt{ValidityMap}, specifying that the keys are \texttt{Validity}s. The \texttt{IntervalMap} module provides several useful functions, such as \texttt{containing}, which takes an \texttt{IntervalMap} and a \texttt{TimePoint} and returns all the keys containing the given time point.
+
+We further define the data type \texttt{IntervalBasedFeatureModel}, which takes the root ID of the IBFM, a \texttt{NameValidities} map, a \texttt{FeatureValidities} map, and a \texttt{GroupValidities} map. This corresponds closely to our interval-based feature model  $(\names,\,\allowbreak\features,\, \groups)$ (see Definition~\vref{def:interval-based-feature-model}). The $\texttt{NameValidities}$ map is a Haskell \texttt{Map}\footnote{\url{https://hackage.haskell.org/package/containers-0.4.0.0/docs/Data-Map.html}} from \texttt{Name}, which is a \texttt{String}, to \texttt{ValidityMap FeatureID}, where \texttt{FeatureID} is a wrapper type for \texttt{String}. Recall from Section~\vref{ssub:mapping-names} that our $\names{}$ map is a map from names to interval maps with feature ID values, which resembles our implementation. The \texttt{FeatureValidities} map has \texttt{FeatureID} keys and \texttt{FeatureValidity} values. 

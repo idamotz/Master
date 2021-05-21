@@ -32,7 +32,6 @@ data FeatureType
 
 type ValidityMap a = IM.IntervalMap Validity a
 
--- TODO change to Moment:)
 data TimePoint
   = TP Int
   | Forever

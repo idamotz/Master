@@ -1,4 +1,5 @@
 \section{Definitions}
+\label{sec:definitions}
 \todo{remove subsections}
 \todo{Begin this section by explaining what I need and then defining what I need}
 
@@ -58,6 +59,8 @@ To define the map values used in interval-based feature models, we must first de
   An interval is a set of time points between a lower and an upper bound. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
   \label{def:interval}
 \end{definition}
+
+To allow us to use intervals that have no end, we define the time point $\forever$, such that $\interval{1}{\forever}$ is an interval that starts at $1$ and never ends. For all time points $t_n$, we have that $t_n \leq \forever$. 
 
 We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains} the time point $t_k$ if $t_\text{start} \leq t_k < t_\text{end}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ \emph{overlap} if there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained by both intervals.
 
