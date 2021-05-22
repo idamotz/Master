@@ -37,7 +37,7 @@ The modification made to $\lookup{\features}{\var{featureID}}$ is to the parent 
 \[
    F_p' = \lookup{\var{clampInterval}(F_p, \, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID}
 \]
-As discussed in earlier sections (e.g. Section~\vref{sub:soundness-of-the-remove-feature-rule}), $\var{clampInterval}$ replaces a mapping $\intervalmapping{t_i}{t_j}{v}$ by $\intervalmapping{t_i}{t_n}{v}$, with $t_n \leq t_j$. Thus $\var{clampInterval}(F_p, \, t_n)$ has no parent group during the temporal scope. The subsequent assignment of $\var{newParentID}$ to $\interval{t_n}{t_{p_2}}$ ensures that the feature has exactly one parent group during the temporal scope. This relation is reflected in the $\groups{}'$ map, with
+As discussed in earlier sections (e.g. Section~\vref{sec:soundness-of-the-remove-feature-rule}), $\var{clampInterval}$ replaces a mapping $\intervalmapping{t_i}{t_j}{v}$ by $\intervalmapping{t_i}{t_n}{v}$, with $t_n \leq t_j$. Thus $\var{clampInterval}(F_p, \, t_n)$ has no parent group during the temporal scope. The subsequent assignment of $\var{newParentID}$ to $\interval{t_n}{t_{p_2}}$ ensures that the feature has exactly one parent group during the temporal scope. This relation is reflected in the $\groups{}'$ map, with
 \begin{align*}
    \groups' &= \\
    \lookup{&\big(\lookup{\groups{}}{\var{oldParentID}} \\

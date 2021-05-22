@@ -143,3 +143,10 @@
 % \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{lemma}[theorem]{Lemma}
+
+%%------------------------------------------------------------------------
+%% Minted 
+%%------------------------------------------------------------------------
+
+\usemintedstyle{bw} % For black and white code
+\newcommand{\haskell}[1]{\mintinline[escapeinside=||, breaklines]{haskell}{#1}}

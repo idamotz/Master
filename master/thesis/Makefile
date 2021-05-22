@@ -17,4 +17,4 @@ debug: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
 
 
 clean:
-	rm $(PDF); cd $(SRCDIR) && latexmk -CA && rm $(SRCFILE).bbl $(SRCFILE).run.xml
+	rm $(PDF); cd $(SRCDIR) && latexmk -CA; rm $(SRCFILE).bbl $(SRCFILE).run.xml; rm -rf _minted-thesis
