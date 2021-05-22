@@ -12,7 +12,7 @@ checkCompatibleTypesFeature :: Validity -> FeatureType -> ValidityMap GroupType 
 checkCompatibleTypesFeature validity ftype gtypes =
   (\(interval, gtype) -> IncompatibleTypes ftype gtype interval)
     <$> ( IM.lookupMin
-            . IM.filter (`compatibleTypes` ftype)
+            . IM.filter (not . (`compatibleTypes` ftype))
             . (`IM.intersecting` validity)
             $ gtypes
         )
@@ -21,7 +21,7 @@ checkCompatibleTypesGroup :: Validity -> GroupType -> ValidityMap FeatureType ->
 checkCompatibleTypesGroup validity gType fTypes =
   (\(interval, fType) -> IncompatibleTypes fType gType interval)
     <$> ( IM.lookupMin
-            . IM.filter (compatibleTypes gType)
+            . IM.filter (not . compatibleTypes gType)
             . (`IM.intersecting` validity)
             $ fTypes
         )
