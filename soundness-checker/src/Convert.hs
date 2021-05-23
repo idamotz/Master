@@ -4,7 +4,6 @@ import Apply
 import Control.Lens
 import Control.Monad.State
 import Data.Foldable (traverse_)
-import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map.Strict as M
 import Helpers
 import Types
@@ -26,12 +25,12 @@ convertFeature tp mParentID (Feature fid name ftype children) = do
   modify $ insertName name validity fid
   featureValidities . ix fid %= \feature ->
     feature
-      & existenceValidities %~ IM.insert validity ()
-      & nameValidities %~ IM.insert validity name
-      & typeValidities %~ IM.insert validity ftype
+      & existenceValidities %~ insert validity ()
+      & nameValidities %~ insert validity name
+      & typeValidities %~ insert validity ftype
   case mParentID of
     Just parentID -> do
-      featureValidities . ix fid . parentValidities %= IM.insert validity parentID
+      featureValidities . ix fid . parentValidities %= insert validity parentID
       modify $ insertEmptyGroup parentID
       groupValidities . ix parentID . childValidities
         %= insertSingleton validity fid
@@ -44,9 +43,9 @@ convertGroup tp parentID (Group gid gtype children) = do
   let validity = Validity tp Forever
   groupValidities . ix gid %= \group ->
     group
-      & existenceValidities %~ IM.insert validity ()
-      & typeValidities %~ IM.insert validity gtype
-      & parentValidities %~ IM.insert validity parentID
+      & existenceValidities %~ insert validity ()
+      & typeValidities %~ insert validity gtype
+      & parentValidities %~ insert validity parentID
   modify $ insertEmptyFeature parentID
   featureValidities . ix parentID . childValidities %= insertSingleton validity gid
   traverse_ (convertFeature tp (Just gid)) children

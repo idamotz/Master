@@ -27,7 +27,7 @@ type instance Index (IM.IntervalMap Validity v) = TimePoint
 
 instance Ixed (IM.IntervalMap Validity v) where
   ix tp handler im = case lookupTP tp im of
-    Just (k, v) -> handler v <&> \v' -> IM.insert k v' im
+    Just (k, v) -> handler v <&> \v' -> insert k v' im
     Nothing -> pure im
 
 type Node = Either FeatureValidity GroupValidity
@@ -40,8 +40,13 @@ type NodeID = Either FeatureID GroupID
 lookupTP :: TimePoint -> ValidityMap a -> Maybe (Validity, a)
 lookupTP tp im = IM.lookupMin $ IM.containing im tp
 
-containingInterval :: TimePoint -> ValidityMap a -> Maybe Validity
-containingInterval tp = fmap fst . lookupTP tp
+containingIntervalTP :: TimePoint -> ValidityMap a -> Maybe Validity
+containingIntervalTP tp = fmap fst . lookupTP tp
+
+containingInterval :: Validity -> ValidityMap a -> ValidityMap a
+containingInterval validity =
+  IM.filterWithKey (\k _ -> k `IM.subsumes` validity)
+    . (`IM.intersecting` validity)
 
 containingTPVal :: Ord a => TimePoint -> a -> ValidityMap (S.Set a) -> Maybe (Validity, S.Set a)
 containingTPVal tp v = IM.lookupMin . IM.filter (S.member v) . (`IM.containing` tp)
@@ -54,6 +59,15 @@ lookupOverlappingValues validity =
 lookupOverlapping :: Validity -> ValidityMap a -> [(Validity, a)]
 lookupOverlapping validity =
   IM.assocs . flip IM.intersecting validity
+
+-- Do not insert if empty interval
+insert :: Validity -> a -> ValidityMap a -> ValidityMap a
+insert (Validity s e) | s >= e = const id
+insert iv = IM.insert iv
+
+insertWith :: (a -> a -> a) -> Validity -> a -> ValidityMap a -> ValidityMap a
+insertWith _ (Validity s e) | s >= e = const id
+insertWith f iv = IM.insertWith f iv
 
 ---------------
 -- Intervals --
@@ -113,12 +127,12 @@ lookupNameInterval name validity =
 ---------------------------------------
 
 insertSingleton :: Ord a => Validity -> a -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
-insertSingleton validity x = IM.insertWith (<>) validity (S.singleton x)
+insertSingleton validity x = insertWith (<>) validity (S.singleton x)
 
 insertName :: Name -> Validity -> FeatureID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 insertName name validity fid =
   over nameValidities $
-    M.insertWith (const $ IM.insert validity fid) name $ IM.singleton validity fid
+    M.insertWith (const $ insert validity fid) name $ IM.singleton validity fid
 
 insertEmptyFeature :: FeatureID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 insertEmptyFeature fid =
@@ -131,7 +145,7 @@ insertEmptyGroup gid =
 clampIntervalEnd :: TimePoint -> ValidityMap a -> ValidityMap a
 clampIntervalEnd tp vm =
   let Just (containingKey@(Validity s _), val) = lookupTP tp vm
-   in IM.insert (Validity s tp) val
+   in insert (Validity s tp) val
         . IM.delete containingKey
         $ vm
 
@@ -140,11 +154,26 @@ clampIntervalEndValue tp v vmap =
   let Just (Validity s e, containingSet) = containingTPVal tp v vmap
    in insertSingleton (Validity s tp) v
         . deleteIfEmpty (Validity s e)
-        . IM.insert (Validity s e) (S.delete v containingSet)
+        . insert (Validity s e) (S.delete v containingSet)
         $ vmap
   where
     deleteIfEmpty :: Validity -> ValidityMap (S.Set a) -> ValidityMap (S.Set a)
     deleteIfEmpty k vm = if null (vm ! k) then IM.delete k vm else vm
+
+deleteNameIfNull :: Name -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
+deleteNameIfNull name ibfm =
+  ibfm & nameValidities . at name
+    %~ (\(Just im) -> if null im then Nothing else Just im)
+
+deleteFeatureIfNull :: FeatureID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
+deleteFeatureIfNull fid ibfm =
+  ibfm & featureValidities . at fid
+    %~ \f@(Just (FeatureValidity fe _ _ _ _)) -> if null fe then Nothing else f
+
+deleteGroupIfNull :: GroupID -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
+deleteGroupIfNull gid ibfm =
+  ibfm & groupValidities . at gid
+    %~ \g@(Just (GroupValidity ge _ _ _)) -> if null ge then Nothing else g
 
 --------------------
 -- Move algorithm --

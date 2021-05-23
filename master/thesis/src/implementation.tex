@@ -46,3 +46,6 @@ The \texttt{Validate} module exports only the function \texttt{validate}, which 
 To apply the operations, the \texttt{Apply} module exports the function \texttt{apply}, which takes a \texttt{Time\-Operation} and an \texttt{Interval\-Based\-Feature\-Model} and applies the operation to the model. This function works similarly to how it is defined in the rules.
 
 The functions are combined in \texttt{validate\-And\-Apply}, which has the return type \texttt{Either [Validation\-Error] Interval\-Based\-Feature\-Model}. If validation fails, it returns a list of errors, and if it succeeds, it applies the operation and returns the modified model.
+
+\section{Distance between theory and implementation}
+\todo{Discuss}

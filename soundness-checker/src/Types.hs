@@ -1,7 +1,9 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Types where
 
@@ -9,6 +11,7 @@ import Control.Lens
 import qualified Data.IntervalMap.Generic.Strict as IM
 import qualified Data.Map as M
 import qualified Data.Set as S
+import qualified GHC.Exts as E
 
 newtype FeatureID = FeatureID String deriving (Show, Eq, Ord)
 type RootID = FeatureID
@@ -51,6 +54,11 @@ instance IM.Interval Validity TimePoint where
 
 instance Semigroup Validity where
   Validity s1 e1 <> Validity s2 e2 = Validity (min s1 s2) (max e1 e2)
+
+-- instance (IM.Interval iv e, Ord e) => E.IsList (IM.IntervalMap iv a) where
+--   type Item (IM.IntervalMap iv a) = (iv, a)
+--   fromList = IM.fromList
+--   toList = IM.toList
 
 data IntervalBasedFeatureModel = IntervalBasedFeatureModel
   { _rootID :: RootID

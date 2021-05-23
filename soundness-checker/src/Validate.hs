@@ -31,7 +31,7 @@ checkNodeNotExists validity vm = NodeAlreadyExists . fst <$> IM.lookupMin (IM.in
 
 checkParentExists :: Validity -> ValidityMap () -> Maybe ValidationError
 checkParentExists validity validityMap
-  | not . null $ IM.within validityMap validity = Nothing
+  | not . null $ containingInterval validity validityMap = Nothing
   | otherwise = Just ParentNotExists
 
 checkNameInUse :: Validity -> Name -> IntervalBasedFeatureModel -> Maybe ValidationError
@@ -39,7 +39,7 @@ checkNameInUse validity name = fmap (uncurry NameInUse) . IM.lookupMin . lookupN
 
 checkNotChanged :: Validity -> ValidityMap a -> (a -> ChangeOperation) -> Maybe ValidationError
 checkNotChanged (Validity s e) vm op =
-  case containingInterval s vm of
+  case containingIntervalTP s vm of
     Just (Validity s' e') ->
       if e' /= e
         then ChangePlanned e' . op . snd <$> lookupTP e' vm
@@ -80,7 +80,7 @@ validate (AddOperation v (AddGroup gid gtype fid)) ibfm =
     ]
 validate (ChangeOperation tp (RemoveFeature fid)) ibfm =
   let (FeatureValidity existence names types parents children) = lookupFeatureDefault fid ibfm
-   in case containingInterval tp existence of
+   in case containingIntervalTP tp existence of
         Nothing -> [NodeNotExists]
         Just (Validity _ endTime) ->
           let scope = Validity tp endTime
@@ -92,7 +92,7 @@ validate (ChangeOperation tp (RemoveFeature fid)) ibfm =
                 ]
 validate (ChangeOperation tp (RemoveGroup gid)) ibfm =
   let (GroupValidity existence types parents children) = lookupGroupDefault gid ibfm
-   in case containingInterval tp existence of
+   in case containingIntervalTP tp existence of
         Nothing -> [NodeNotExists]
         Just (Validity _ endTime) ->
           let scope = Validity tp endTime
@@ -104,7 +104,7 @@ validate (ChangeOperation tp (RemoveGroup gid)) ibfm =
 validate (ChangeOperation tp (MoveFeature fid gid)) ibfm =
   let (FeatureValidity existence _ types _ _) = lookupFeatureDefault fid ibfm
       (GroupValidity groupExistence groupTypes _ _) = lookupGroupDefault gid ibfm
-   in case (containingInterval tp existence, containingInterval tp groupExistence) of
+   in case (containingIntervalTP tp existence, containingIntervalTP tp groupExistence) of
         (Nothing, Nothing) -> [NodeNotExists, ParentNotExists]
         (_, Nothing) -> [ParentNotExists]
         (Nothing, _) -> [NodeNotExists]
@@ -121,7 +121,7 @@ validate (ChangeOperation tp (MoveFeature fid gid)) ibfm =
 validate (ChangeOperation tp (MoveGroup gid fid)) ibfm =
   let (GroupValidity existence _ _ _) = lookupGroupDefault gid ibfm
       (FeatureValidity featureExistence _ _ _ _) = lookupFeatureDefault fid ibfm
-   in case (containingInterval tp existence, containingInterval tp featureExistence) of
+   in case (containingIntervalTP tp existence, containingIntervalTP tp featureExistence) of
         (Nothing, Nothing) -> [NodeNotExists, ParentNotExists]
         (_, Nothing) -> [ParentNotExists]
         (Nothing, _) -> [NodeNotExists]
@@ -133,7 +133,7 @@ validate (ChangeOperation tp (MoveGroup gid fid)) ibfm =
                in toList $ checkGroupCycles scope gid fid ibfm
 validate (ChangeOperation tp (ChangeFeatureType fid fType)) ibfm =
   let (FeatureValidity _ _ types parents _) = lookupFeatureDefault fid ibfm
-   in case containingInterval tp types of
+   in case containingIntervalTP tp types of
         Nothing -> [NodeNotExists]
         Just (Validity _ endTime) ->
           let scope = Validity tp endTime
@@ -147,7 +147,7 @@ validate (ChangeOperation tp (ChangeFeatureType fid fType)) ibfm =
                 $ parents
 validate (ChangeOperation tp (ChangeGroupType gid gType)) ibfm =
   let (GroupValidity _ types _ children) = lookupGroupDefault gid ibfm
-   in case containingInterval tp types of
+   in case containingIntervalTP tp types of
         Nothing -> [NodeNotExists]
         Just (Validity _ endTime) ->
           let scope = Validity tp endTime
@@ -165,7 +165,7 @@ validate (ChangeOperation tp (ChangeGroupType gid gType)) ibfm =
                 $ children
 validate (ChangeOperation tp (ChangeFeatureName fid name)) ibfm =
   let (FeatureValidity _ names _ _ _) = lookupFeatureDefault fid ibfm
-   in case containingInterval tp names of
+   in case containingIntervalTP tp names of
         Nothing -> [NodeNotExists]
         Just (Validity _ endTime) ->
           let scope = Validity tp endTime
