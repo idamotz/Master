@@ -1,47 +1,83 @@
 
 \section{Scope}
 \label{sec:scope}
-What is the scope?
-\\
 
-Given a sound plan P and an operation associated with a time point O, the scope is the part of P that \textit{may be affected} by adding O. The scope must be defined in two dimensions:\\
+The scope of an operation consists of the parts of the plan that \emph{may} be affected by the operation.
 
-\subsubsection*{Time}
-Which time points of the plan may be affected by the change?
+In this section, we define the scope for each of the operations defined in Section~\vref{sub:operations}. The scope is later used when creating the analysis rules for modification of the interval-based feature model.
 
-\subsubsection*{Space}
-Which parts of the feature model may be affected within the temporal scope?
+In the section, we describe the \emph{spatial} and \emph{temporal} scopes. The spatial scope consists of the parts of a feature model that may be affected by change. For instance, adding a group affects the group being added and its parent feature, as the operation does not modify any other part of the plan. We must also take into account the \emph{temporal} aspect, since the plan also has a dimension of time. The temporal scope then consists of the time points that may be affected by applying an operation. In Figure~\vref{ex:add-group-scope}\footnote{Notice that the plan differentiates between groups and feature, but does not display types or names} %TODO: readd vref but make sure it isn't at a page break.
+, we visualise the spatial and temporal scopes. In the original plan, a feature $C$ is added to group $A$ at time 2. In time 3, it is moved to group $B$. We modify the plan by adding a group $D$ to feature $C$ from time 2 to time 3. In the modified plan, the scope is shown, containing feature $C$ and group $D$ from time 2 to 3. Notice that $Root$ and $A$ are not in the scope, and nor are the time points 1 or 4.
+\begin{figure}[h]
+  \centering
+      \textbf{Original plan}
+
+      \includegraphics[width=0.7\textwidth]{MoveCPlan}
+      \bigskip
+      
+      apply \textbf{addGroup}$(D, \ldots, C)$ from 2 to 3  
+      \bigskip
+
+      \textbf{Modified plan}
+
+      \includegraphics[width=0.9\textwidth]{MoveCPlanMod}
+  \caption{Add group scope visualisation}
+  \label{ex:add-group-scope}
+\end{figure}
+
+For each of the operations defined in Section~\vref{sub:operations}, we define the scope in the temporal and spatial dimensions. By assuming that the original plan is sound, meaning that it contains no paradoxes, we include only those parts of the plan in which paradoxes may arise after applying an operation.
 
 \subsubsection*{Operation Scopes}
-We define the \textit{minimal} scope for each operation.
+We define the temporal and spatial scopes for each operation.
 \begin{itemize}
 
   \item \textbf{addFeature}(\var{featureID}, \var{parentGroupID}, \var{name}, \var{featureType}) from $t_n$ to $t_m$\\
-     We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the interval-based feature model is affected by the change. In other words, if we look at the interval-based feature model as a sequence of feature models, the only models that may break as a result of this modification, are the ones associated with time points between $t_n$ and (but not including) $t_m$. The spatial scope must be only the feature itself, the parent group and the name. If the group type of the parent changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. The name is unique, so we must also verify that no other feature is using the name during the temporal scope. 
+     We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the plan is affected by the change. In other words, if we look at the plan as a sequence of feature models, the only models that may break as a result of this modification, are the ones associated with time points between $t_n$ and (but not including) $t_m$. The spatial scope must be only the feature itself, the parent group and the name. If the group type of the parent changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. The name is unique, so we must also verify that no other feature is using the name during the temporal scope. 
  
 
   \item \textbf{addGroup}(\var{groupID}, \var{parentFeatureID}, \var{groupType}) from $t_n$ to $t_m$\\
-    The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the group with id $\var{groupID}$ and the parent feature with ID$\var{parentFeatureID}$, for which the only conflicting event is removal -- the types of a group and its parent never conflict.
+    The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the group with id $\var{groupID}$ and the parent feature with ID $\var{parentFeatureID}$, for which the only conflicting event is removal -- the types of a group and its parent never conflict. The scope for this operation is visualised in Figure~\vref{ex:add-group-scope}
   \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\
-    \todo{Explain why the temporal scope is the way it is}
-    If the original interval containing $t_n$ in which the feature exists inside the feature model is $\interval{t_m}{t_k}$, then the temporal scope is $\interval{t_n}{t_k}$ - from the feature is removed until it would have been removed anyway \todo{rephrase}. Since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.\\
-    The spatial scope must be the feature itself, its parent group, and its subgroups. If the feature has or will have a subgroup during the interval, then it cannot be removed. Otherwise, there are no conflicts. When modifying the interval-based feature model, the feature must be removed from the parent's set of subfeatures, which is why the parent group is included in the spatial scope.
+    If the original interval containing $t_n$ in which the feature exists inside the feature model is $\interval{t_m}{t_k}$, then the temporal scope is $\interval{t_n}{t_k}$, where $t_n$ is the time at which we specify that the feature be removed, and $t_k$ is the time at which the feature was \emph{originally} planned to be removed. In some cases, $t_k$ will be $\forever$, meaning that the feature was never originally planned to be removed. Since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.\\
+    The spatial scope must be the feature itself, its parent group, its child groups, and its name. If the feature has or will have a child group during the interval, then it cannot be removed. Otherwise, there are no conflicts. When modifying the interval-based feature model, the feature must be removed from the parent's set of child features, which is why the parent group is included in the spatial scope. Likewise, the feature's ID must be removed from its name's mappings during the temporal scope, and so the name is also inside the scope. If the name changes during the temporal scope, there is a paradox, since a feature planned to be modified should not be removed.  
   \item \textbf{removeGroup}(\var{groupID}) at $t_n$\\
-    Extremely similar to \textbf{removeFeature}. 
+    This is similar to the scope for \textbf{removeFeature}, but without consideration for names, as groups do not have names.  Thus the temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time at which the group was originally planned to be removed. The spatial scope includes the group itself, its parent feature, and its child features. As with features, a group cannot be removed if it has or will have child features during the temporal scope.
   \item \textbf{moveFeature}(\var{featureID}, \var{targetGroupID}) at $t_n$\\
-  If $t_m$ is the time at which the feature is next moved in the original plan, the temporal scope is $\interval{t_n}{t_m}$, since this operation only affects the plan within this interval.\\
-  The spatial scope is discussed in more detail in the \textbf{move feature algo}. This scope is the largest and hardest to define, because we have to detect cycles. The scope is defined by the feature and its ancestors, as well as target group and its ancestors, which may change during the intervals. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common, as well as the feature and the group themselves. As usual, conflicting types and removal must be considered in addition to cycles.
+  If $t_m$ is the time at which the feature is next moved in the original plan, the temporal scope is $\interval{t_n}{t_m}$, since this operation only affects the plan within this interval.
+  \begin{figure}[h]
+    \centering
+
+      \textbf{Original plan}
+
+      \includegraphics[width=0.7\textwidth]{MoveCPlan}
+      \bigskip
+
+      apply \textbf{moveGroup}$(B, C)$ at 2
+      \bigskip
+
+      \textbf{Modified plan}
+
+      \includegraphics[width=0.7\textwidth]{CycleParadox}
+    \caption{Move operation causing cycle}
+    \label{ex:move-cycle}
+  \end{figure}
+
+  The spatial scope is discussed in more detail in the algorithm for moving features or groups presented in Section~\vref{sub:move-algorithm}. This scope is the largest and hardest to define, because we have to detect cycles. See Figure~\vref{ex:move-cycle} for an example of a move which causes a cycle. In the example, the original plan contains a move operation in which feature $C$ is moved to group $B$ at time 2. In the modified plan, group $B$ is moved to feature $C$ at time 2. Although this seems problem-free at time 2, it causes a paradox in the shape of a cycle at time 3, since $C$ is then moved to a group in its subtree. The scope is defined by the feature and its ancestors, as well as the target group and its ancestors, which may change during the intervals due to other move operations. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common in the original plan, as well as the feature and the group themselves. Conflicting types and removal of the new parent must be considered in addition to cycles.
   \item \textbf{moveGroup}(\var{groupID}, \var{targetFeatureID}) at $t_n$\\
-    See moveFeature. Very similar.
+    This is similar to the scope for \textbf{moveFeature}, as cycles violate the tree structure independently of whether the nodes are features or groups.
+    The difference in spatial scope concerns types, as type conflicts can only arise between a parent group and its child feature. Since the operation does not change the relation between a parent group and its child features, and the original plan is assumed to be sound, conflicting types are not considered for this operation.
   \item \textbf{changeFeatureVariationType}(\var{featureID}, \var{newType}) at $t_n$\\
-    Temporal scope: $\interval{t_n}{t_m}$ if $t_m$ is the next time point at which the feature's type changes or when feature is (next) removed.\\
-    Spatial scope: The only possibly conflicting thing in the feature model is the parent group's type. At no point must the feature have type `mandatory` and the parent group have type `alternative` or `or`. Thus, the spatial scope is the parent group.\\
-  \item \textbf{changeGroupVariationType}(\var{groupID}, \var{newType}) at $t_n$
-    Temporal scope: Same as previous.\\
-    The spatial scope are the group's child features; the possible conflict is the same as with changeFeatureType.\\
-  \item \textbf{changeFeatureName}(\var{featureID}, \var{name}) at $t_n$
-    Temporal scope: Same as previous.\\
-    Spatial scope: The name, the feature, and its previous name. If it already exists within the feature model during the interval, or if the feature does not exist, then the change is invalid. 
+    The temporal scope is $\interval{t_n}{t_m}$ if $t_m$ is the next time point at which the feature's type changes next or when the feature is (next) removed, since this is the only part of the plan which is changed by the operation.\\
+    The only possible conflict in the spatial scope is the parent group's type. At no point must the feature have type \mandatory{} and the parent group have type \xortype{} or \ortype{}. Thus, the spatial scope is the parent group and the feature itself.\\
+  \item \textbf{changeGroupVariationType}(\var{groupID}, \var{newType}) at $t_n$\\
+    The temporal scope is $\interval{t_n}{t_m}$ if $t_m$ is the next time point at which the group's type changes next or when the group is (next) removed, since this is the only part of the plan which is changed by the operation.
+
+    The spatial scope includes the group's child features; the possible conflict is the same as with changeFeatureType, but between the group and its child features. Consequently, this scope may encompass several features.\\
+  \item \textbf{changeFeatureName}(\var{featureID}, \var{name}) at $t_n$\\
+  The temporal scope is $\interval{t_n}{t_m}$ if $t_m$ is the next time point at which the feature's name changes next or when the feature is (next) removed, since this is the only part of the plan which is changed by the operation.
+
+    The spatial scope consists of the name, the feature, and its previous name. If it already exists within the feature model during the interval, or if the feature does not exist at time $t_n$, then the change is invalid. 
 \end{itemize}
 
-\todo{deal with batch operations/reverting a change}: It is currently impossible to \emph{extend} an interval; If a feature exists during $\interval{t_3}{t_5}$, it is impossible to change the plan such that it exists during $\interval{t_3}{t_6}$ instead. Don't really know how to fix that, except maybe adding an operation. In Figure~\vref{ex:washing-machine}, if we try to change the name of feature 1 to Dryer at $t_2$, intending to change it back before Dryer is added, then these semantics will reject the first change, as two features will have the name Dryer during $\interval{t_5}{\forever}$. The paradox would be righted once we add that the name will change back to Washer at $t_4$. There are workarounds for this, for instance changing the name of feature 2 to some temporary placeholder, making the changes to feature 1, and then changing feature 2 back. This, however, seems too cumbersome. Hopefully this use case is not common enough that most users will suffer for it, but it is definitely an example of the semantics being too strict. 
+When we present the analysis, the scope is used to decide which parts of the plan need to be examined. For each operation, we analyse and modify only the parts of the plan which are inside its scope.
+
