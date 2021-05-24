@@ -15,6 +15,5 @@ watch: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
 debug: $(SRCDIR)/$(SRCFILE).tex $(SRCDIR)/$(CITATIONS)
 	cd $(SRCDIR) && pdflatex -shell-escape $(SRCFILE) && mv $(PDF) ..
 
-
 clean:
-	rm $(PDF); cd $(SRCDIR) && latexmk -CA; rm $(SRCFILE).bbl $(SRCFILE).run.xml; rm -rf _minted-thesis
+	cd $(SRCDIR) && latexmk -CA; rm $(SRCFILE).bbl $(SRCFILE).run.xml; rm -rf _minted-thesis

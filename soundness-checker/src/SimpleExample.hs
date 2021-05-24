@@ -5,11 +5,8 @@ module SimpleExample where
 import qualified Data.IntervalMap.Generic.Strict as IM
 import Types
 
-im :: (Validity, a) -> ValidityMap a
-im = uncurry IM.singleton
-
-(↦) :: a -> b -> (a, b)
-(↦) = (,)
+im :: Validity -> a -> ValidityMap a
+im = IM.singleton
 
 simplePlan :: IntervalBasedFeatureModel
 simplePlan =
@@ -17,25 +14,25 @@ simplePlan =
     (FeatureID "feature:root")
     [
       ( "Root"
-      , im (Validity (TP 1) Forever ↦ FeatureID "feature:root")
+      , im (Validity (TP 1) Forever) (FeatureID "feature:root")
       )
     ]
     [
       ( FeatureID "feature:root"
       , FeatureValidity
-          (im $ Validity (TP 1) Forever ↦ ())
-          (im $ Validity (TP 1) Forever ↦ "Root")
-          (im $ Validity (TP 1) Forever ↦ Mandatory)
+          (im (Validity (TP 1) Forever) ())
+          (im (Validity (TP 1) Forever) "Root")
+          (im (Validity (TP 1) Forever) Mandatory)
           mempty
-          (im $ Validity (TP 1) (TP 5) ↦ [GroupID "group:A"])
+          (im (Validity (TP 1) (TP 5)) [GroupID "group:A"])
       )
     ]
     [
       ( GroupID "group:A"
       , GroupValidity
-          (im $ Validity (TP 1) (TP 5) ↦ ())
-          (im $ Validity (TP 1) (TP 5) ↦ And)
-          (im $ Validity (TP 1) (TP 5) ↦ FeatureID "feature:root")
+          (im (Validity (TP 1) (TP 5)) ())
+          (im (Validity (TP 1) (TP 5)) And)
+          (im (Validity (TP 1) (TP 5)) (FeatureID "feature:root"))
           mempty
       )
     ]
