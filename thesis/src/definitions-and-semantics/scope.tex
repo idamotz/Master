@@ -4,7 +4,7 @@
 
 The scope of an operation consists of the parts of the plan that \emph{may} be affected by the operation.
 
-In this section, we define the scope for each of the operations defined in Section~\vref{sub:operations}. The scope is later used when creating the analysis rules for modification of the interval-based feature model.
+In this section, we define the scope for each of the operations defined in Section~\vref{sec:operations}. The scope is later used when creating the analysis rules for modification of the interval-based feature model.
 
 In the section, we describe the \emph{spatial} and \emph{temporal} scopes. The spatial scope consists of the parts of a feature model that may be affected by change. For instance, adding a group affects the group being added and its parent feature, as the operation does not modify any other part of the plan. We must also take into account the \emph{temporal} aspect, since the plan also has a dimension of time. The temporal scope then consists of the time points that may be affected by applying an operation. In Figure~\vref{ex:add-group-scope}\footnote{Notice that the plan differentiates between groups and feature, but does not display types or names} %TODO: readd vref but make sure it isn't at a page break.
 , we visualise the spatial and temporal scopes. In the original plan, a feature $C$ is added to group $A$ at time 2. In time 3, it is moved to group $B$. We modify the plan by adding a group $D$ to feature $C$ from time 2 to time 3. In the modified plan, the scope is shown, containing feature $C$ and group $D$ from time 2 to 3. Notice that $Root$ and $A$ are not in the scope, and nor are the time points 1 or 4.
@@ -25,7 +25,7 @@ In the section, we describe the \emph{spatial} and \emph{temporal} scopes. The s
   \label{ex:add-group-scope}
 \end{figure}
 
-For each of the operations defined in Section~\vref{sub:operations}, we define the scope in the temporal and spatial dimensions. By assuming that the original plan is sound, meaning that it contains no paradoxes, we include only those parts of the plan in which paradoxes may arise after applying an operation.
+For each of the operations defined in Section~\vref{sec:operations}, we define the scope in the temporal and spatial dimensions. By assuming that the original plan is sound, meaning that it contains no paradoxes, we include only those parts of the plan in which paradoxes may arise after applying an operation.
 
 \subsubsection*{Operation Scopes}
 We define the temporal and spatial scopes for each operation.

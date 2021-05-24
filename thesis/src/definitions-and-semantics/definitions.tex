@@ -1,22 +1,19 @@
-\section{Definitions}
-\label{sec:definitions}
-\todo{remove subsections}
-\todo{Begin this section by explaining what I need and then defining what I need}
+To achieve our goal of a modular analysis of modification for feature model evolution plans, we first need a representation that supports local lookup and modification. Using the representation we defined in the paper~\cite{art:consistency-preserving-evolution-planning} , with an initial model followed by a list of operations associated with time points, would not serve us, as the operations have to be applied in order to retrieve the state (current feature model) at any point in time. In this chapter we present the definitions required for our representation, the operations for editing plans, and their scopes.
 
-\subsection{Interval-Based Feature Model}
-\label{sub:interval-based-feature-model}
+\section{Interval-Based Feature Model}
+\label{sec:interval-based-feature-model}
 
 \begin{definition}[Interval-based feature model]
-  An \emph{interval-based feature model} is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from \emph{names} to \emph{feature IDs}, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from \emph{group IDs} to \emph{group entries}. 
+  An \emph{interval-based feature model} is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from names to \emph{interval maps} with feature ID values, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from group IDs to \emph{group entries}. 
   \label{def:interval-based-feature-model}
 \end{definition}
 
-The reason for this choice is efficiency and modularity. As mentioned in \todo{motivation or background or something}, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be a mistake to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations as described in \citetitle{art:consistency-preserving-evolution-planning} \parencite{art:consistency-preserving-evolution-planning}. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID is fresh.
+The reason for this choice is mainly modularity. As previously mentioned, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be a mistake to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations as described in \citetitle{art:consistency-preserving-evolution-planning} \parencite{art:consistency-preserving-evolution-planning}. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID is fresh.
 
 To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of interval-based feature models.
 
-\subsection{Maps}
-\label{sub:maps}
+\section{Maps}
+\label{sec:maps}
 
 \begin{definition}[Map]
   A \emph{map} is a set of entries on the form $\mapping{k}{v}$, where each key $k$ uniquely defines a value $v$. 
@@ -52,8 +49,8 @@ To remove a mapping with key $k$, we use $\map{map} \setminus k$. For maps with 
 \]
 That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, we remove the mapping. Otherwise, we only remove $v$ from the set of values associated with $k$. 
 
-\subsection{Intervals}
-\label{sub:intervals}
+\section{Intervals}
+\label{sec:intervals}
 To define the map values used in interval-based feature models, we must first define an \emph{interval}.
 \begin{definition}[Interval]
   An interval is a set of time points between a lower and an upper bound. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
@@ -66,8 +63,8 @@ We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains
 
 For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{\textbf{max}(t_{start}, t_l)}{\textbf{min}(t_{end}, t_r)}$.
 
-\subsection{Interval Maps}
-\label{sub:interval-maps}
+\section{Interval Maps}
+\label{sec:interval-maps}
 \begin{definition}[Interval map]
 An \emph{interval map} is a map where the key is an interval (Definition~\vref{def:interval}). 
   \label{def:interval-map}
@@ -99,8 +96,8 @@ Likewise, the empty mapping $\intervalmapping{t_n}{t_n}{v}$ is ignored, such tha
   \map{IM} \cup \set{\intervalmapping{t_n}{t_n}{v}} = \map{IM}
 \]
 
-\subsection{Interval Sets}
-\label{sub:interval-sets}
+\section{Interval Sets}
+\label{sec:interval-sets}
 
 \begin{definition}[Interval set]
   An \emph{interval set} is a set of intervals (Definition~\vref{def:interval}). 
@@ -108,24 +105,25 @@ Likewise, the empty mapping $\intervalmapping{t_n}{t_n}{v}$ is ignored, such tha
 
 Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
 
-Notice that $\in \, \subseteq \, \inn \, \subseteq \, \innr$, which means that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$. \todo{double check with respect to the next paragraph}
+Notice that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$. Thus $\in$ is the strictest, and $\innr$ the most general.
 
-We also define these predicates for time points $t_n$, so that $t_n \inn \map{IS}$ if some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n < t_j$. 
+We also define $\inn$ for time points $t_n$, so that $t_n \inn \map{IS}$ if some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n < t_j$. 
 
 $\containing{\map{IS}}{t_n}$ returns the subset of $\map{IS}$ containing $t_n$.
 
-\todo{The three following sections should be grouped together in a logical context}
-\subsection{Map Entries}
-\label{sub:map-entries}
-\subsubsection{Mapping Names}
-\label{ssub:mapping-names}
+\section{Map Entries}
+\label{sec:map-entries}
+Each feature, group, and name should be available at the top level, so as to make sure names and IDs are unique at some time. However, all their parts are variable. A name may be used by several features at different times. A group may move, change its type, or be removed, and a feature can do all of the former as well as change its name. Thus all of this information must be captured in the map entries; if we look up a name, we should find all its usages, and if we look up a feature or a group, \emph{all} the information about its variations must be available. We therefore design the map entries with this in mind.
+
+\subsection{Mapping Names}
+\label{sub:mapping-names}
 
 The \names{} map has entries of the form $\mapping{\name{}}{\textit{interval map}}$. Assuming $\mapping{\var{name}}{\map{Im}} \in \names$, the interval map \map{Im} contains mappings on the form $\intervalmapping{t_\text{start}}{t_\text{end}}{\var{featureID}}$, where \var{featureID} is the ID of some feature in the interval-based feature model. This should be interpreted as ``\emph{The name \emph{\var{name}} belongs to the feature with ID \emph{\var{featureID}} from $t_{\emph{\text{start}}}$ to $t_{\emph{\text{end}}}$}". Looking up a name which does not exist will return an empty map $\emptyset$. 
 
 This map is mainly used when adding features or changing names. The new name and the scope of the change is then looked up in the \names{} map to verify that no other feature shares the name.
 
-\subsubsection{Mapping Features}
-\label{ssub:mapping-features}
+\subsection{Mapping Features}
+\label{sub:mapping-features}
 
 The \features{} map has entries of the form $\mapping{\var{featureID}}{\textit{feature entry}}$. Since several pieces of information are crucial to the analysis of a feature, it is not enough to have a simple mapping as we have for names.
 A feature has a name, a type, a parent group, and zero or more child groups. Furthermore, a feature may be removed and re-added during the course of the plan, so we also need information about when the feature exists.
@@ -137,15 +135,15 @@ The root ID is constant for a interval-based feature model. We assume that it ha
 
 The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 
-\subsubsection{Mapping Groups}
-\label{ssub:mapping-groups}
+\subsection{Mapping Groups}
+\label{sub:mapping-groups}
 
 The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group entry}}$. A group has a type, a parent feature, and zero or more child features. These can all be defined in terms of intervals and collected into a 4-tuple similarly to the feature entries $\group$, where $G_e$ is an interval set denoting when the group exists, $G_t$ is an interval map with the group's types, $G_p$ is an interval map with parent feature IDs, and $G_c$ is an interval map with child feature ID set values, the interval keys possibly overlapping.
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
-\subsection{How to Use the Interval-Based Feature Model}
-\label{sub:how-to-use-the-interval-based-feature-model}
+\section{How to Use the Interval-Based Feature Model}
+\label{sec:how-to-use-the-interval-based-feature-model}
 To provide intuition, we give some examples of how to use the interval-based feature model.
 
 If a group with ID $\var{groupID}$ with $\lookup{\groups}{\var{groupID}} = \group{}$ has the type \xortype{} at time $t_2$, then
@@ -197,7 +195,7 @@ We often want to know what is true for an \emph{interval}, not just a time point
 This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}{t_2}$. If we had that $\interval{t_1}{t_3} \in F_e$, the above predicate would be false, since both intervals contain the time point $t_1$.
 
 \subsection{Example Evolution Plan}
-A small example of an interval-based feature model can be found in Figure~\vref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
+A small example of an interval-based feature model can be found in Figure~\vref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. 
 
 \begin{figure}
   \begin{align*}
@@ -231,8 +229,17 @@ A small example of an interval-based feature model can be found in Figure~\vref{
   \label{ex:washing-machine}
 \end{figure}
 
-\subsection{Operations}
-\label{sub:operations}
+The same plan can be viewed in Figure~\vref{ex:washing-machine-visual}. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
+
+\begin{figure}
+  \centering
+  \includegraphics{WashingMachine}
+  \caption{Washing machine visualisation}
+  \label{ex:washing-machine-visual}
+\end{figure}
+
+\section{Operations}
+\label{sec:operations}
 
 We define \emph{operations} to alter the interval-based feature model. The choice of operations is in large part based on the edit operations defined in our paper~\cite{art:consistency-preserving-evolution-planning}. We adapt them by adding a temporal dimension, letting us specify both \emph{where} an operation should be applied in the feature model, and \emph{when}, i.e. at which stage of the plan. We give a brief summary of the requirements a plan must fulfil for the operations to be applied.
 
