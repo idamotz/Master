@@ -35,7 +35,7 @@ $$\sossize\begin{array}{c}
         \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
       }
       {
-        \textbf{addFeature}(\var{featureID}, \var{name}, \var{type}, \var{parentGroupID})\text{ at }\interval{t_n}{t_m} \shove \\
+        \textbf{addFeature}(\var{featureID}, \var{name}, \var{type}, \var{parentGroupID})\text{ from } t_n \text{ to } t_m\shove \\
          (\names{}, \features{}, \groups{})\\
         \transition\\
         (\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID},  \\
@@ -105,7 +105,7 @@ The rule in figure \ref{rule:add-group} describes the conditions which must be i
         \lookup{\features{}}{\var{parentFeatureID}} = \feature 
       }
       {
-        \textbf{addGroup}( \var{groupID}, \var{type}, \var{parentFeatureID} ) \text{ at } \interval{t_n}{t_m} \shove \\
+        \textbf{addGroup}( \var{groupID}, \var{type}, \var{parentFeatureID} ) \text{ from } t_n \text{ to } t_m \shove \\
         ( \names{}, \features{}, \groups{} ) \\
         \transition \\
         (\names{}, \\

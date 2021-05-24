@@ -7,7 +7,7 @@ In this chapter, we present the implementation. We first give an overview of the
 
 \section{Overview}
 \label{sec:overview}
-We have created a prototype for an implementation of the analysis rules. The implementation can be found on GitHub\footnote{\todo{github}}. The implementation is not meant to be integrated directly into a tool, but serves as a proof of concept that our analysis method is realisable in practice. It can also serve as a guide for how to interpret the rules where they are unclear, if they are to be realised as part of a SPL planning tool. 
+We have created a prototype for an implementation of the analysis rules. The implementation can be found on GitHub\footnote{\url{https://github.com/idamotz/Master/tree/master/soundness-checker}}. The implementation is not meant to be integrated directly into a tool, but serves as a proof of concept that our analysis method is realisable in practice. It can also serve as a guide for how to interpret the rules where they are unclear, if they are to be realised as part of a SPL planning tool. 
 
 The prototype is implemented in Haskell\footnote{\url{https://www.haskell.org/}}, which is a strongly typed, purely functional programming language. We chose the language since a functional language corresponds closely to the mathematical nature of our analysis rules. Moreover, Haskell has an implementation of interval maps\footnote{\url{https://hackage.haskell.org/package/IntervalMap}} which are easily adapted to our purposes. 
 
@@ -58,7 +58,7 @@ The example in Figure~\vref{ex:simple-plan} is formalized below in our previousl
  \}&)\\
 \end{align*}
 
-Below, the above example is translated to our Haskell representation\footnote{This example can be found in the GitHub repository, in \texttt{src/SimpleExample.hs}}.
+Below, the above example is translated to our Haskell representation\footnote{This example can be found in the GitHub repository, in \texttt{soundness-checker/\allowbreak src/\allowbreak SimpleExample.hs}}.
 
 \begin{minted}{haskell}
 im :: Validity -> a -> ValidityMap a
@@ -95,7 +95,7 @@ simplePlan =
 
 \end{minted}
 
-The operations are interpreted quite directly, in two categories: The \texttt{Add\-Operation}s, which take a \texttt{Validity} (interval) and an operation, and the \texttt{Change\-Operation}s, which take a \texttt{TimePoint} and an operation. An operation in general is called a \texttt{Time\-Operation}. To express $\textbf{addFeature}(\text{feature:B}, \text{B}, \mandatory{}, \text{group:A}) \text{ at } \interval{3}{\forever}$, we write
+The operations are interpreted quite directly, in two categories: The \texttt{Add\-Operation}s, which take a \texttt{Validity} (interval) and an operation, and the \texttt{Change\-Operation}s, which take a \texttt{TimePoint} and an operation. An operation in general is called a \texttt{Time\-Operation}. To express $\textbf{addFeature}(\text{feature:B}, \text{B}, \mandatory{}, \text{group:A}) \text{ from } 3 \text{ to } \forever$, we write
 \begin{minted}[escapeinside=,breaklines]{haskell}
 op =
    AddOperation (Validity (TP 3) Forever)
