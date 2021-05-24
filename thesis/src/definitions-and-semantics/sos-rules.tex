@@ -9,7 +9,7 @@
 \\
 SOS rules \todo{explain what SOS rules are used for}
 
-A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not enough to let a human verify a change. 
+A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not necessarily enough to let a human verify a change. 
 
 The rules are on the form 
 $$\sossize\begin{array}{c}
@@ -18,7 +18,7 @@ $$\sossize\begin{array}{c}
     \text{Premises}}
     { S \transition S'}
   \end{array}$$
-  where $S$ is the state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In this thesis, the state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. 
+  where $S$ is the state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In this thesis, the state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
 
 \section{Add Feature Rule}
 \label{sec:add-feature-rule}
@@ -340,9 +340,28 @@ See Figure~\vref{rule:move-feature} for the semantics of the \textbf{moveFeature
 \subsection{Algorithm for Detecting Cycles Resulting from \textbf{Move} Operations}
 \label{sub:move-algorithm}
 
-Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation results in a sound plan. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. 
+Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. In Figure~\vref{ex:illustration-move-algo}, we show an example of such a paradox. In the original plan, the marked node $E$ is moved to $C$ at time 2, and to \emph{some node} in node $D$'s subtree $s$. In the modified plan, $D$ (and its subtree $s$) has been moved to node $F$. There is no paradox at time $1$ or $2$, but at time 3, when $E$ is moved to $s$, it causes a cycle. At time $1$, the new ancestors of $D$ are $F$, $G$, and $E$. At time $2$, the new ancestors are still $F$, $G$, and $E$, but $C$ is added to the list, since $C$ was not an ancestor of $D$ in the original plan. When $E$ is then moved to $D$'s subtree $s$, it causes a paradox, since $E$ now has $F$ as an ancestor.
 
-Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ which takes the interval-based feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
+Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation does not cause a cycle.
+
+Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ (see Figure~vref{fun:ancestors})which takes the interval-based feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
+
+
+\begin{figure}
+  \centering
+  \textbf{Original plan}
+  \includegraphics[width=0.9\textwidth]{MoveParadox1}
+  \bigskip
+
+  apply \textbf{moveFeature}($D$, $F$) at 1
+  \bigskip 
+  
+  \textbf{Modified plan}
+  \includegraphics[width=0.9\textwidth]{MoveParadox2}
+  \caption{Illustration of move paradox}
+  \label{ex:illustration-move-algo}
+\end{figure}
+
 
 First, check whether $n \in \texttt{ancestors}(IBFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
 
@@ -413,8 +432,6 @@ See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
   \label{rule:move-group}
 \end{figure}
 
-\todo{This is hard}
-
 \section{Change Feature Variation Type Rule}
 \label{sec:change-feature-variation-type-rule}
 The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{featureID}$ at time $t_n$. The first expression above the line ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. The next line may be hard to read, but its intent is easier to understand. It checks that all the types a parent group has \emph{while it is the parent of the feature} has a type which is compatible with the new type of the feature. If everything above the line is true, then the $\features{}$ map is updated at $\var{featureID}$ by shortening the interval key for the original type at $t_n$, and assigning the new type to the affected interval $\interval{t_n}{t_{t_2}}$. 
@@ -430,12 +447,12 @@ The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics 
         \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \\
-        \begin{split}
-           \forall \interval{t_{p_1}}{t_{p_2}} \in \overlapping{F_p}{t_n}{t_{t_2}}  \\ % for all parent intervals overlapping the temporal scope
-          \forall p \in \lookup{F_p}{\interval{t_{p_1}}{t_{p_2}}}  \\% for all parent groups (always exactly one) in the parent interval
-          \forall t \in \, \var{getTypes}\left(\lookup{\groups}{p}, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)  \\
-           \big(\var{compatibleTypes}(t, \var{type})\big) 
-        \end{split}\\
+        \begin{aligned}
+          \forall \interval{t_{p_1}}{t_{p_2}} & \in \overlapping{F_p}{t_n}{t_{t_2}}  \\ % for all parent intervals overlapping the temporal scope
+          \forall p & \in \lookup{F_p}{\interval{t_{p_1}}{t_{p_2}}}  \\% for all parent groups (always exactly one) in the parent interval
+          \forall t & \in \, \var{getTypes}\left(\lookup{\groups}{p}, \clamp{\interval{t_{p_1}}{t_{p_2}}}{t_n}{t_{t_2}}\right)  \\
+                    & \big(\var{compatibleTypes}(t, \var{type})\big) 
+        \end{aligned}\\
         \\
         \lookup{\features{}}{\var{featureID}} = \feature
       }
@@ -474,12 +491,12 @@ The rule in Figure~\vref{rule:change-group-varation-type} is similar to the \tex
         \containing{G_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \\
-        \begin{split}
-        \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}}\\ % for all parent intervals overlapping the temporal scope 
-        \forall c \in \, \bigcup \lookup{G_c}{\interval{t_{c_1}}{t_{c_2}}}\\ % for all child features in the child interval
-        \forall t \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right) \\ % for all the types of the child features during the temporal scope
-        \big(\var{compatibleTypes}(\var{type}, t)\big)
-      \end{split}\\
+        \begin{aligned}
+          \forall \interval{t_{c_1}}{t_{c_2}} & \in \overlapping{G_c}{t_n}{t_{t_2}}\\ % for all parent intervals overlapping the temporal scope 
+          \forall c & \in \, \bigcup \lookup{G_c}{\interval{t_{c_1}}{t_{c_2}}}\\ % for all child features in the child interval
+          \forall t & \in \, \var{getTypes}\left(\lookup{\features}{c}, \clamp{\interval{t_{c_1}}{t_{c_2}}}{t_n}{t_{t_2}}\right) \\ % for all the types of the child features during the temporal scope
+                    & \big(\var{compatibleTypes}(\var{type}, t)\big)
+      \end{aligned}\\
          \\
 
         \lookup{\groups{}}{\var{groupID}} = \group
