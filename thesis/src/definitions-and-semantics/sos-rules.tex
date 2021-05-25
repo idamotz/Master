@@ -2,16 +2,9 @@
 \label{cha:a-rule-system-for-analysis-of-plan-change}
 \todo{Instantiate rules with a concrete example for the rules and the scope}
 
-
-\todo{Remember premises = above the line}
-
-\todo{Repeat definition of syntax/motivate use of weird constructs}
-\\
-SOS rules \todo{explain what SOS rules are used for}
-
 A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not necessarily enough to let a human verify a change. 
 
-The rules are on the form 
+To communicate our analysis method, we use rules similar to structural operational semantics rules.  The rules are on the form 
 $$\sossize\begin{array}{c}
     \ntyperule{Rule-Label}
     { \\
@@ -49,7 +42,7 @@ $$\sossize\begin{array}{c}
         \var{addChildFeature}(\lookup{\groups{}}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID}))
     }
     \end{array}$$
-    \caption{The \rulefont{Add-Feature} SOS rule}
+    \caption{The \rulefont{Add-Feature} rule}
     \label{rule:add-feature}
 \end{figure}
 
@@ -116,7 +109,7 @@ The rule in figure \ref{rule:add-group} describes the conditions which must be i
              \var{setGroupAttributes}( \lookup{\groups{}}{\var{groupID}}, \var{type}, \var{parentFeatureID} )  )
       }
     \end{array}$$
-    \caption{The \rulefont{Add-Group} SOS rule}
+    \caption{The \rulefont{Add-Group} rule}
     \label{rule:add-group}
 \end{figure}
 
@@ -169,7 +162,7 @@ Figure \ref{rule:remove-feature} shows the semantics of removing a feature with 
       \lookup{\groups{}}{\var{parentGroupID}} \assign \var{removeFeatureAt}\left(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n\right)\big)
       }
     \end{array}$$
-    \caption{The \rulefont{Remove-Feature} SOS rule}
+    \caption{The \rulefont{Remove-Feature} rule}
     \label{rule:remove-feature}
 \end{figure}
 
@@ -290,7 +283,7 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
         \lookup{\groups{}}{\var{groupID}} \assign \var{clampGroup}\left(\lookup{\groups{}}{\var{groupID}}, t_n\right) \big)
       }
     \end{array}$$
-    \caption{The \rulefont{Remove-Group} SOS rule}
+    \caption{The \rulefont{Remove-Group} rule}
   \label{rule:remove-group}
 \end{figure}
 
@@ -331,7 +324,7 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
       \var{addChildFeature}(\lookup{\groups{}}{\var{newParentID}}, \interval{t_n}{t_{p_2}}, \var{featureID})
         }
     \end{array}$$
-    \caption{The \rulefont{Move-Feature} SOS rule}
+    \caption{The \rulefont{Move-Feature} rule}
   \label{rule:move-feature}
 \end{figure}
 
@@ -428,7 +421,7 @@ See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
         \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, G_n,\, G_t,\, 
         \lookup{\var{clampInterval}(G_p, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID},\, G_c \right)}
     \end{array}$$
-    \caption{The \rulefont{Move-Group} SOS rule}
+    \caption{The \rulefont{Move-Group} rule}
   \label{rule:move-group}
 \end{figure}
 
@@ -443,7 +436,7 @@ The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics 
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Variation-Type}
       {\\
-        \var{featureID} \neq \var{rootID} \qquad
+        \var{featureID} \neq $RootID$ \qquad
         \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \\
@@ -466,7 +459,7 @@ The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics 
         \\ \groups{})
       }
     \end{array}$$
-    \caption{The \rulefont{Change-Feature-Variation-Type} SOS rule}
+    \caption{The \rulefont{Change-Feature-Variation-Type} rule}
     \label{rule:change-feature-varation-type}
 \end{figure}
 
@@ -509,7 +502,7 @@ The rule in Figure~\vref{rule:change-group-varation-type} is similar to the \tex
         \lookup{\groups{}}{\var{groupID}} \assign \left( G_e,\, \lookup{\var{clampInterval}(G_t, t_n)}{\interval{t_n}{t_{t_2}}} \assign \var{type},\, G_p,\, G_c \right))
       }
     \end{array}$$
-    \caption{The \rulefont{Change-Group-Variation-Type} SOS rule}
+    \caption{The \rulefont{Change-Group-Variation-Type} rule}
   \label{rule:change-group-varation-type}
 \end{figure}
 
@@ -537,6 +530,6 @@ The semantics of changing the name of a feature are shown in the \rulefont{Chang
         \groups{}\Big)
       }
     \end{array}$$
-    \caption{The \rulefont{Change-Feature-Name} SOS rule}
+    \caption{The \rulefont{Change-Feature-Name} rule}
   \label{rule:change-feature-name}
 \end{figure}

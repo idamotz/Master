@@ -10,7 +10,11 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation adds the feature with ID \var{featureID} to the interval-based feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \wf{1-9}.
+be the initial state, and
+\[
+   (\names', \features', \groups')
+\]
+the state after applying the \rulefont{Add-Feature} rule.  Recall that this operation adds the feature with ID \var{featureID} to the interval-based feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \wf{1-9}. This is the induction hypothesis.
 
 \paragraph{Scope}
 
@@ -29,7 +33,7 @@ In the rule, we look up only the feature ID, the parent group ID, and the name, 
 
 If the rule is applied, the well-formedness requirements must hold for the updated feature model. 
 
-Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = \var{rootID}$. Thus the rule does not affect the root feature, and \wf{1} and \wf{2} hold for the updated interval-based feature model.
+Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = RootID$. Thus the rule does not affect the root feature, and \wf{1} and \wf{2} hold for the updated interval-based feature model.
 
 Because we assume that \wf{8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
 Consequently, \wf{3} holds.
@@ -65,7 +69,7 @@ After adding the feature to the interval-based feature model, looking up the nam
 \]
 , then due to the semantics of map assignment (Definition~\vref{def:map}), and lookup in interval maps (Definition~\vref{def:interval-map}),
 \[
-   \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} = \set{\var{featureID}}
+   \lookup{\lookup{\names'}{\var{name}}}{\interval{t_n}{t_m}} = \set{\var{featureID}}
 \]
 will hold.
 
@@ -79,20 +83,20 @@ Similarly, if we wish to lookup information about the feature during the interva
 
 to $\lookup{\features}{\var{featureID}}$. 
 
-According to the semantics of assignment (Section~\vref{sec:maps}) and $\var{setFeatureAttributes}$ (Figure~\vref{fun:set-feature-attributes}), and given that $\lookup{\features}{\var{featureID}} = \feature$, then 
+According to the semantics of assignment (Section~\vref{sec:maps}) and $\var{setFeatureAttributes}$ (Figure~\vref{fun:set-feature-attributes}), and given that $\lookup{\features'}{\var{featureID}} = \featurevar{F'}$, then 
 \begin{align}
-   \interval{t_n}{t_m} &\in F_e && \text{the feature exists} \tag{1} \label{add-feature1}\\
-   \lookup{F_n}{\interval{t_n}{t_m}} &= \set{\var{name}} && \text{the feature has the expected name} \tag{2} \label{add-feature2}\\
-   \lookup{F_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the feature has the expected type} \tag{3} \label{add-feature3}\\
-   \lookup{F_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}}  && \text{the feature has the expected parent group} \tag{4} \label{add-feature4}\\
-   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has subgroups} \tag{5} \label{add-feature5}
+   \interval{t_n}{t_m} &\in F'_e && \text{the feature exists} \tag{1} \label{add-feature1}\\
+   \lookup{F'_n}{\interval{t_n}{t_m}} &= \set{\var{name}} && \text{the feature has the expected name} \tag{2} \label{add-feature2}\\
+   \lookup{F'_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the feature has the expected type} \tag{3} \label{add-feature3}\\
+   \lookup{F'_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}}  && \text{the feature has the expected parent group} \tag{4} \label{add-feature4}\\
+   \lookup{F'_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has subgroups} \tag{5} \label{add-feature5}
 \end{align}
 
 Statement (\ref{add-feature1}) holds due to the line $F_e \cup \interval{t_n}{t_m}$ in $\var{setFeatureAttributes}$. The next four hold due to both premises in the rule and modifications in the function. Due to the premise $\interval{t_n}{t_m} \not \innr F_e$, which means that the feature does not previously exist at any point during the interval, and since \wf{8} is assumed to hold for the original model, the original feature does not have a name, type, parent group or child groups during the interval. In the function $\var{setFeatureAttributes}$, the name is added ($\lookup{F_n}{\interval{t_{start}}{t_{end}}} \assign \var{name}$), and so is the type ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{type}$) and the parent group ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{parentGroupID}$). The child groups are not modified, and so (\ref{add-feature5}) holds.
 
-The child features of the group must also be updated according to the semantics of the operation. After applying the rule, given that $\lookup{\groups}{\var{parentGroupID}} = \group{}$, 
+The child features of the group must also be updated according to the semantics of the operation. After applying the rule, given that $\lookup{\groups'}{\var{parentGroupID}} = \groupvar{G'}$, 
 \[
-   \var{featureID} \in \bigcup \lookup{G_c}{\interval{t_n}{t_m}}
+   \var{featureID} \in \bigcup \lookup{G'_c}{\interval{t_n}{t_m}}
 \]
 , meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see Figure~\vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
 \\

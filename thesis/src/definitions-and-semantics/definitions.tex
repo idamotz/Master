@@ -131,7 +131,7 @@ This information is collected into a 5-tuple $\feature$, where $F_e$ is an inter
 
 Looking up a feature which does not exist returns an empty feature $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. This lets us treat an unsuccessful lookup the same way as a successful one.
 
-The root ID is constant for a interval-based feature model. We assume that it has been computed and is stored in the variable $\var{rootID}$. 
+The root ID is constant for a interval-based feature model. We assume that it has been computed and represent it by referring to $RootID$. This is to aviod cluttering the representation with information that never changes.
 
 The reasoning behind the choice of interval sets and maps here is in large part the temporal scope; for instance, when a feature is removed, we can easily look up the temporal scope in the $F_c$ map (child groups) to verify that removing the feature leaves no group without a parent.
 

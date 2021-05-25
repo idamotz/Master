@@ -4,13 +4,9 @@
 
 % \todo{and completeness? The operations in themselves are not complete, in the sense that there is not a one-to-one correspondence between the operations defined on interval-based feature models (temporal operations) and the operations defined on feature models (model operations). However, the temporal operations are more restricted than the model operations, and any valid change within that subset to an evolution plan would be accepted by the rules. Should I try to prove completeness as well?}
 
-In this chapter, we prove soundness for the analysis rules.
+In this chapter, we prove soundness for the analysis rules. 
 
-
-\todo{Elaborate the proofs kept in this chapter}
-\todo{Prepare the reader for what is to come. To not overwhelm the reader with proofs, the details can be found in the appendix. Here I will emphasize how I prove things, give concrete samples, and point to where the rest of it can be found.}
-
-We use an inductive proof structure to prove soundness and modularity for the rule system (Section~\vref{cha:a-rule-system-for-analysis-of-plan-change}). The base case is a proof by construction, in which we define a sound interval-based feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (Section~\vref{sec:scope}). We present only two of the proofs in this chapter, as the others are much the same. The rest of the proofs can be found in Appendix~\vref{cha:remaining-soundness-proofs}.
+We use an inductive proof structure to prove soundness and modularity for the rule system (Section~\vref{cha:a-rule-system-for-analysis-of-plan-change}). The base case is a proof by construction, in which we define a sound interval-based feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (Section~\vref{sec:scope}). We present only two of the proofs in this chapter, as the totality of the proofs can be overwhelming, and the structure of the proofs is similar to the ones we present here. The rest of the proofs can be found in Appendix~\vref{cha:remaining-soundness-proofs}.
 
 \input{soundness/ibfms}
 

@@ -10,7 +10,10 @@ Let
    (\names{}, \features{}, \groups{})
 \end{split}
 \end{equation*}
-be the initial state. Recall that this operation removes the feature with ID \var{featureID} from the interval-based feature model $(\names{}, \features{}, \groups{})$ at $t_n$. Furthermore, let $\lookup{\features}{\var{featureID}} = \feature$, and $\interval{t_i}{t_j} \in F_e$, with $t_i \leq t_n < t_j$. This means that the original plan added the feature at time $t_i$ and removed it at $t_j$, with the possibility that $t_j = \forever$. In the latter case, there was no plan to remove the feature originally.
+be the initial state, and
+\[
+   (\names'{}, \features'{}, \groups'{})
+\] be the state after the \rulefont{Remove-Feature} rule has been applied. Recall that this operation removes the feature with ID \var{featureID} from the interval-based feature model $(\names{}, \features{}, \groups{})$ at $t_n$. Furthermore, let $\lookup{\features}{\var{featureID}} = \feature$, and $\interval{t_i}{t_j} \in F_e$, with $t_i \leq t_n < t_j$. This means that the original plan added the feature at time $t_i$ and removed it at $t_j$, with the possibility that $t_j = \forever$. In the latter case, there was no plan to remove the feature originally.
 
 \paragraph{Scope}
 As defined in Section~\vref{sec:scope}, the \textbf{removeFeature} operation's temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time point in which the feature was originally planned to be removed. We can see from the description above that $t_k = t_j$; the end point in the feature's existence set containing $t_n$. We then have that the scope is defined as $\interval{t_n}{t_j}$. In the rule, we find the interval $\interval{t_i}{t_j}$ by looking up
@@ -38,6 +41,11 @@ As defined in Section~\vref{sec:scope}, the \textbf{removeFeature} operation's t
 \end{lemma}
 
 \paragraph{Preserving well-formedness}
+Let
+\[
+   \lookup{\features'}{\var{featureID}} = \featurevar{F'}
+\]
+
 
 The \rulefont{Remove-Feature} rule contains the premise
 \begin{equation*}
@@ -45,13 +53,13 @@ The \rulefont{Remove-Feature} rule contains the premise
 \end{equation*}
 , ensuring that the feature has \emph{exactly} one parent group during the temporal scope of the rule. Under the assumption that \wf{1} holds in the original model, the feature being removed cannot be the root feature, since the root has no parent group. Furthermore, it means that the feature does not move during the temporal scope, which would be a conflict. Therefore, both \wf{1} and \wf{2} hold in the modified model.
 
-For any time point $t_n$ in the temporal scope of the rule, $t_n \notinn F_e$ due to the semantics of $\var{clampFeature}$ (Figure~\vref{fun:clamp-feature}), so \wf{3} holds trivially.  The only change made to a group is by the function $\var{removeFeatureAt}$ (Figure~\vref{fun:remove-feature-at}), which removes the feature from the parent group's map of subgroups during $\interval{t_n}{t_j}$. Hence \wf{5} holds, and since that function does not modify the types map $G_t$ of the group, \wf{4} holds given that it is true for the original model. 
+For any time point $t_n$ in the temporal scope of the rule, $t_n \notinn F'_e$ due to the semantics of $\var{clampFeature}$ (Figure~\vref{fun:clamp-feature}), so \wf{3} holds trivially for the updated model.  The only change made to a group is by the function $\var{removeFeatureAt}$ (Figure~\vref{fun:remove-feature-at}), which removes the feature from the parent group's map of subgroups during $\interval{t_n}{t_j}$. Hence \wf{5} holds, and since that function does not modify the types map $G_t$ of the group, \wf{4} holds given that it is true for the original model. 
 
 The premise $\lookup{F_c}{\interval{t_n}{t_{e_2}}} = \emptyset$ ensures that the feature to be removed does not have any subgroups during the temporal scope, so no group is left without a parent in the updated model. Thus \wf{6} holds. 
 
 Suppose that the parent group has the type $\xortype{}$ or $\ortype{}$ at some point during the temporal scope. In the original model, no child feature of the group has type $\mandatory{}$ due to the assumption that \wf{7} is true. The \rulefont{Remove-Feature} rule does not add any features or change a feature type, so this requirement still holds for the modified model. 
 
-After applying the rule, we have that $\interval{t_n}{t_j} \notinnr F_e$, which means that the feature does not exist during the temporal scope of the operation. To fulfil \wf{8}, we must furthermore have that $\lookup{F_n}{\interval{t_n}{t_j}} = \lookup{F_t}{\interval{t_n}{t_j}}= \lookup{F_p}{\interval{t_n}{t_j}} = \lookup{F_c}{\interval{t_n}{t_j}} = \emptyset$, and that $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_j}}$. The former statement holds due to the semantics of $\var{clampFeature}$ and $\var{clampInterval}$; the feature's attributes are all clamped to end at the time of removal, and the premises on the form $\lookup{F_x}{\interval{t_n}{t_{e_2}}} = \set{v}$ ensure that no changes are made to those attributes during the temporal scope. $\lookup{F_c}{\interval{t_n}{t_j}} = \emptyset$ is a premise in the rule (since $t_j = t_{e_2}$). As for the $\names$ map, the mapping from $\var{name}$ to $\intervalmapping{t_i}{t_j}{\var{featureID}}$ is replaced by $\intervalmapping{t_i}{t_n}{\var{featureID}}$ in the function $\var{clampInterval}(\lookup{\names}{\var{name}}, t_n)$. Hence \wf{8} is true for the altered interval-based feature model.
+After applying the rule, we have that $\interval{t_n}{t_j} \notinnr F'_e$, which means that the feature does not exist during the temporal scope of the operation. To fulfil \wf{8}, we must furthermore have that $\lookup{F_n}{\interval{t_n}{t_j}} = \lookup{F_t}{\interval{t_n}{t_j}}= \lookup{F_p}{\interval{t_n}{t_j}} = \lookup{F_c}{\interval{t_n}{t_j}} = \emptyset$, and that $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_j}}$. The former statement holds due to the semantics of $\var{clampFeature}$ and $\var{clampInterval}$; the feature's attributes are all clamped to end at the time of removal, and the premises on the form $\lookup{F_x}{\interval{t_n}{t_{e_2}}} = \set{v}$ ensure that no changes are made to those attributes during the temporal scope. $\lookup{F_c}{\interval{t_n}{t_j}} = \emptyset$ is a premise in the rule (since $t_j = t_{e_2}$). As for the $\names$ map, the mapping from $\var{name}$ to $\intervalmapping{t_i}{t_j}{\var{featureID}}$ is replaced by $\intervalmapping{t_i}{t_n}{\var{featureID}}$ in the function $\var{clampInterval}(\lookup{\names}{\var{name}}, t_n)$. Hence \wf{8} is true for the altered interval-based feature model.
 
 Under the assumption that no cycles exist in the original model, removing a feature does not create a new one, so \wf{9} is holds for the modified model as well.
 \\
@@ -62,16 +70,16 @@ Under the assumption that no cycles exist in the original model, removing a feat
 \end{lemma}
 
 \paragraph{Correctness of model modification}
-The semantics of the \textbf{removeFeature} operation is that applying it should remove the feature from the plan from $t_n$ until the point at which is was originally planned to be removed. Then if $\lookup{\features}{\var{featureID}} = \feature{}$, and $\containing{F_e}{t_n} = \interval{t_i}{t_j}$, then
+The semantics of the \textbf{removeFeature} operation is that applying it should remove the feature from the plan from $t_n$ until the point at which is was originally planned to be removed. Then if $\lookup{\features'}{\var{featureID}} = \featurevar{}$, and $\containing{F_e}{t_n} = \interval{t_i}{t_j}$, then
 \begin{align}
-   \interval{t_n}{t_m} &\notinnr F_e && \text{the feature does not exist} \tag{1} \label{remove-feature1}\\
-   \lookup{F_n}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has no name} \tag{2} \label{remove-feature2}\\
-   \lookup{F_t}{\interval{t_n}{t_m}} &= \emptyset  && \text{the feature has no type} \tag{3} \label{remove-feature3}\\
-   \lookup{F_p}{\interval{t_n}{t_m}} &= \emptyset  && \text{the feature has no parent group} \tag{4} \label{remove-feature4}\\
-   \lookup{F_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has no subgroups} \tag{5} \label{remove-feature5}
+   \interval{t_n}{t_j} &\notinnr F_e && \text{the feature does not exist} \tag{1} \label{remove-feature1}\\
+   \lookup{F_n}{\interval{t_n}{t_j}} &= \emptyset && \text{the feature has no name} \tag{2} \label{remove-feature2}\\
+   \lookup{F_t}{\interval{t_n}{t_j}} &= \emptyset  && \text{the feature has no type} \tag{3} \label{remove-feature3}\\
+   \lookup{F_p}{\interval{t_n}{t_j}} &= \emptyset  && \text{the feature has no parent group} \tag{4} \label{remove-feature4}\\
+   \lookup{F_c}{\interval{t_n}{t_j}} &= \emptyset && \text{the feature has no subgroups} \tag{5} \label{remove-feature5}
 \end{align}
-Since we established $\interval{t_n}{t_m} \notinnr F_e$ in the above paragraph, these
-statements follow directly from Lemma~\vref{lemma:remove-feature-well-formed} and \wf{8}. It further follows that no name is associated with $\var{featureID}$ in the $\names{}$ map, and that no group in the $\groups{}$ map has the feature listed as a subfeature.
+Since we established $\interval{t_n}{t_j} \notinnr F_e$ in the above paragraph, these
+statements follow directly from Lemma~\vref{lemma:remove-feature-well-formed} and \wf{8}. It further follows that no name is associated with $\var{featureID}$ in the $\names{}'$ map, and that no group in the $\groups{}'$ map has the feature listed as a subfeature.
 \\
 
 \begin{lemma}
