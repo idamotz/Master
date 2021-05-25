@@ -1,8 +1,6 @@
 \subsection{Soundness of the Move Feature Rule}
 \label{sub:soundness-of-the-move-reature-rule}
 
-\todo{make sure that the parent group exists}
-
 See Figure~\vref{rule:move-feature} for the \rulefont{Move-Feature} rule. Let 
 \begin{equation*}
    \begin{split}
@@ -24,7 +22,7 @@ Recall that the temporal scope of the move-feature rule is $\interval{t_n}{t_k}$
    \]
    Here, the time point $t_n$ for moving the feature is looked up in the feature's parent map's set of interval keys, and the expected result is $\set{\interval{t_{p_1}}{t_{p_2}}}$. This means that there is a mapping $\intervalmapping{t_{p_1}}{t_{p_2}}{\var{parentGroupID}}$ in $F_p$, with $\var{parentGroupID}$ being the ID of the feature's parent group at time $t_n$, and this group stops being the feature's parent at $t_{p_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{p_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{p_2}}$, but it is necessary to also look at the cycle detection algorithm in Section~\vref{sub:move-algorithm}, since this is also referenced in the rule by $\neg \var{createsCycle}$. Here, $t_{p_2}$ is called $t_e$, and the algorithm states that it only looks at time points between $t_n$ and $t_e$. Thus the rule operates strictly within the temporal scope of the \textbf{moveFeature} operation.
 
-   The spatial scope for this operation is defined as the \emph{ancestors which the feature and the target group do not have in common}. In other words, the \emph{new} ancestors of the feature after applying the rule. In the rule itself, only the feature with ID $\var{featureID}$ and its new parent group with ID $\var{newParentID}$ are looked up. However, the cycle detection algorithm must also be considered. Here, the ancestors of both the feature and the group at $t_n$ are looked up, the first ancestor they have in common identified, and the new ancestors are collected into a list. If one of them is moved before $t_e$, the list is updated. Hence the algorithm's spatial scope is indeed the feature's new ancestors and the feature itself, and so the rule operates within the defined spatial scope.
+   The spatial scope for this operation is defined as the \emph{ancestors which the feature and the target group do not have in common}. In other words, the \emph{new} ancestors of the feature after applying the rule. In the rule itself, only the feature with ID $\var{featureID}$ and its new parent group with ID $\var{newParentID}$ are looked up. However, the cycle detection algorithm must also be considered. Here, the ancestors of both the feature and the group at $t_n$ are looked up, the first ancestor they have in common identified, and the new ancestors are collected into a list. If one of them is moved before $t_e$, the list is updated. Hence the algorithm's spatial scope is indeed the feature's ancestors and target group's ancestors, as well as the feature and the group themselves, and so the rule operates within the defined spatial scope.
 \\
 
 \begin{lemma}
@@ -39,7 +37,7 @@ The modification made to $\lookup{\features}{\var{featureID}}$ is to the parent 
 \[
    F_p' = \lookup{\var{clampInterval}(F_p, \, t_n)}{\interval{t_n}{t_{p_2}}} \assign \var{newParentID}
 \]
-As discussed in earlier sections (e.g. Section~\vref{sec:soundness-of-the-remove-feature-rule}), $\var{clampInterval}$ replaces a mapping $\intervalmapping{t_i}{t_j}{v}$ by $\intervalmapping{t_i}{t_n}{v}$, with $t_n \leq t_j$. Thus $\var{clampInterval}(F_p, \, t_n)$ has no parent group during the temporal scope. The subsequent assignment of $\var{newParentID}$ to $\interval{t_n}{t_{p_2}}$ ensures that the feature has exactly one parent group during the temporal scope. This relation is reflected in the $\groups{}'$ map, with
+As discussed in earlier sections (e.g. Section~\vref{sec:soundness-of-the-remove-feature-rule}), $\var{clampInterval}$ replaces a mapping $\intervalmapping{t_i}{t_j}{v}$ by $\intervalmapping{t_i}{t_n}{v}$, with $t_n \leq t_j$. The feature has no parent group  after the application of $\var{clampInterval}(F_p, \, t_n)$. The subsequent assignment of $\var{newParentID}$ to $\interval{t_n}{t_{p_2}}$ ensures that the feature has exactly one parent group during the temporal scope. This relation is reflected in the $\groups{}'$ map, with
 \begin{align*}
    \groups' &= \\
    \lookup{&\big(\lookup{\groups{}}{\var{oldParentID}} \\
@@ -60,7 +58,7 @@ By the premise
 \]
 in the rule, the types of the feature and its new parent group are compatible. For each interval key in $F_t$ overlapping the temporal scope, and for each interval key in $G_t$ overlapping both the aforementioned interval \emph{and} the temporal scope, it checks whether the types they map to are compatible. To fulfil this, each type the feature has during the temporal scope must be compatible with the type the parent group has at the same time. Thus \wf{7} holds for the modified model.
 
-As the rule does not alter the feature's existence set, \wf{8} is preserved. 
+Since the rule adds a child feature to the target group during the temporal scope, the group must exist during the temporal scope for \wf{8} to hold. The premise $\interval{t_n}{t_{p_2}} \inn G_e$ along with the assumption that \wf{8} holds in the origial plan ensure this. Moreover, the rule does not alter the feature's existence set, \wf{8} is preserved. 
 
 The intention of the cycle detection algorithm in Section~\vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original interval-based feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveFeature}$ operation introduced it, and the feature being moved must be part of the cycle. This could only happen if the feature became part of its own subtree during the temporal scope, which means that at some point, the feature occurs in its own list of ancestors. The algorithm looks at the feature's \emph{new} ancestors, meaning the ancestors that the feature does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the feature's subtree. Thus the rule preserves \wf 9.
 \\
