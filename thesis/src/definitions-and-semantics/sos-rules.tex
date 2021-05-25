@@ -296,16 +296,17 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
       \ntyperule{Move-Feature}
       {\\
         \neg \var{createsCycle} \qquad
-        \containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \qquad
-        \lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}} \\
+        \containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \\
+        \lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}} \qquad
+        \interval{t_n}{t_{p_2}} \inn G_e\\
         \\
-        \begin{split}
-          \forall \interval{t_{f_1}}{t_{f_2}} \in \overlapping{F_t}{t_n}{t_{p_2}}
+        \begin{aligned}
+          \forall \interval{t_{f_1}}{t_{f_2}} & \in \overlapping{F_t}{t_n}{t_{p_2}}
           \forall \interval{t_{g_1}}{t_{g_2}} \in \lookup{G_t}{\clamp{\interval{t_{f_1}}{t_{f_2}}}{t_n}{t_{p_2}}}_{\overlap{}} \\
-          \forall \var{ft} \in \lookup{F_t}{\interval{t_{f_1}}{t_{f_2}}}
+          \forall \var{ft} & \in \lookup{F_t}{\interval{t_{f_1}}{t_{f_2}}}
           \forall \var{gt} \in \lookup{G_t}{\interval{t_{g_1}}{t_{g_2}}}
           \left(\var{compatibleTypes}(\var{gt},\, \var{ft}) \right)
-        \end{split} \\
+        \end{aligned} \\
       \\
       \lookup{\features{}}{\var{featureID}} = \feature \\
         \lookup{\groups{}}{\var{newParentID}} = \group
@@ -328,12 +329,30 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
   \label{rule:move-feature}
 \end{figure}
 
-See Figure~\vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the algorithm described in Section~\vref{sub:move-algorithm}. The algorithm is not described as a function here, as it is easier to understand written in natural language. An implementation of it can be found in the \todo{appendix}. 
+See Figure~\vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the algorithm described in Section~\vref{sub:move-algorithm}. The algorithm is not described as a function here, as it is easier to understand written in natural language. A concrete implementation of the algorithm can be found on GitHub\footnote{\url{https://github.com/idamotz/Master/blob/master/soundness-checker/}}. 
+
+The premise $\containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}}$ locates the scope of the operation, namely $\interval{t_n}{t_{p_2}}$. The ID of the feature's former parent group is identified in the premise $\lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}}$ for the purpose of updating the $\groups{}$ map. The premise $\interval{t_n}{t_{p_2}} \inn G_e$ ensures that the new parent exists during the entire temporal scope.
+
+As the plan may contain several type changes for both the feature being moved and its new parent, we must check that the types they have at the same time are compatible. This is achieved by the rather complex premise
+\begin{align*}
+  \forall \interval{t_{f_1}}{t_{f_2}} & \in \overlapping{F_t}{t_n}{t_{p_2}}
+  \forall \interval{t_{g_1}}{t_{g_2}} \in \lookup{G_t}{\clamp{\interval{t_{f_1}}{t_{f_2}}}{t_n}{t_{p_2}}}_{\overlap{}} \\
+  \forall \var{ft} & \in \lookup{F_t}{\interval{t_{f_1}}{t_{f_2}}}
+  \forall \var{gt} \in \lookup{G_t}{\interval{t_{g_1}}{t_{g_2}}}
+  \left(\var{compatibleTypes}(\var{gt},\, \var{ft}) \right)
+\end{align*}
+For each interval key overlapping the temporal scope in the feature's type map, then for each interval in the group's type map overlapping the aforementioned key and limited by the temporal scope, then for all types mapped to by those keys, those types must be compatible. This ensures that we are not too strict, because we check only those combinations of types which the feature and its new parent group have at the same time, further restricted by the temporal scope.
+
+If all the premises hold, then the interval-based feature model is updated to reflect it. The feature's parent group map is updated by shortening the interval mapped to the former parent's ID to end at $t_n$, and adding a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$.
+
+The feature is removed from the previous parent's ($\var{oldParentID}$) set of child features during the temporal scope, and the feature is added to the new parent's set of child features during the same interval. 
 
 \subsection{Algorithm for Detecting Cycles Resulting from \textbf{Move} Operations}
 \label{sub:move-algorithm}
 
-Compared with the other operations (e.g. add feature, remove feature, etc.), move feature requires extensive verification. For simplicity, we abstract away from groups and features and view the combination of the two as nodes. In Figure~\vref{ex:illustration-move-algo}, we show an example of such a paradox. In the original plan, the marked node $E$ is moved to $C$ at time 2, and to \emph{some node} in node $D$'s subtree $s$. In the modified plan, $D$ (and its subtree $s$) has been moved to node $F$. There is no paradox at time $1$ or $2$, but at time 3, when $E$ is moved to $s$, it causes a cycle. At time $1$, the new ancestors of $D$ are $F$, $G$, and $E$. At time $2$, the new ancestors are still $F$, $G$, and $E$, but $C$ is added to the list, since $C$ was not an ancestor of $D$ in the original plan. When $E$ is then moved to $D$'s subtree $s$, it causes a paradox, since $E$ now has $F$ as an ancestor.
+Compared with the other operations, \textbf{moveFeature} and \textbf{moveGroup} require extensive verification, as moving a feature or a group may cause cycles at the time of the move or at some later point. Since cycles violate only the tree structure of the feature model evolution plan, we abstract away from groups and features, viewing both as nodes.  
+
+In Figure~\vref{ex:illustration-move-algo}, we show an example of a cycle arising from a move operation. In the original plan, the marked node $E$ is moved to $C$ at time 2, and to \emph{some node} in node $D$'s subtree $s$. In the modified plan, $D$ (and its subtree $s$) has been moved to node $F$. There is no paradox at time $1$ or $2$, but at time 3, when $E$ is moved to $s$, it causes a cycle. At time $1$, the new ancestors of $D$ are $F$, $G$, and $E$. At time $2$, the new ancestors are still $F$, $G$, and $E$, but $C$ is added to the list, since $C$ was not an ancestor of $D$ in the original plan. When $E$ is then moved to $D$'s subtree $s$, it causes a paradox, since $E$ now has $F$ as an ancestor.
 
 Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation does not cause a cycle.
 
@@ -396,7 +415,7 @@ In the conclusion of the rule, the feature's parent map is updated to express th
 
 \section{Move Group Rule}
 \label{sec:move-group-rule}
-See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} operation. The semantics is similar to the one for the \textbf{moveFeature} operation, but it differs in that it does not have a check for types. This is because there can only be a conflict between a parent group and a child feature, not a parent feature and a child group. Since only the latter relation changes in this rule, it is not necessary to check that the types are compatible.
+See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} operation. The rule is similar to the \rulefont{Move-Feature} rule, but it differs in that it does not have a check for types. This is because there can only be a conflict between a parent group and a child feature, not a parent feature and a child group. Since only the latter relation changes in this rule, it is not necessary to check that the types are compatible. The model is updated similarly to the way it is done in the \rulefont{Move-Feature} rule. 
 
 \begin{figure}[h]
     \renewcommand{\arraystretch}{1.1}
@@ -404,7 +423,8 @@ See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
       \ntyperule{Move-Group}
       {\\
         \neg \var{createsCycle} \qquad
-        \containing{G_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \qquad
+        \containing{G_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}} \\
+        \interval{t_n}{t_{p_2}} \inn F_e \qquad
         \lookup{G_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}} \\
         \lookup{\groups{}}{\var{groupID}} = \group \\
         \lookup{\features{}}{\var{newParentID}} = \feature 
@@ -427,16 +447,16 @@ See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} op
 
 \section{Change Feature Variation Type Rule}
 \label{sec:change-feature-variation-type-rule}
-The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{featureID}$ at time $t_n$. The first expression above the line ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. The next line may be hard to read, but its intent is easier to understand. It checks that all the types a parent group has \emph{while it is the parent of the feature} has a type which is compatible with the new type of the feature. If everything above the line is true, then the $\features{}$ map is updated at $\var{featureID}$ by shortening the interval key for the original type at $t_n$, and assigning the new type to the affected interval $\interval{t_n}{t_{t_2}}$. 
+The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{featureID}$ at time $t_n$. The first premise $\var{featureID} \neq RootID$ ensures that we are not attempting to modify the type of the root feature, which should always be \mandatory{}. The second premise ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. If there is no such planned change, then $t_{t_2} = \forever$. The temporal scope is then $\interval{t_n}{t_{t_2}}$ as defined in the \nameref{sec:scope} section (Section~\vref{sec:scope}). The next premise is a little convoluted, but its intent is easier to understand. It checks that all the types a parent group has \emph{while it is the parent of the feature}, limited by the temporal scope, has a type which is compatible with the new type of the feature. This is necessary as the feature may potentially move around several times during the temporal scope, and the various parent groups could change their types often. 
 
-\todo{make it more readable}
+If all the premises true, then the $\features{}$ map is updated at $\var{featureID}$ by shortening the interval key for the original type at $t_n$, and assigning the new type to the temporal scope $\interval{t_n}{t_{t_2}}$. 
 
 \begin{figure}[h]
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Variation-Type}
       {\\
-        \var{featureID} \neq $RootID$ \qquad
+        \var{featureID} \neq RootID \qquad
         \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}} % Temporal scope = [t_n, t_t_2)
         \\
         \\
