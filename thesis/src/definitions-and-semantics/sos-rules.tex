@@ -1,8 +1,9 @@
 \chapter{A Rule System for Analysis of Plan Change}
 \label{cha:a-rule-system-for-analysis-of-plan-change}
 \todo{Instantiate rules with a concrete example for the rules and the scope}
+\todo{(Figure..) -> (In figure)}
 
-A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to check \emph{automatically} that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not necessarily enough to let a human verify a change. 
+A software product line may grow very large, and the plans even larger. Since different factors may influence the plan, it is necessary to be able to change the plan accordingly. If the plan is indeed extremely large, and since feature models have strict structure constraints, it is also necessary to have tool support that can check that the changes do not compromise the structure. Due to the size and complexity of the problem, it is not necessarily enough to let a human verify a change. 
 
 To communicate our analysis method, we use rules similar to structural operational semantics rules.  The rules are on the form 
 $$\sossize\begin{array}{c}
@@ -11,12 +12,12 @@ $$\sossize\begin{array}{c}
     \text{Premises}}
     { S \transition S'}
   \end{array}$$
-  where $S$ is the state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In this thesis, the state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
+  where $S$ is the initial state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In the rules, the initial state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
 
 \section{Add Feature Rule}
 \label{sec:add-feature-rule}
 
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Add-Feature}
@@ -27,14 +28,14 @@ $$\sossize\begin{array}{c}
         t_n < t_m \\
         \lookup{\features{}}{\var{featureID}} = \feature \\
         \lookup{\groups{}}{\var{parentGroupID}} = \group\\
-        \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
+        \forall \var{gt} \in \lookup{G_t}{\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
       }
       {
         \textbf{addFeature}(\var{featureID}, \var{name}, \var{type}, \var{parentGroupID})\text{ from } t_n \text{ to } t_m\shove \\
          (\names{}, \features{}, \groups{})\\
         \transition\\
         (\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID},  \\
-        {\lookup{\features{}}{\var{featureID}}} \assign 
+        \lookup{\features{}}{\var{featureID}} \assign 
         \var{setFeatureAttributes}(\lookup{\features{}}{\var{featureID}}, 
         \interval{t_n}{t_m}, \\
         \var{name}, \var{type}, \var{parentGroupID}),\\
@@ -48,11 +49,15 @@ $$\sossize\begin{array}{c}
 
 Figure \ref{rule:add-feature}  describes the semantics of the \textbf{addFeature} operation. 
 To add a feature during the interval $\interval{t_n}{t_m}$, its ID cannot exist exist during the interval ($\interval{t_n}{t_m} \not \innr F_e$). The parent feature must exist ($\interval{t_n}{t_m} \inn G_e$), and the types it has during the interval must be compatible with the type of the 
-added feature ($\forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must not be in use during the interval ($\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset$), and the interval must start before it ends ($t_n < t_m$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. 
+added feature ($\forall \var{gt} \in \lookup{G_t}{\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must not be in use during the interval ($\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset$), and the interval must start before it ends ($t_n < t_m$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. \todo{elaborate}
 
-To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (Figure \ref{fun:compatible-types}), $\var{setFeatureAttributes}$ (Figure \ref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (Figure \ref{fun:add-child-feature}). 
+To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (in Figure~\ref{fun:compatible-types}), $\var{setFeatureAttributes}$ (Figure \vref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (Figure~\vref{fun:add-child-feature}). The $\var{compatibleTypes}$ function takes a group type (\andtype{}, \ortype{} or \xortype{}) and a feature type (\mandatory{} or \optional{}) and checks whether they are compatible. The types should belong to a parent group and its child feature. The only combination which is not allowed is a \mandatory{} feature with an \xortype{} or \ortype{} parent group.
 
-\begin{figure}
+The $\var{setFeatureAttributes}$ function takes a feature entry, an interval, a name, a type, and a group ID, and returns the feature entry with the information included. It modifies the existence set by adding the interval, maps the interval to the name in the names map, to the type in the types map, and to the parent group ID in the parent groups map.
+
+The $\var{addChildFeature}$ function takes a group entry, an interval, and a feature ID, and adds the feature ID to the group's child feature map during the interval.
+
+\begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
 compatibleTypes(|$\andtype$|, _) = True
 compatibleTypes(_, |$\optional$|) = False
@@ -62,11 +67,11 @@ compatibleTypes(_, _) = True
   \label{fun:compatible-types}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
 setFeatureAttributes|$(\feature$|, |$\interval{t_{start}}{t_{end}}$|, name, type
                     , parentGroupID|$)$|
-  = |$($| |$F_e \cup \interval{t_{start}}{t_{end}}$|
+  = |$($| |$F_e \cup \set{\interval{t_{start}}{t_{end}}}$|
     , |$\lookup{F_n}{\interval{t_{start}}{t_{end}}}$| |$\assign$| name
     , |$\lookup{F_t}{\interval{t_{start}}{t_{end}}}$| |$\assign$| type
     , |$\lookup{F_p}{\interval{t_{start}}{t_{end}}}$| |$\assign$| parentGroupID
@@ -76,7 +81,7 @@ setFeatureAttributes|$(\feature$|, |$\interval{t_{start}}{t_{end}}$|, name, type
   \label{fun:set-feature-attributes}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
 addChildFeature|$(\group, \interval{t_{start}}{t_{end}}, \var{fid})$|
   = |$\left(G_e, G_t, G_p , \lookup{G_c}{\interval{t_{start}}{t_{end}}} \addassign \var{fid}\right)$|
@@ -85,11 +90,148 @@ addChildFeature|$(\group, \interval{t_{start}}{t_{end}}, \var{fid})$|
   \label{fun:add-child-feature}
 \end{figure}
 
-\section{Add Group Rule}
-\label{sec:add-group-rule}
-The rule in figure \ref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval ($\interval{t_n}{t_m}$). The group must not already exist in the plan during the interval ($\interval{t_n}{t_m} \notinnr G_e$), and the parent feature must exist for the duration of the interval ($\interval{t_n}{t_m} \inn F_e$). The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map. Lastly, the interval must fulfil the condition $t_n < t_m$, meaning that it starts before it ends.
+\subsubsection{Applying the \rulefont{Add-Feature} rule to an example}
+
+We show how to use a rule by applying the \rulefont{Add-Feature} rule to a simple example. Following is a simple interval-based feature model, containing one feature and one group. The module is visualised in a simplified version in Figure~\vref{ex:add-feature-original-plan}. The visualisation shows only the structure of the feature model, not the feature or groups' types or other attributes.
+
+\begin{align*}
+  (&\; \{  \mapping{\text{Root}}{\set{\intervalmapping{1}{\forever}{\text{feature:root}}}} \\
+   &\; \}\\
+    ,&\; \{  \text{feature:root} \mapsto \left( \begin{aligned}
+          \, & \set{\interval{1}{\forever}} \\
+       ,  \, & \set{\intervalmapping{1}{\forever}{\text{Root}}} \\
+       ,  \, & \set{\intervalmapping{1}{\forever}{\mandatory}} \\
+       ,  \, & \emptyset \\
+       ,  \, & \set{\intervalmapping{1}{\forever}{\set{\text{group:A}}}} \\
+  \end{aligned}\right) \\
+   &\; \}\\ 
+          ,&\; \{ \text{group:A} \mapsto \left( \begin{aligned}
+                & \set{\interval{1}{5}} \\
+                , \, & \set{\intervalmapping{1}{5}{\andtype}} \\
+                , \, & \set{\intervalmapping{1}{5}{\text{feature:Root}}} \\
+                , \, & \emptyset \\
+            \end{aligned} \right) \\
+   &\; \})
+\end{align*}
 
 \begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{AddFeatureOriginalPlan}
+  \caption{Add feature example \textemdash{} original plan}
+  \label{ex:add-feature-original-plan}
+\end{figure}
+
+We apply the operation \textbf{addFeature}$(\text{feature:B}, \text{B}, \optional{}, \text{group:A})$ from $3$ to $5$ using the \rulefont{Add-Feature} rule. This means that we want to add a feature with ID feature:B, name B, and type \optional{} to the group with ID group:A from time 3 until (but not including) 5. We must go through all the premises and check that each of them holds for the original model. First, we look up the new feature in the original model. Since the feature does not exist, we get
+\[
+  \lookup{\features{}}{\text{feature:B}} = (\emptyset, \emptyset, \emptyset, \emptyset, \emptyset)
+\]
+We further look up the parent group:
+\begin{align*}
+  \lookup{\groups{}}{\text{group:A}} = ( 
+                & \set{\interval{1}{5}} \\
+                , \, & \set{\intervalmapping{1}{5}{\andtype}} \\
+                , \, & \set{\intervalmapping{1}{5}{\text{feature:Root}}} \\
+                , \, & \emptyset ) \\
+\end{align*}
+We see that the group exists from 1 to 5, that it has the type \andtype{} during its lifespan, and that its parent feature has ID \text{feature:Root}. Now that we have the information we require, we can check that the other premises hold.
+
+In the premise $\interval{t_n}{t_m} \not \innr F_e$, we replace $t_n$, $t_m$ and $F_e$ by their concrete values:
+\[
+  \interval{3}{5} \not \innr \emptyset
+\]
+Since no element is member of $\emptyset$, no element in $\emptyset$ overlaps $\interval{3}{5}$, so this premise holds.
+
+The premise $\interval{t_n}{t_m} \inn G_e$ asserts that an interval in $G_e$ should contain the interval $\interval{t_n}{t_m}$. We instantiate the variables with our concrete values and verify that this holds:
+\[
+  \interval{3}{5} \inn \set{\interval{1}{5}}
+\]
+Since $\interval{1}{5}$ does contain $\interval{3}{5}$, this premise also holds.
+
+The premise $\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset$ means that the name of the new feature should be unique during the temporal scope.  We verify:
+\[
+  \lookup{\lookup{\names}{\text{B}}}{\interval{3}{5}} = \emptyset
+\]
+
+The only key in the $\names{}$ map is A, so this statement is true. The next premise we check is $t_n < t_m$, which is true because $3 < 5$.
+
+Lastly, we check that the types of the new feature and its parent group are compatible, the premise $\forall \var{gt} \in \lookup{G_t}{\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type}))$. We instantiate the variables:
+\[
+  \forall \var{gt} \in \lookup{\set{\intervalmapping{1}{5}{\andtype}}}{\interval{3}{5}}(\var{compatibleTypes}(\var{gt}, \optional{}))
+\]
+The only value in $\set{\intervalmapping{1}{5}{\andtype}}$ during the interval $\interval{3}{5}$ is \andtype, so we instatiate $\var{gt}$ with that value.
+\[
+  \var{compatibleTypes}(\andtype{}, \optional{})
+\]
+This matches the first case in the \var{compatibleTypes} function, which evaluates to \texttt{True}. Thus the last premise holds, so we can apply the transition. We go through each map individually, starting with \names{}. The rule gives the modification
+\[
+  \lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID}
+\]
+, which becomes
+\[
+  \lookup{\lookup{\{  \mapping{\text{Root}}{\set{\intervalmapping{1}{\forever}{\text{feature:root}}}}\}}{\text{B}}}{\interval{3}{5}} \assign \text{feature:B}
+\]
+This gives us the map
+\begin{align*}
+  \{\mapping{\text{Root}}{& \set{\intervalmapping{1}{\forever}{\text{feature:root}}}}, \\
+   \mapping{\text{B}}{& \set{\intervalmapping{3}{5}{\text{feature:B}}}}\} 
+\end{align*}
+According to the rule, the \features{} map should be modified in the following way:
+\begin{align*}
+  \lookup{\features{}}{\var{featureID}} \assign \var{setFeature}&\var{Attributes}(\lookup{\features{}}{\var{featureID}}, \\
+                           &\interval{t_n}{t_m},\\
+                           &\var{name}, \var{type}, \var{parentGroupID})
+\end{align*}
+We instantiate:
+\begin{align*}
+  \lookup{\features{}}{\text{feature:B}} \assign \var{setFeature}&\var{Attributes}((\emptyset, \emptyset, \emptyset, \emptyset, \emptyset), \\
+                           &\interval{3}{5},\\
+                           &\text{A}, \optional{}, \text{group:A})
+\end{align*}
+We apply \var{setFeatureAttributes}:
+\begin{minted}[escapeinside=||]{text}
+setFeatureAttributes|$((\emptyset, \emptyset, \emptyset, \emptyset, \emptyset), \interval{3}{5}, \text{B}, \optional{}, \text{group:A})$|
+  = |$($| |$\emptyset \cup \set{\interval{3}{5}}$|
+    , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |$\text{B}$|
+    , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |\optional{}|
+    , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |$\text{group:A}$|
+    , |$\emptyset \ )$|
+ \end{minted}
+ This gives us the feature mapping
+\begin{align*}
+  \lookup{\features{}}{\text{feature:B}} \mapsto ( & \set{\interval{3}{5}} \\
+  , & \set{\intervalmapping{3}{5}{\text{B}}}\\
+  , & \set{\intervalmapping{3}{5}{\optional{}}}\\
+  , & \set{\intervalmapping{3}{5}{\text{group:A}}}\\
+  , & \; \emptyset)
+\end{align*}
+, which is then mapped to $\lookup{\features{}}{\text{feature:B}}$.
+
+\todo{groups}
+
+        % \interval{t_n}{t_m} \not \innr F_e
+        % \interval{t_n}{t_m} \inn G_e
+        % \lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset
+        % t_n < t_m
+        % \lookup{\features{}}{\var{featureID}} = \feature
+        % \lookup{\groups{}}{\var{parentGroupID}} = \group
+        % \forall \var{gt}_{\in \lookup{G_t}{\interval{t_n}{t_m}}} (\var{compatibleTypes}(\var{gt}, \var{type})) \\
+
+        % (\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID},  \\
+        % \lookup{\features{}}{\var{featureID}} \assign 
+        % \var{setFeatureAttributes}(\lookup{\features{}}{\var{featureID}}, 
+        % \interval{t_n}{t_m}, \\
+        % \var{name}, \var{type}, \var{parentGroupID}),\\
+        % {\lookup{\groups{}}{\var{parentGroupID}}} \assign 
+        % \var{addChildFeature}(\lookup{\groups{}}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID}))
+
+
+\section{Add Group Rule}
+\label{sec:add-group-rule}
+The rule in figure \ref{rule:add-group} describes the conditions which must be in place to add a (pre-existing or fresh) group to the FMEP during an interval ($\interval{t_n}{t_m}$). The group must not already exist in the plan during the interval ($\interval{t_n}{t_m} \notinnr G_e$), and the parent feature must exist for the duration of the interval ($\interval{t_n}{t_m} \inn F_e$). Lastly, the interval must fulfil the condition $t_n < t_m$, meaning that it starts before it ends. 
+
+If all the premises hold, the model is updated according to the semantics of the \textbf{addGroup} operation. The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map. This is achieved by using the $\var{addChildGroup}$ function, which is extremely similar to $\var{addChildFeature}$, and the $\var{setGroupAttributes}$ function, which is similar to $\var{setFeatureAttributes}$, respectively (Figures~ \ref{fun:add-child-group} and \vref{fun:set-group-attributes}).
+
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Add-Group}
@@ -117,7 +259,7 @@ The rule in figure \ref{rule:add-group} describes the conditions which must be i
   \begin{minted}[escapeinside=||]{text}
 setGroupAttributes|$\big(\group, \, \interval{t_{start}}{t_{end}}, \, \var{type}$|
                   |$, \var{parentFeatureID}\big)$|
-  = |$($| |$G_e \cup \interval{t_{start}}{t_{end}}$|
+  = |$($| |$G_e \cup \set{\interval{t_{start}}{t_{end}}}$|
     , |$\lookup{G_t}{\interval{t_{start}}{t_{end}}}$| |$\assign$| type
     , |$\lookup{G_p}{\interval{t_{start}}{t_{end}}}$| |$\assign$| parentFeatureID
     , |$G_c )$|
@@ -138,9 +280,9 @@ addChildGroup|$\left(\feature, \,\interval{t_{start}}{t_{end}}, \, \var{groupID}
 \section{Remove Feature Rule}
 \label{sec:remove-feature-rule}
 
-Figure \ref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{featureID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ set $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($\lookup{F_c}{\interval{t_{n}}{t_{e_2}}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the interval-based feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$. 
+Figure \ref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{featureID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ set $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($\lookup{F_c}{\interval{t_{n}}{t_{e_2}}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the interval-based feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$.  \todo{Write about the helper functions}
 
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Remove-Feature}
@@ -259,10 +401,10 @@ removeGroupAt|$\left(\feature, \var{groupID}, t_c \right)$|
 \label{sec:remove-group-rule}
 The $\rulefont{Remove-Group}$ rule in Figure~\vref{rule:remove-group} describes the semantics of removing a group in an interval-based feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group may not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
 
-We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clampIntervalValue}$ (Figure~\vref{fun:clamp-interval-value}), and $\var{clampGroup}$ (Figure~\ref{fun:clamp-group} \todo{pass på at dette er på riktig side}) helper functions to update the interval-based feature model.  The $\var{clampInterval}$ function takes an interval map with non-overlapping keys and a time point $t_c$, and updates the interval key containing $t_c$ to end at $t_c$. $\var{clampIntervalValue}$ does the same, but for interval maps with overlapping keys and set values. It takes an interval map, a time point $t_c$, and a value $v$, and shortens the interval key containing $t_c$ and $v$ to end at $t_c$. $\var{clampSetInterval}$ takes an interval set with non-overlapping values and a time point $t_c$, and shortens the interval containing $t_c$. 
+We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), \var{clamp\-Interval\-Value} (Figure~\vref{fun:clamp-interval-value}), and $\var{clampGroup}$ (Figure~\vref{fun:clamp-group}) helper functions to update the interval-based feature model.  The $\var{clamp\-Interval}$ function takes an interval map with non-overlapping keys and a time point $t_c$, and updates the interval key containing $t_c$ to end at $t_c$. $\var{clamp\-Interval\-Value}$ does the same, but for interval maps with overlapping keys and set values. It takes an interval map, a time point $t_c$, and a value $v$, and shortens the interval key containing $t_c$ and $v$ to end at $t_c$. $\var{clampSetInterval}$ takes an interval set with non-overlapping values and a time point $t_c$, and shortens the interval containing $t_c$. 
 
 
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Remove-Group}
@@ -290,7 +432,7 @@ We use the $\var{clampInterval}$ (Figure~\vref{fun:clamp-interval}), $\var{clamp
 
 \section{Move Feature Rule}
 \label{sec:move-feature-rule}
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Move-Feature}
@@ -451,7 +593,7 @@ The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics 
 
 If all the premises true, then the $\features{}$ map is updated at $\var{featureID}$ by shortening the interval key for the original type at $t_n$, and assigning the new type to the temporal scope $\interval{t_n}{t_{t_2}}$. 
 
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Feature-Variation-Type}
@@ -496,7 +638,7 @@ getTypes|$\left(\feature, \, \interval{t_n}{t_m} \right) = \lookup{G_t}{\interva
 \label{sec:change-group-variation-type-rule}
 The rule in Figure~\vref{rule:change-group-varation-type} is similar to the \textbf{changeFeatureVariationType} rule in Figure~\vref{rule:change-feature-varation-type}, and shows the semantics of changing the type of a group. In a similar way to the aforementioned \textbf{changeFeatureVariationType} rule, it verifies that the types of all the child groups during the affected interval are compatible with the new group type.
 
-\begin{figure}[h]
+\begin{figure}
     \renewcommand{\arraystretch}{1.1}
     \sossize$$\begin{array}{c}
       \ntyperule{Change-Group-Variation-Type}

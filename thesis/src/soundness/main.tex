@@ -1,9 +1,9 @@
 \chapter{Soundness}
 \label{cha:soundness}
 
-In this chapter, we prove soundness for the analysis rules (Section~\vref{cha:a-rule-system-for-analysis-of-plan-change}) by formalizing soundness for interval-based feature models and examining the behaviour of each rule individually.
+In this chapter we prove soundness for the analysis rules (Section~\vref{cha:a-rule-system-for-analysis-of-plan-change}) by formalizing soundness for interval-based feature models and examining the behaviour of each rule individually.
 
-We use an inductive proof structure to prove soundness and modularity for the rule system . The base case is a proof by construction, in which we define a sound interval-based feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (Section~\vref{sec:scope}). We present only two of the proofs in this chapter, as the totality of the proofs can be overwhelming, and the structure of the proofs is similar to the ones we present here. The rest of the proofs can be found in Appendix~\vref{cha:remaining-soundness-proofs}.
+We use an inductive proof structure to prove soundness and modularity for the rule system. The base case is a proof by construction, in which we define a sound interval-based feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (Section~\vref{sec:scope}). We present only two of the proofs in this chapter to show the structure of the proofs. The rest of the proofs can be found in Appendix~\vref{cha:remaining-soundness-proofs}.
 
 \input{soundness/ibfms}
 

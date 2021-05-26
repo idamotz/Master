@@ -1,6 +1,6 @@
 
-\section{Soundness for the Add Group Rule}
-\label{sec:soundness-for-the-add-group-rule}
+\section{Soundness of the Add Group Rule}
+\label{sec:soundness-of-the-add-group-rule}
 
 See Figure~\vref{rule:add-group} for the \rulefont{Add-Group} rule. 
 Let 
@@ -68,7 +68,7 @@ Looking up the added group's ID in the modified model should return the informat
    \lookup{G'_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the group has no children} \tag{4} \label{add-group4}
 \end{align}
 
-Statement (\ref{add-group1}) holds due to the line $G_e \cup \interval{t_n}{t_m}$ in $\var{setGroupAttributes}$ (Figure~\vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \wf{8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
+Statement (\ref{add-group1}) holds due to the line $G_e \cup \set{\interval{t_n}{t_m}}$ in $\var{setGroupAttributes}$ (Figure~\vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \wf{8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
 
 Furthermore, we would expect the group to be listed as a child group of the parent feature in the modified model, so given that $\lookup{\features'{}}{\var{parentFeatureID}} = \featurevar{F'}$, then
 \begin{equation*}

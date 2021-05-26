@@ -27,7 +27,7 @@ The well-formedness requirements listed in Section \vref{sub:feature-models} can
    \item At any time $t_n$, a group with types \xortype{} or \ortype{} must not contain \mandatory{} features. Formally, given a group ID $\var{groupID}$ with $\lookup{\groups}{\var{groupID}} = \group$, if $\lookup{F_t}{t_n} = \set{\var{type}}$ with $\var{type} \in \set{\xortype{}, \ortype{}}$, and if $\var{featureID} \in \bigcup \lookup{F_c}{t_n}$ and $\lookup{\features}{\var{featureID}} = \feature$, then $\lookup{F_t}{t_n} = \set{\optional}$.
 \end{enumerate}
 
-We must add two additional requirements:
+Since our representation does not enforce structural requirements, we must add two additional requirements:
 \begin{enumerate}[itemsep=0mm]
    \item[\wf{8}] For a feature with ID $\var{featureID}$ such that $\lookup{\features}{\var{featureID}} = \feature$, if $t_n \notinn F_e$, then $\lookup{F_n}{t_n} = \lookup{F_t}{t_n} = \lookup{F_p}{t_n} = \lookup{F_c}{t_n} = \emptyset$, and for all keys $\var{name}$ in $\names$, $\var{featureID} \notin \lookup{\lookup{\names}{\var{name}}}{t_n}$ \textemdash{} no name belongs to the feature. Similarly, for a group with ID $\var{groupID}$ such that $\lookup{\groups}{\var{groupID}} = \group$, if $t_n \notinn G_e$, then $\lookup{G_t}{t_n} = \lookup{G_p}{t_n} = \lookup{G_c}{t_n} = \emptyset$. In other words, a feature or a group which does not exist cannot have a name, a type, a parent, or a child.
    \item[\wf{9}] The interval-based feature model contains no cycles, which means that at any time point $t_n \geq t_0$, for any feature or group that exists at $t_n$, if we follow the parent chain upwards, we never encounter the same feature or group twice. In other words, no feature or group is its own ancestor.
@@ -35,8 +35,8 @@ We must add two additional requirements:
 
 Together, these requirements form the basis of the soundness proofs. We assume that the original plan is sound, so each of these requirements is assumed to be true for the original interval-based feature model. Furthermore, we prove that the requirements must still hold for the updated model if the rule can be applied.
 
-\section{Soundness of Each Rule}
-\label{sec:soundness-of-each-rule}
+\section{Soundness of the Rules}
+\label{sec:soundness-of-the-rules}
 In the following sections, we prove that each rule is sound, and conclude that the system is sound. We rely upon the above defined well-formedness requirements \wf{1\textendash 9} to show this.
 
 For each rule, the proof for soundness includes three parts: 
