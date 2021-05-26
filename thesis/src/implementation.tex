@@ -18,7 +18,7 @@ The most important modules are \texttt{Types},
 \subsection{Translation from Definitions to Types}
 \label{sub:the-types-module}
 
-In the \texttt{Types} module we define all the types used throughout the project, corresponding closely with our definitions (see Chapter~\vref{cha:basics}). Our time points are implemented as an abstract data type \texttt{TimePoint}. The possible \texttt{TimePoints} are \texttt{TP n}, where \texttt{n} is an integer, or \texttt{Forever}, which corresponds to $\forever$. For all integers \texttt{n}, we have that \texttt{TP n < Forever}. Our notion of intervals are translated to an abstract data type \texttt{Validity}. Using
+In the \texttt{Types} module we define all the types used throughout the project, corresponding closely with our definitions (see Chapter~\vref{cha:formalizing-the-feature-model-evolution-plan}). Our time points are implemented as an abstract data type \texttt{TimePoint}. The possible \texttt{TimePoints} are \texttt{TP n}, where \texttt{n} is an integer, or \texttt{Forever}, which corresponds to $\forever$. For all integers \texttt{n}, we have that \texttt{TP n < Forever}. Our notion of intervals are translated to an abstract data type \texttt{Validity}. Using
 \begin{minted}{haskell}
    Validity (TP 3) (TP 5)
 \end{minted}
