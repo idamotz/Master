@@ -358,10 +358,10 @@ Recall that the \textbf{removeFeature} operation removes a feature at a given ti
 \begin{minipage}[t]{0.5\textwidth}
   \begin{minted}[escapeinside=||]{text}
 clampInterval|$\left( \map{map}, \, t_c \right)$|
-  = let |$\set{\interval{t_{start}}{t_{end}}} \assign \containing{\map{map}}{t_c}$|
-        |$\set{v} \assign \lookup{\map{map}}{t_c}$|
-        |$\map{map}' \assign \map{map} \remove \interval{t_{start}}{t_{end}}$|
-     in |$\lookup{\map{map}'}{\interval{t_{start}}{t_c}} \assign v$|
+  = |$\lookup{\map{map}'}{\interval{t_{start}}{t_c}} \assign v$|
+  where |$\set{\interval{t_{start}}{t_{end}}} = \containing{\map{map}}{t_c}$|
+        |$\set{v} = \lookup{\map{map}}{t_c}$|
+        |$\map{map}' = \map{map} \remove \interval{t_{start}}{t_{end}}$|
   \end{minted}
   \captionof{figure}{\var{clampInterval}}
   \label{fun:clamp-interval}
@@ -369,23 +369,23 @@ clampInterval|$\left( \map{map}, \, t_c \right)$|
 \begin{minipage}[t]{0.5\textwidth}
   \begin{minted}[escapeinside=||]{text}
 clampIntervalValue|$\left( \map{map}, \, t_c ,\, v\right)$|
-  = let |$\set{\interval{t_{start}}{t_{end}}} \assign \containingvalue{\map{map}}{t_c}{v}$|
-        |$\map{map}' \assign \map{map} \removevalue{v} \interval{t_{start}}{t_{end}}$|
-     in |$\lookup{\map{map}'}{\interval{t_{start}}{t_c}} \addassign v$|
-    |$$|
+  = |$\lookup{\map{map}'}{\interval{t_{start}}{t_c}} \addassign v$|
+  where |$\set{\interval{t_{start}}{t_{end}}} = \containingvalue{\map{map}}{t_c}{v}$|
+        |$\map{map}' = \map{map} \removevalue{v} \interval{t_{start}}{t_{end}}$|
+        |$$|
   \end{minted}
   \captionof{figure}{\var{clampIntervalValue}}
   \label{fun:clamp-interval-value}
 \end{minipage}
+\\
 
 \begin{minipage}[t]{0.5\textwidth}
   \begin{minted}[escapeinside=||]{text}
      |$$|
 clampSetInterval|$\left( \map{IS}, \, t_c \right)$|
-  = let |$\set{\interval{t_{start}}{t_{end}}} \assign \containing{\map{IS}}{t_c}$|
-        |$\map{IS}' \assign \map{IS} \remove \interval{t_{start}}{t_{end}}$|
-     in |$\map{IS}' \cup \set{\interval{t_{start}}{t_c}}$|
-
+  = |$\map{IS}' \cup \set{\interval{t_{start}}{t_c}}$|
+  where |$\set{\interval{t_{start}}{t_{end}}} = \containing{\map{IS}}{t_c}$|
+        |$\map{IS}' = \map{IS} \remove \interval{t_{start}}{t_{end}}$|
      |$$|
   \end{minted}
   \captionof{figure}{\var{clampSetInterval}}
@@ -562,7 +562,7 @@ In Figure~\vref{ex:illustration-move-algo}, we show an example of a cycle arisin
 
 Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation does not cause a cycle.
 
-Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ (see Figure~\vref{fun:ancestors})which takes the interval-based feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$. 
+Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ (see Figure~\vref{fun:ancestors}), written in Haskell-like syntax, which takes the interval-based feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$.
 
 First, check whether $n \in \texttt{ancestors}(IBFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
 
@@ -581,18 +581,19 @@ Look for the first move of one of the critical nodes. If no such moves occur unt
 \begin{figure}[h]
   \begin{minted}[escapeinside=||]{text}
 ancestors|$\left((\names{}, \features{}, \groups{}), \, \var{featureID}, t_n \right)$| 
-  = let |$\feature \assign     \lookup{\features{}}{\var{featureID}}$|
-        parentGroup |$ \assign \lookup{F_p}{t_n} $|
-     in 
-      case parentGroup of
+  = case parentGroup of
         { parentGroupID } |$ \rightarrow $| 
-          parentGroupID : ancestors|$\left((\names, \features{}, \groups{}), \, \var{parentGroupID}, t_n\right)$|
+             parentGroupID : ancestors|$((\names, \features{}, \groups{}),$|
+                                        |$\var{parentGroupID}, t_n)$|
         |$ \emptyset \rightarrow $| []
+  where |$\feature = \lookup{\features{}}{\var{featureID}}$|
+        parentGroup |$ = \lookup{F_p}{t_n} $|
+
 ancestors|$\left((\names{}, \features{}, \groups{}), \, \var{groupID}, t_n \right)$| 
-  = let |$\group \assign     \lookup{\groups{}}{\var{groupID}}$|
+  = parentFeatureID : ancestors|$((\names{}, \features{}, \groups{}),$|
+                                 |$\var{parentFeatureID}, t_n )$| 
+  where |$\group \assign     \lookup{\groups{}}{\var{groupID}}$|
         { parentFeatureID } |$ \assign \lookup{G_p}{t_n} $|
-     in 
-        parentFeatureID : ancestors|$\left((\names{}, \features{}, groups{}), \, \var{parentFeatureID}, t_n \right)$| 
   \end{minted}
   \caption{\var{ancestors}}
   \label{fun:ancestors}
