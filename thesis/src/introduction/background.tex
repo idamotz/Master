@@ -29,6 +29,7 @@ Feature models often also allow \emph{cross-tree constraints}. These are similar
 
 The formal structural requirements (well-formedness rules) to a feature model, as specified in~\cite{art:consistency-preserving-evolution-planning} are 
 \begin{enumerate}[\itbf{WF\arabic*}, itemsep=0mm]
+   \label{wf-requirements}
    \item A feature model has exactly one root feature.
    \item The root feature must be mandatory.
    \item Each feature has exactly one unique name, variation type and (potentially empty) collection of subgroups.
@@ -38,7 +39,7 @@ The formal structural requirements (well-formedness rules) to a feature model, a
    \item Groups with types \xortype{} or \ortype{} must not contain \mandatory{} features.
 \end{enumerate}
 
-Furthermore, a feature model is a tree structure and must not contain cycles. There is an additional requirement that groups with types \xortype{} or \ortype{} must contain at least two child features, but this is not taken into account in this thesis.
+Furthermore, a feature model is a tree structure and must not contain cycles. There is an additional requirement that groups with types \xortype{} or \ortype{} must contain at least two child features, but this is not taken into account in this thesis. A \emph{paradox} is a violation of these well-formedness requirements, i.e. if the root is not mandatory, if a name is not unique, etc.
 
 \subsection{Feature Model Evolution Plans}
 \label{sub:feature-model-evolution-plans}
@@ -84,7 +85,7 @@ In the LTEP research project, we have formalized evolution plans as an initial m
    \end{center}
 \end{figure}
 
-Furthermore, we have published a semantics for these edit operations along with a formal definition of a feature model, letting us define a \emph{sound} plan~\cite{art:consistency-preserving-evolution-planning}. The semantics is formalized as a set of structural operational semantic rules, detailing exactly which conditions must be fulfilled for an operation to be applied, and the way to construct the resulting feature model after applying it. A sound plan is an evolution plan in which applying each operation in order results in a structurally sound feature model for each step. Using this semantics on a modified plan allows for validation of change. When changing a feature model evolution plan, soundness of the updated plan can be checked by modifying the list of edit operations and checking that the resulting plan is sound using the semantics. However, this approach models change to \emph{feature models}, whereas the goal of this thesis is to model and analyse change to a \emph{feature model evolution plan}.
+Furthermore, we have published a semantics for these edit operations along with a formal definition of a feature model, letting us define a \emph{sound} plan~\cite{art:consistency-preserving-evolution-planning}. The semantics is formalized as a set of structural operational semantic rules, detailing exactly which conditions must be fulfilled for an operation to be applied, and the way to construct the resulting feature model after applying it. A sound plan is an evolution plan in which applying each operation in order results in a structurally sound feature model for each step, i.e., a plan resulting in no paradoxes. Using this semantics on a modified plan allows for validation of change. When changing a feature model evolution plan, soundness of the updated plan can be checked by modifying the list of edit operations and checking that the resulting plan is sound using the semantics. However, this approach models change to \emph{feature models}, whereas the goal of this thesis is to model and analyse change to a \emph{feature model evolution plan}.
 
 \section{Static Analysis}
 \label{sec:static-analysis}
@@ -134,4 +135,4 @@ The syntax-driven, unambiguous, and compact nature of such rules make them popul
 % Emphasize that I've made an implementation as well as the theory.
 \subsection{Soundness}
 A feature model evolution plan may be viewed as a sequence of feature models associated with time points. 
-In this context, soundness of a feature model evolution plan means that all of the feature models in the plan uphold the structural requirements \itbf{WF1\textendash WF7} given in Section~\ref{sub:feature-models}. In a sound plan, no paradoxes occur; for instance, no two features have the same name at the same time, no groups with type \xortype{} or \ortype{} contain features of type \mandatory{}, etc. This can be verified automatically, as we did in \cite{art:consistency-preserving-evolution-planning}.
+In this context, soundness of a feature model evolution plan means that all of the feature models in the plan uphold the structural requirements \itbf{WF1\textendash WF7} given in Section~\vref{wf-requirements}. In a sound plan, no paradoxes occur; for instance, no two features have the same name at the same time, no groups with type \xortype{} or \ortype{} contain features of type \mandatory{}, etc. This can be verified automatically, as we did in \cite{art:consistency-preserving-evolution-planning}.

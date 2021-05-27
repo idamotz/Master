@@ -3,7 +3,7 @@
 
 In this chapter we prove soundness for the analysis rules (Section~\vref{cha:a-rule-system-for-analysis-of-plan-change}) by formalizing soundness for interval-based feature models and examining the behaviour of each rule individually.
 
-We use an inductive proof structure to prove soundness and modularity for the rule system. The base case is a proof by construction, in which we define a sound interval-based feature model. Using the induction hypothesis that the initial model is sound, we prove that each rule preserves soundness and operates within the previously defined scope (Section~\vref{sec:scope}). We present only two of the proofs in this chapter to show the structure of the proofs. The rest of the proofs can be found in Appendix~\vref{cha:remaining-soundness-proofs}.
+Our goal is to show that applying a rule will result in a sound plan, and that the rules operate within the operation's scope and updates the model correctly. We first define formally what constitutes a well-formed interval-based feature model. Next, we prove that each rule results in a sound IBFM, given that the original IBFM is well-formed. Moreover, we show that the rules do not violate the scopes defined in Section~\ref{sec:scope}, and that they update the model according to the semantics of each rule. We present only two of the proofs in this chapter to show the structure of the proofs. The rest of the proofs can be found in Appendix~\vref{cha:remaining-soundness-proofs}.
 
 \input{soundness/ibfms}
 

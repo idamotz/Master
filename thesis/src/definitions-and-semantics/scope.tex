@@ -6,26 +6,26 @@ The scope of an operation consists of the parts of the plan that \emph{may} be a
 
 In this section, we define the scope for each of the operations defined in Section~\vref{sec:operations}. The scope is later used when creating the analysis rules for modification of the interval-based feature model.
 
-In the section, we describe the \emph{spatial} and \emph{temporal} scopes. The spatial scope consists of the parts of a feature model that may be affected by change. For instance, adding a group affects the group being added and its parent feature, as the operation does not modify any other part of the plan. We must also take into account the \emph{temporal} aspect, since the plan also has a dimension of time. The temporal scope then consists of the time points that may be affected by applying an operation. In Figure~\vref{ex:add-group-scope}\footnote{Notice that the plan differentiates between groups and feature, but does not display types or names} %TODO: readd vref but make sure it isn't at a page break.
-, we visualise the spatial and temporal scopes. In the original plan, a feature $C$ is added to group $A$ at time 2. In time 3, it is moved to group $B$. We modify the plan by adding a group $D$ to feature $C$ from time 2 to time 3. In the modified plan, the scope is shown, containing feature $C$ and group $D$ from time 2 to 3. Notice that $Root$ and $A$ are not in the scope, and nor are the time points 1 or 4.
+In the section, we describe the \emph{spatial} and \emph{temporal} scopes. The spatial scope consists of the parts of a feature model that may be affected by change. For instance, adding a group affects the group being added and its parent feature, as the operation does not modify any other part of the plan. We must also take into account the \emph{temporal} aspect, since the plan also has a dimension of time. The temporal scope then consists of the time points that may be affected by applying an operation. In Figure~\vref{ex:add-group-scope}\footnote{Notice that the plan differentiates between groups and features, but does not display types or names} %TODO: readd vref but make sure it isn't at a page break.
+, we visualise the spatial and temporal scopes. In the original plan, a group $D$ is added to feature $B$ at time 2. In time 3, it is moved to feature $C$. We modify the plan by adding a feature $E$ to group $D$ from time 2 to time 3. In the modified plan, the spatial and temporal scopes are shown, with the spatial scope containing group $D$ and feature $E$, and the temporal scope containing times 2 and 3. Notice that $Root$, $A$, and $B$ are not in the scope, nor are the time points 1 and 4.
 \begin{figure}[h]
   \centering
       \textbf{Original plan}
 
-      \includegraphics[width=0.7\textwidth]{MoveCPlan}
+      \includegraphics[width=0.6\textwidth]{MoveDPlan}
       \bigskip
       
-      apply \textbf{addGroup}$(D, \ldots, C)$ from 2 to 3  
+      apply \textbf{addFeature}$(E, \ldots, D)$ from 2 to 3  
       \bigskip
 
       \textbf{Modified plan}
 
-      \includegraphics[width=0.9\textwidth]{MoveCPlanMod}
+      \includegraphics[width=0.8\textwidth]{MoveDPlanMod}
   \caption{Add group scope visualisation}
   \label{ex:add-group-scope}
 \end{figure}
 
-For each of the operations defined in Section~\vref{sec:operations}, we define the scope in the temporal and spatial dimensions. By assuming that the original plan is sound, meaning that it contains no paradoxes, we include only those parts of the plan in which paradoxes may arise after applying an operation.
+For each of the operations defined in Section~\vref{sec:operations}, we define the scope in the temporal and spatial dimensions. By assuming that the original plan is sound, meaning that it contains no paradoxes, we include only those parts of the plan in which the operation may cause a paradox.
 
 \subsubsection*{Operation Scopes}
 We define the temporal and spatial scopes for each operation.
@@ -55,14 +55,16 @@ We define the temporal and spatial scopes for each operation.
       apply \textbf{moveGroup}$(B, C)$ at 2
       \bigskip
 
-      \textbf{Modified plan \todo{Make two different circles for two different scopes}}
+      \textbf{Modified plan}
 
       \includegraphics[width=0.7\textwidth]{CycleParadox}
     \caption{Move operation causing cycle}
     \label{ex:move-cycle}
   \end{figure}
 
-  The spatial scope is discussed in more detail in the algorithm for moving features or groups presented in Section~\vref{sub:move-algorithm}. This scope is the largest and hardest to define, because we have to detect cycles. See Figure~\vref{ex:move-cycle} for an example of a move which causes a cycle. In the example, the original plan contains a move operation in which feature $C$ is moved to group $B$ at time 3. In the modified plan, group $B$ is moved to feature $C$ at time 2. Although this seems problem-free at time 2, it causes a paradox in the shape of a cycle at time 3, since $C$ is then moved to a group in its subtree. The scope is defined by the feature and its ancestors, as well as the target group and its ancestors, which may change during the intervals due to other move operations. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common in the original plan, as well as the feature and the group themselves. Conflicting types and removal of the new parent must be considered in addition to cycles.
+  The spatial scope is discussed in more detail in the algorithm for moving features or groups presented in Section~\vref{sub:move-algorithm}. This scope is the largest and hardest to define, because we have to detect cycles. See Figure~\vref{ex:move-cycle} for an example of a move which causes a cycle. In the example, the original plan contains a move operation in which feature $C$ is moved to group $B$ at time 3. In the modified plan, group $B$ is moved to feature $C$ at time 2. Although this seems problem-free at time 2, it causes a paradox in the shape of a cycle at time 3, since $C$ is then moved to a group in its subtree. 
+
+  The scope is defined by the feature and its ancestors, as well as the target group and its ancestors, which may change during the intervals due to other move operations. It is not necessary to look at all ancestors, only the ones which \var{feature} and \var{targetGroup} do not have in common in the original plan, as well as the feature and the group themselves. Conflicting types and removal of the new parent must be considered in addition to cycles.
   \item \textbf{moveGroup}(\var{groupID}, \var{targetFeatureID}) at $t_n$\\
     This is similar to the scope for \textbf{moveFeature}, as cycles violate the tree structure independently of whether the nodes are features or groups.
     The difference in spatial scope concerns types, as type conflicts can only arise between a parent group and its child feature. Since the operation does not change the relation between a parent group and its child features, and the original plan is assumed to be sound, conflicting types are not considered for this operation.

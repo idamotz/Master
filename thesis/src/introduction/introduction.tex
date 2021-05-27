@@ -82,8 +82,12 @@ This method requires us to analyse the entire plan each time a change to the pla
 
 \section{Research Questions}
 \label{sec:research-questions}
-
-In order to reach the objective, we present research questions that will be addressed in the conclusion of the thesis. \todo{Pinpoint the challenge. Then the overall goal of the thesis. In order to achieve this goal, the thesis will address the following questions}
+% \todo{Pinpoint the challenge. Then the overall goal of the thesis. In order to achieve this goal, the thesis will address the following questions}
+% Challenge
+Although we have formalized the feature model evolution plan in our previous work~\cite{art:consistency-preserving-evolution-planning}, change to such a plan has not been addressed formally. 
+% Goal
+The goal of this thesis is to formalize plan change and create an analysis method which verifies it, leveraging the knowledge that a change affects only parts of the plan.
+In order to achieve this goal, the thesis will address the following research questions.
 
 \begin{enumerate}[\itbf{RQ\arabic*}, itemsep=0mm]
    \item \textit{Which operations are useful for modifying a feature model evolution plan?} In the LTEP project, we defined operations for modifying a feature model, but not a feature model evolution plan. \label{rq1}
@@ -95,7 +99,7 @@ In order to reach the objective, we present research questions that will be addr
 
 \section{Contributions}
 
-In this thesis, we present a set of edit operations for changing feature model evolution plans. We furthermore define the scope of each of these operations, meaning that we deduce exactly which parts of a plan may be affected by each operation. A representation for feature model evolution plan is devised with the aim to easily isolate a scope for analysis. Based on the scope and representations, we create an analysis method for validation and application of the edit operations. The analysis is formalized as a set of rules, giving detailed specification of when an operation may be applied to the evolution plan, and how to apply the modification. We implement a prototype\footnote{\todo{Create a repo}} of the analysis as proof of concept. Finally, we give an inductive proof that the rule set is sound by showing that each rule preserves well-formedness of the structure of the feature model, that the application of each rule affects only a specified scope within the feature model evolution plan, and that each rule updates the evolution plan correctly according to the semantics of the operation applied.
+In this thesis, we present a set of edit operations for changing feature model evolution plans. We furthermore define the scope of each of these operations, meaning that we deduce exactly which parts of a plan may be affected by each operation. A representation for feature model evolution plan is devised with the aim to easily isolate a scope for analysis. Based on the scope and representations, we create an analysis method for validation and application of the edit operations. The analysis is formalized as a set of rules, giving detailed specification of when an operation may be applied to the evolution plan, and how to apply the modification. We implement a prototype of the analysis as proof of concept. Finally, we give a proof that the rule set is sound by showing that each rule preserves well-formedness of the structure of the feature model, that the application of each rule affects only a specified scope within the feature model evolution plan, and that each rule updates the evolution plan correctly according to the semantics of the operation applied.
 
 \section{Chapter Overview}
 \label{sec:chapter-overview}
