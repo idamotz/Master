@@ -35,20 +35,20 @@ If the rule is applied, the well-formedness requirements must hold for the updat
 
 Since the rule checks that the feature does not already exist during the temporal scope, it is impossible that $\var{featureID} = RootID$. Thus the rule does not affect the root feature, and \wf{1} and \wf{2} hold for the updated interval-based feature model.
 
-Because we assume that \wf{8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or subgroups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
+Because we assume that \wf{8} holds for the original model, and the feature does not exist during $\interval{t_n}{t_m}$, the feature has no name, type, or child groups in the original plan. When we add the feature to the feature model using \var{setFeatureAttributes}, we give the feature exactly one name and one type during the temporal scope, and the set of child groups is empty. The temporal scope is also added to the feature's existence set, so only the new feature has the ID $\var{featureID}$ during the temporal scope. To link the feature ID to the name, the rule sets the feature ID as the value at key $\var{name}$ in the $\names{}$ map during the temporal scope, so the name is unique during the temporal scope.
 Consequently, \wf{3} holds.
 
 The rule does not modify the parent group's variation type, so \wf{4} is preserved in the modified interval-based feature model.
 
 Similarly to the argument for \wf{3}, the parent group ID is uniquely defined for the feature in \var{setFeatureAttributes}, and \var{featureID} is added to the parent group's set of child features, so the new feature is part of exactly one group. Since we do not remove any other feature IDs from the parent group's set of features, and as we already established that the new feature is not the root feature, \wf{5} is preserved.
 
-The new feature does not have any subgroups during the temporal scope, and we do not modify the parent group's parent feature. Under the assumption that \wf{6} holds in the original model, it still holds after applying the \rulefont{Add-Feature} rule.
+The new feature does not have any child groups during the temporal scope, and we do not modify the parent group's parent feature. Under the assumption that \wf{6} holds in the original model, it still holds after applying the \rulefont{Add-Feature} rule.
 
 The rule verifies that all of the parent group's types are compatible with the added feature's type during the temporal scope, so \wf{7} holds after applying the rule.
 
 Since the rule adds the temporal scope to the new feature's existence table, and since the parent group exists in the original plan, \wf{8} is preserved after the rule is applied.
 
-It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no subgroups, so it cannot be part of a cycle. Because of the assumption that \wf{9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
+It is furthermore impossible that adding this feature creates a cycle in the modified model. The new feature has no child groups, so it cannot be part of a cycle. Because of the assumption that \wf{9} holds in the original plan, and applying the rule does not introduce a cycle, this requirement still holds. 
 
 As the rule operates within the scope (Lemma~\vref{lemma:add-feature-scope}), it does not affect any other part of the plan.
 
@@ -89,7 +89,7 @@ According to the semantics of assignment (Section~\vref{sec:interval-based-featu
    \lookup{F'_n}{\interval{t_n}{t_m}} &= \set{\var{name}} && \text{the feature has the expected name} \tag{2} \label{add-feature2}\\
    \lookup{F'_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the feature has the expected type} \tag{3} \label{add-feature3}\\
    \lookup{F'_p}{\interval{t_n}{t_m}} &= \set{\var{parentGroupID}}  && \text{the feature has the expected parent group} \tag{4} \label{add-feature4}\\
-   \lookup{F'_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has subgroups} \tag{5} \label{add-feature5}
+   \lookup{F'_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the feature has child groups} \tag{5} \label{add-feature5}
 \end{align}
 
 Statement (\ref{add-feature1}) holds due to the line $F_e \cup \set{\interval{t_n}{t_m}}$ in $\var{setFeatureAttributes}$. The next four hold due to both premises in the rule and modifications in the function. Due to the premise $\interval{t_n}{t_m} \not \innr F_e$, which means that the feature does not previously exist at any point during the interval, and since \wf{8} is assumed to hold for the original model, the original feature does not have a name, type, parent group or child groups during the interval. In the function $\var{setFeatureAttributes}$, the name is added ($\lookup{F_n}{\interval{t_{start}}{t_{end}}} \assign \var{name}$), and so is the type ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{type}$) and the parent group ($\lookup{F_t}{\interval{t_{start}}{t_{end}}} \assign \var{parentGroupID}$). The child groups are not modified, and so (\ref{add-feature5}) holds.

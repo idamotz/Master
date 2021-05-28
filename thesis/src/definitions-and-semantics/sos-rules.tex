@@ -566,13 +566,13 @@ Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent
 
 First, check whether $n \in \texttt{ancestors}(IBFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
 
-Next, find a list of critical nodes. 
-Let $A_n = \texttt{ancestors}(IBFM, n, t_1) = [a_1, a_2, \dots, SN, \dots, r]$ and $A_{c_1} = \texttt{ancestors}(IBFM, c_1, t_1) = [c_2, c_3, \dots, c_n, SN, \dots, r]$ with $SN$ the first common ancestor of $n$ and $c_1$. The list of critical nodes is then $C = [c_1, c_2, \dots, c_n]$, which is essentially the list of $n$'s new ancestors after the move. 
+Next, find a list of critical nodes. These are the nodes which may cause a cycle if they are moved. 
+Let $A_n = \texttt{ancestors}(IBFM, n, t_1) = [a_1, a_2, \dots, SN, \dots, r]$ and $A_{c_1} = \texttt{ancestors}(IBFM, c_1, t_1) = [c_2 \comma c_3 \comma \dots \comma c_n \comma SN \comma \dots \comma r]$ with $SN$ the first common ancestor of $n$ and $c_1$. The list of critical nodes is then $C = [c_1, c_2, \dots, c_n]$, which is essentially the list of $n$'s new ancestors after the move. 
 
 \textbf{Repeat this step until the algorithm terminates:}
 
-Look for the first move of one of the critical nodes. If no such moves occur until $t_e$, the operation causes no paradoxes, and the algorithm terminates successfully.  
-  Suppose there is a `move` operation scheduled for $t_k$, with $t_1 < t_k < t_e$, where $c_i$ is moved to $k$. There are two possibilities:  
+Look for the first move of one of the critical nodes, following the order of the list $C$. If no such moves occur until $t_e$, the operation creates no cycles, and the algorithm terminates successfully.  
+  Suppose there is a `move` operation scheduled for $t_k$, with $t_1 \leq t_k < t_e$, where $c_i$ is moved to $k$. There are two possibilities:  
   \begin{enumerate}
     \item $k$ is in $n$'s subtree, which is equivalent to $n \in \texttt{ancestors}(IBFM, k, t_k)$. Report that the move will cause a cycle and terminate. 
 \item $k$ is not in $n$'s subtree, so this move is safe. Let $A_k = \texttt{ancestors}(IBFM, k, t_k) = [k_1, k_2, \dots, k_n, SN', \dots, r]$, with SN' the first common element of $A_k$ and $A_n$. Update the list of critical nodes to $[c_1, \dots, c_i, k_1, \dots, k_n]$.

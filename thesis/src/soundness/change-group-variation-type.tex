@@ -21,7 +21,7 @@ Recall that the temporal scope of the \rulefont{Change-Group-Variation-Type} rul
    \]
    Here, the time point $t_n$ for changing the group type is looked up in the group's types map's set of interval keys, and the expected result is $\set{\interval{t_{t_1}}{t_{t_2}}}$. This means that there is a mapping $\intervalmapping{t_{t_1}}{t_{t_2}}{\var{oldType}}$ in $G_t$, with $\var{oldType}$ being the type of the group at time $t_n$, and this stops being the case at $t_{t_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{t_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{t_2}}$, so the rule operates strictly within the temporal scope of the operation.
 
-   The spatial scope for this operation is the group itself and its parent feature. The group may have several subfeatures during the temporal scope, which may both move and change their types. These features and their types are looked up in the premise
+   The spatial scope for this operation is the group itself and its parent feature. The group may have several child features during the temporal scope, which may both move and change their types. These features and their types are looked up in the premise
 \[
    \begin{split}
         \forall \interval{t_{c_1}}{t_{c_2}} \in \overlapping{G_c}{t_n}{t_{t_2}}\\ % for all parent intervals overlapping the temporal scope 
@@ -56,7 +56,7 @@ As discussed in the \textbf{Scope} paragraph, the premise
         \big(\var{compatibleTypes}(\var{type}, t)\big)
    \end{split}
 \]
-looks up all subfeature mappings overlapping the temporal scope ($\intervalmapping{t_{c_1}}{t_{c_2}}{\set{f_1, f_2, \ldots}}$), finds the types each subfeature has during the scope and \emph{while} it is the subfeature of the group, and verifies that those types are compatible. Thus \wf{7} is preserved. 
+looks up all child feature mappings overlapping the temporal scope ($\intervalmapping{t_{c_1}}{t_{c_2}}{\set{f_1, f_2, \ldots}}$), finds the types each child feature has during the scope and \emph{while} it is the child feature of the group, and verifies that those types are compatible. Thus \wf{7} is preserved. 
 As no changes are made to any other part of the interval-based feature model, the other requirements \wf{1\textendash 3}, \wf{5\textendash 6}, and \wf{8\textendash 9} hold trivially.
 \\
 
