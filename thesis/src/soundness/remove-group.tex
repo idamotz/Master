@@ -11,7 +11,7 @@ be the initial state, and
 \]
 be the result state after applying the \rulefont{Remove-Group} rule. Recall that this operation removes the group with ID $\var{groupID}$ from the interval-based feature model $(\names, \features, \groups)$ at $t_n$. Furthermore, let $\lookup{\groups}{\var{groupID}} = \group{}$, and $\interval{t_i}{t_j} \in G_e$, with $t_i \leq t_n < t_j$. This means that the original plan added the group at time $t_i$ and removed it at $t_j$, with the possibility that $t_j = \forever$. In the latter case, there was no plan to remove the group originally.
 
-\paragraph{Scope}
+\paragraph{Modularity}
 
 As defined in Section~\vref{sec:scope}, the \textbf{removeGroup} operation's temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time point in which the group was originally planned to be removed. We can see from the description above that $t_k = t_j$; the end point in the group's existence set containing $t_n$. We then have that the scope is defined as $\interval{t_n}{t_j}$. In the rule, we find the interval $\interval{t_i}{t_j}$ by looking up
 \[
@@ -30,10 +30,12 @@ According to the semantics of $\containing{\map{IS}}{t_n}$, it is true then that
    \lookup{G_c}{\interval{t_n}{t_{e_2}}} = \emptyset
 \end{equation*}
    ensures that the operation is not applied unless the group's set of child features is empty. The only features and groups looked up is the group itself and its parent feature. Thus, the rule stays within the spatial scope.
+
+Based on the above proof, we conclude with the following lemma:
  \\
 
 \begin{lemma}
-   The $\rulefont{Remove-Group}$ rule operates strictly within the scope of the \textbf{removeGroup} operation.
+   The $\rulefont{Remove-Group}$ rule operates strictly within the temporal and spatial scopes of the \textbf{removeGroup} operation.
    \label{lemma:remove-group-scope}
 \end{lemma}
 
@@ -66,6 +68,8 @@ Since a premise of the rule is
 Clearly, $\lookup{G''_t}{\interval{t_n}{t_j}} = \emptyset$.  Furthermore, since $\interval{t_{t_1}}{t_n}$ does not overlap $\interval{t_n}{t_j}$, $\lookup{G'_t}{\interval{t_n}{t_j}} = \emptyset$. An analogous argument can be made for $\lookup{G'_p}{\interval{t_n}{t_j}} = \emptyset$. From the definition of $\var{clampGroup}$, $G_c = G'_c$, so by the premise $\lookup{G_c}{\interval{t_n}{t_j}} = \emptyset$ in the rule, $\lookup{G_c'}{\interval{t_n}{t_j}} = \emptyset$. Consequently \wf{8} holds for the altered interval-based feature model.
 
 Given that no cycles exist in the original model, removing a group does not create a new one, so \wf{9} holds.
+
+We conclude that the \rulefont{Remove-Group} rule preserves well-formedness for the interval-based feature model, according to well-formedness rules \wf{1-9}. 
 \\
 
 \begin{lemma}
@@ -79,6 +83,8 @@ Given that no cycles exist in the original model, removing a group does not crea
 % Vis: \interval{t_n}{t_j} \notinnr G'_e
 % \lookup{G_t}{\interval{t_n}{t_j}} = \lookup{G_p}{\interval{t_n}{t_j}} = \lookup{G_c}{\interval{t_n}{t_j}}
 The semantics of the \textbf{removeGroup} operation dictate that the group should not exist, have a type, a parent, or child features after being removed. A proof for this can be found in the previous paragraph. Moreover, the parent feature's map of child features should not contain $\var{groupID}$ during the temporal scope. This is also proven in the previous paragraph. The $\names{}$ map should not be modified. It is clear from the rule that $\names{} = \names{}'$, so this condition, too, is true.
+
+The above proof shows the following lemma:
 \\
 
 \begin{lemma}

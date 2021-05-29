@@ -16,15 +16,17 @@ be the initial state, and
 \]
 the state after applying the \rulefont{Add-Feature} rule.  Recall that this operation adds the feature with ID \var{featureID} to the interval-based feature model $(\names{}, \features{}, \groups{})$ from $t_n$ to $t_m$. We assume that $(\names{}, \features{}, \groups{})$ is well-formed, as defined in \wf{1\textendash 9}.
 
-\paragraph{Scope}
+\paragraph{Modularity}
 
 Recall from Section~\vref{sec:scope} that the temporal scope of this operation is $\interval{t_n}{t_m}$, and the spatial scope is the feature itself, the parent group and the name. 
 
-In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up or assigned to in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation.
+In the rule, we look up only the feature ID, the parent group ID, and the name, and update only the name, feature, and parent group. Thus, the rule operates within the spatial scope of the operation. Furthermore, the only interval looked up or assigned to in the interval maps and sets of the model is $\interval{t_n}{t_m}$, which is exactly the temporal scope of the rule. Hence the rule operates strictly within the temporal and spatial scopes of the operation. 
+
+Based on the above proof, we conclude with the following lemma:
 \\
 
 \begin{lemma}
-   The \rulefont{Add-Feature} rule operates strictly within the scope of the \textbf{addFeature} operation.
+   The \rulefont{Add-Feature} rule operates strictly within the temporal and spatial scopes of the \textbf{addFeature} operation.
    \label{lemma:add-feature-scope}
 \end{lemma}
 
@@ -99,6 +101,8 @@ The child features of the group must also be updated according to the semantics 
    \var{featureID} \in \bigcup \lookup{G'_c}{\interval{t_n}{t_m}}
 \]
 , meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see Figure~\vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
+
+The above proof shows the following lemma:
 \\
 
 \begin{lemma}

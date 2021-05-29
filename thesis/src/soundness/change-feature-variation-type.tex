@@ -15,7 +15,7 @@ be the initial state, and
 \]
 be the result state after applying the \rulefont{Change-Feature-Variation-Type} rule. Recall that this operation changes the type of the feature with ID $\var{featureID}$ to $\var{type}$.
 
-\paragraph{Scope}
+\paragraph{Modularity}
 Recall that the temporal scope of the \rulefont{Change-Feature-Variation-Type} rule is $\interval{t_n}{t_k}$ (Section~\vref{sec:scope}), where $t_k$ is the time point at which the type is originally planned to be changed or the feature is removed. In the rule, this scope is identified by 
    \[
       \containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}
@@ -33,10 +33,12 @@ Recall that the temporal scope of the \rulefont{Change-Feature-Variation-Type} r
 \]
 
 Otherwise, the only feature or group looked up or assigned to in the rule is $\lookup{features}{\var{featureID}}$, so the rule stays within the spatial scope.
+
+Based on the above proof, we conclude with the following lemma:
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Feature-Variation-Type} rule operates strictly within the scope of the \textbf{changeFeatureVariationType} operation.
+   The \rulefont{Change-Feature-Variation-Type} rule operates strictly within the temporal and spatial scopes of the \textbf{changeFeatureVariationType} operation.
    \label{lemma:change-feature-variation-type-scope}
 \end{lemma}
 
@@ -57,6 +59,8 @@ As discussed in the \textbf{Scope} paragraph, the premise
     \end{split}
 \]
 looks up all parent mappings overlapping the temporal scope ($\intervalmapping{t_{p_1}}{t_{p_2}}{p}$), finds the types each parent group has during the scope and \emph{while} it is the parent of the feature, and verifies that those types are compatible. Thus \wf{7} is preserved.
+
+We conclude that the \rulefont{Change-Feature-Variation-Type} rule preserves well-formedness for the interval-based feature model, according to well-formedness rules \wf{1-9}. 
 \\
 
 \begin{lemma}

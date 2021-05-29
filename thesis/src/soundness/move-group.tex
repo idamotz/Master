@@ -15,7 +15,7 @@ be the initial state, and
 \]
 be the result state after applying the \rulefont{Move-Group} rule. Recall that this operation moves the group with ID $\var{groupID}$ to the feature with ID $\var{newParentID}$.
 
-\paragraph{Scope}
+\paragraph{Modularity}
 Recall that the temporal scope of the \rulefont{Move-Group} rule is $\interval{t_n}{t_k}$ (Section~\vref{sec:scope}), where $t_k$ is the time point at which the group is originally planned to be moved or is removed. In the rule, this scope is identified by 
    \[
       \containing{G_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}}
@@ -23,10 +23,12 @@ Recall that the temporal scope of the \rulefont{Move-Group} rule is $\interval{t
    Here, the time point $t_n$ for moving the group is looked up in the group's parent map's set of interval keys, and the expected result is $\set{\interval{t_{p_1}}{t_{p_2}}}$. This means that there is a mapping $\intervalmapping{t_{p_1}}{t_{p_2}}{\var{parentFeatureID}}$ in $F_p$, with $\var{parentFeatureID}$ being the ID of the group's parent feature at time $t_n$, and this feature stops being the group's parent at $t_{p_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{p_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{p_2}}$, but it is necessary to also look at the cycle detection algorithm in Section~\vref{sub:move-algorithm}, since this is also referenced in the rule by $\neg \var{createsCycle}$. Here, $t_{p_2}$ is called $t_e$, and the algorithm states that it only looks at time points between $t_n$ and $t_e$. Thus the rule operates strictly within the temporal scope of the \textbf{moveGroup} operation.
 
    The spatial scope for this operation is defined as the \emph{ancestors which the group and the target feature do not have in common}. In other words, the \emph{new} ancestors of the group after applying the rule. In the rule itself, only the group with ID $\var{groupID}$ and its new parent feature with ID $\var{newParentID}$ are looked up. However, the cycle detection algorithm must also be considered. Here, the ancestors of both the group and the feature at $t_n$ are looked up, the first ancestor they have in common identified, and the new ancestors are collected into a list. If one of them is moved before $t_e$, the list is updated. Hence the algorithm's spatial scope is indeed the group ancestors and the target feature's ancestors, as well as the group and feature themselves, and so the rule operates within the defined spatial scope.
+
+Based on the above proof, we conclude with the following lemma:
 \\
 
 \begin{lemma}
-   The \rulefont{Move-Group} rule operates strictly within the scope of the \textbf{moveGroup} operation.
+   The \rulefont{Move-Group} rule operates strictly within the temporal and spatial scopes of the \textbf{moveGroup} operation.
    \label{lemma:move-group-scope}
 \end{lemma}
 
@@ -56,6 +58,8 @@ As the group's types and child features map are not modified, \wf{4\textendash 5
 Since the rule adds a child group to the target feature during the temporal scope, the feature must exist during the temporal scope for \wf{8} to hold. The premise $\interval{t_n}{t_{p_2}} \inn F_e$ along with the assumption that \wf{8} holds in the origial plan ensure this. Moreover, the rule does not alter the group's existence set, \wf{8} is preserved. 
 
 The intention of the cycle detection algorithm in Section~\vref{sub:move-algorithm} is to uphold \wf{9}. Given the assumption that the original interval-based feature model contains no cycles, if the altered model contains a cycle then the $\textbf{moveGroup}$ operation introduced it, and the group being moved must be part of the cycle. This could only happen if the group became part of its own subtree during the temporal scope, which means that at some point, the group occurs in its own list of ancestors. The algorithm looks at the group's \emph{new} ancestors, meaning the ancestors that the group does not have in the original plan, but does in the new one. It then checks that none of those ancestors are moved to the group's subtree. Thus the rule preserves \wf 9.
+
+We conclude that the \rulefont{Move-Group} rule preserves well-formedness for the interval-based feature model, according to well-formedness rules \wf{1-9}. 
 \\
 
 \begin{lemma}
@@ -78,6 +82,8 @@ Given the modified map of parent features $G'_p$ and the original map $G_p$, we 
 This statement assigns $\var{newParentID}$ to the temporal scope $\interval{t_n}{t_{p_2}}$ after applying $\var{clampInterval}(G_p, t_n)$, meaning that the original parent mapping is shortened to end at $t_n$, and a new mapping $\intervalmapping{t_n}{t_{p_2}}{\var{newParentID}}$ is inserted. By semantics of assignment, it is clear that for $t_i$ with $t_n \leq t_i < t_{p_2}$, $\lookup{G'_p}{t_i} = \set{\var{newParentID}}$, which is the desired result and fulfils \ref{move-group-parentfeature}.
 
 By Lemma~\vref{lemma:move-group-well-formed} and \wf{5}, \ref{move-group-oldparent} and \ref{move-group-newparent} follow from \ref{move-group-parentfeature}. In other words, since the updated interval-based feature model is well-formed, and the group's parent feature during the temporal scope is $\var{newParentID}$, the group is not in the original parent feature's set of child groups during the temporal scope, and is in the new parent feature's set of child groups.
+
+The above proof shows the following lemma:
 \\
 
 \begin{lemma}

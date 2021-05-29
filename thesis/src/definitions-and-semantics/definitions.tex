@@ -4,7 +4,7 @@ To achieve our goal of a modular analysis of modification for feature model evol
 \label{sec:interval-based-feature-model}
 In this section we present the interval-based feature model as our representation for feature model evolution plans. To define it, we must first present the data structures it is based upon.
 
-A feature model evolution plan has two dimensions: the spatial dimension and the temporal dimension. The spatial dimension consists of the feature models \textemdash{} which features and groups exist, what their names and types are, and how they are related. The temporal dimension concerns time, i.e., which points in time are used in the feature model evolution plan. To store the information about the spatial dimension, we have decided to use maps, which are useful for looking up information about a specific element. Looking up a feature ID in such a map will give us the information about that feature. 
+A feature model evolution plan has two dimensions: the spatial dimension and the temporal dimension. The spatial dimension consists of the feature models \textemdash{} which features and groups exist, what their names and types are, and how they are related. The temporal dimension concerns time, i.e., which points in time appear in the feature model evolution plan. To store the information about the spatial dimension, we have decided to use maps, which are useful for looking up information about a specific element. Looking up a feature ID in such a map will give us the information about that feature. 
 \\
 
 \begin{definition}[Map]
@@ -55,11 +55,12 @@ That is, if removing $v$ leaves only the empty set at $\lookup{\map{map}}{k}$, w
 \[
   \map{map} \removevalue{v} k = \map{map}
 \]
-In other words, trying to a remove a value which does not exist does not modify the map.
+In other words, trying to remove a value which does not exist does not modify the map.
 
 We define \emph{time points} as the points in time used in a feature model evolution plan. A time point must be a member of a set $S$ such that $<$ is a strict total order on $S$. An example of such a set are the integers $\mathbb{Z}$, since $<$ on integers is a strict total order. Time points can also be dates or strings, as long as any set of time points can be ordered uniquely. In this thesis we use natural numbers for their simplicity, but in the real world, a time point will usually be a date.
 
 We choose to express the temporal dimension of the feature model evolution plan using \emph{intervals}. An interval denotes a range in time, for instance, from Monday to Friday. This interval contains Tuesday, but not Sunday.
+\\
 \begin{definition}[Interval]
   We define an interval as a set of time points between a lower bound and an upper bound, where the lower and upper bounds are time points. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound, and $t_\text{start} < t_\text{end}$. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
   \label{def:interval}
@@ -80,7 +81,7 @@ An \emph{interval map} is a map where the key is an interval.
   \label{def:interval-map}
 \end{definition}
 
-To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{IM} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure~\vref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
+To look up values, one can either give an interval or a time point as key. Both will return sets of values. For instance, if an interval map \map{IM} contains the mapping $\intervalmapping{t_1}{t_5}{v}$, all of the queries in Figure~\ref{ex:interval-map} will return $\{v\}$ (assuming that $t_1 < t_2 < \ldots < t_5$):
 
 \begin{figure}[h]
   \begin{align*}
@@ -132,7 +133,7 @@ To describe an entire feature model evolution plan, we define the \emph{interval
 \\
 
 \begin{definition}[Interval-based feature model]
-  An \emph{interval-based feature model} is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from names to interval maps with feature ID values, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from group IDs to \emph{group entries}. 
+  An \emph{interval-based feature model} (IBFM) is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from names to interval maps with feature ID values, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from group IDs to \emph{group entries}. 
   \label{def:interval-based-feature-model}
 \end{definition}
 
@@ -160,7 +161,7 @@ The \groups{} map has entries of the form $\mapping{\var{groupID}}{\textit{group
 
 Looking up a group which does not exist in the map returns an empty group $(\emptyset \comma \emptyset \comma \emptyset \comma \emptyset)$. 
 
-\section{How to Use the Interval-Based Feature Model}
+\subsection{Example \textemdash{} Application of Interval-Based Feature Model}
 \label{sec:how-to-use-the-interval-based-feature-model}
 To provide intuition, we give some examples of how to use the interval-based feature model.
 
@@ -212,44 +213,54 @@ We often want to know what is true for an \emph{interval}, not just a time point
 \]
 This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}{t_2}$. If we had that $\interval{t_1}{t_3} \in F_e$, the above predicate would be false, since both intervals contain the time point $t_1$.
 
-\subsection{Example Evolution Plan}
-A small example of an interval-based feature model can be found in Figure~\vref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. 
-
-\begin{figure}
+\begin{figure}[htpb]
   \begin{align*}
     ( \{ \; & \mapping{\text{Washing Machine}}{\intervalmapping{t_0}{\forever}{0}} \\
        ,\; & \mapping{\text{Washer}}{\intervalmapping{t_0}{\forever}{1}} \\
        ,\; & \mapping{\text{Dryer}}{\intervalmapping{t_5}{\forever}{2}}\; \} \\
        \\
-       ,\{\; & \mapping{0}{(\{ \interval{t_0}{\forever}\} ,\, \\
+       ,\{\; & [ 0 \mapsto \\
+             & \hspace{1cm} \begin{aligned} & \big(\{ \interval{t_0}{\forever}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\text{Washing Machine}}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\mandatory{}}\} ,\, \\
              &  \emptyset ,\, \\ 
-             & \{\intervalmapping{t_0}{\forever}{10}\} ) } \\
-             ,\, & \mapping{1}{(\{\interval{t_0}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{10}\} \big) ] \\
+             \end{aligned}\\
+             &\\
+         ,\, & [ 1 \mapsto \\
+              & \hspace{1cm} \begin{aligned} & \big(\{\interval{t_0}{\forever}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\text{Washer}}\} ,\, \\
              & \{\intervalmapping{t_0}{\forever}{\mandatory{}}\} ,\, \\
-             &  \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
-             & \emptyset)} \\
-             ,\, & \mapping{2}{(\{\interval{t_5}{\forever}\} ,\, \\
+             & \{\intervalmapping{t_0}{\forever}{10}\} ,\, \\ 
+             & \emptyset\big)] \\
+                \end{aligned} \\
+         ,\, & [ 2 \mapsto \\
+             & \hspace{1cm} \begin{aligned} & \big(\{\interval{t_5}{\forever}\} ,\, \\
              & \{\intervalmapping{t_5}{\forever}{\text{Dryer}}\} ,\, \\
              & \{\intervalmapping{t_5}{\forever}{\optional{}}\} ,\, \\
              &  \{\intervalmapping{t_5}{\forever}{10}\} ,\, \\ 
-             & \emptyset)} \}\\
+             & \emptyset\big) \}\\
+               \end{aligned} \\
              \\
-               ,\; \{ \; & [ 10 \mapsto (\{\interval{t_0}{\forever}\} ,\, \\
+         ,\; \{ \; & [ 10 \mapsto \\
+                   & \hspace{1cm} \begin{aligned} & \big(\{\interval{t_0}{\forever}\} ,\, \\
                          & \{\intervalmapping{t_0}{\forever}{\andtype{}}\} ,\, \\
                          & \{\intervalmapping{t_0}{\forever}{0}\} ,\, \\
-                         & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} ) ]\\
+                         & \{\intervalmapping{t_0}{\forever}{1},\, \intervalmapping{t_5}{\forever}{2}\} \big) ]\\
+                     \end{aligned}\\
     \}&)\\
   \end{align*}
   \caption{Small interval-based feature model}
   \label{ex:washing-machine}
 \end{figure}
 
-The same plan can be viewed in Figure~\vref{ex:washing-machine-visual}. It is clear from this example that the representation is better suited for manipulating the structure than reading it. 
 
-\begin{figure}
+\subsection{Example \textemdash{} Interval-Based Feature Model}
+A small example of an interval-based feature model can be found in Figure~\ref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. 
+
+The same plan can be viewed in Figure~\ref{ex:washing-machine-visual}, where the feature model at different stages of the plan are shown at time 1 and 5 respectively. It is clear from this example that the interval-based feature model is better suited for manipulating the structure than reading it. 
+
+\begin{figure}[htpb]
   \centering
   \includegraphics{WashingMachine}
   \caption{Washing machine visualisation}
@@ -259,7 +270,7 @@ The same plan can be viewed in Figure~\vref{ex:washing-machine-visual}. It is cl
 \section{Operations}
 \label{sec:operations}
 
-We define \emph{operations} to alter the interval-based feature model. The choice of operations is in large part based on the edit operations defined in our earlier work~\cite{art:consistency-preserving-evolution-planning}. We adapt them by adding a temporal dimension, letting us specify both \emph{where} an operation should be applied in the feature model, and \emph{when}, i.e. at which stage of the plan. We give a brief summary of the requirements a plan must fulfil for the operations to be applied.
+We define \emph{update operations} to alter the interval-based feature model. The choice of operations is in large part based on the edit operations defined in our earlier work~\cite{art:consistency-preserving-evolution-planning}. We adapt them by adding a temporal dimension, letting us specify both \emph{where} an operation should be applied in the feature model, and \emph{when}, i.e. at which stage of the plan. We give a brief summary of the requirements a plan must fulfil for the operations to be applied.
 
 \begin{itemize}
   \item \textbf{addFeature}(\var{featureID}, \var{name}, \var{featureType}, \var{parentGroupID}) from $t_n$ to $t_m$\\

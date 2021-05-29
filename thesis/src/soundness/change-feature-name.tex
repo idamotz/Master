@@ -14,7 +14,7 @@ be the initial state, and
 \]
 be the result state after applying the \rulefont{Change-Feature-Name} rule. Recall that this operation changes the name of the feature with ID $\var{featureID}$ to $\var{name}$.
 
-\paragraph{Scope}
+\paragraph{Modularity}
 Recall that the temporal scope of the \rulefont{Change-Feature-Name} rule is $\interval{t_n}{t_k}$ (Section~\vref{sec:scope}), where $t_k$ is the time point at which the name is originally planned to be changed or the feature is removed. In the rule, this scope is identified by 
    \[
       \containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}
@@ -22,10 +22,12 @@ Recall that the temporal scope of the \rulefont{Change-Feature-Name} rule is $\i
    Here, the time point $t_n$ for changing the name is looked up in the feature's names map's set of interval keys, and the expected result is $\set{\interval{t_{n_1}}{t_{n_2}}}$. This means that there is a mapping $\intervalmapping{t_{n_1}}{t_{n_2}}{\var{oldName}}$ in $F_n$, with $\var{oldName}$ being the name of the feature at time $t_n$, and this stops being the case at $t_{n_2}$. Thus the temporal scope of this operation is $\interval{t_n}{t_{n_2}}$. The only interval looked up or assigned to in the rule is $\interval{t_n}{t_{n_2}}$, so the rule operates strictly within the temporal scope of the operation.
 
    The spatial scope for this operation is the name, the feature, and its original name. The only feature looked up or assigned to is $\lookup{\features}{\var{featureID}}$, and the only names looked up or assigned to are $\var{oldName}$ and $\var{name}$. The $\groups{}$ map is not modified or looked up in by the rule. Clearly, the rule stays within the spatial scope.
+
+Based on the above proof, we conclude with the following lemma:
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Feature-Name} rule operates strictly within the scope of the \textbf{changeFeatureName} operation.
+   The \rulefont{Change-Feature-Name} rule operates strictly within the temporal and spatial scopes of the \textbf{changeFeatureName} operation.
    \label{lemma:change-feature-name-scope}
 \end{lemma}
 
@@ -49,6 +51,8 @@ Moreover \wf{3} requires that the name belongs to the same feature, and no other
 \]
 Here, the interval containing $t_n$ in $\lookup{\names}{\var{oldName}}$ is clamped to end at $t_n$, and the resulting map is assigned $\var{featureID}$ at $\var{name}$ during the temporal scope, so the new name belongs to only the feature. This fulfils \wf{3}.
 As no other part of the interval-based feature model is modified, $\wf{4\textendash 9}$ hold.
+
+We conclude that the \rulefont{Change-Feature-Name} rule preserves well-formedness for the interval-based feature model, according to well-formedness rules \wf{1-9}. 
 \\
 
 \begin{lemma}

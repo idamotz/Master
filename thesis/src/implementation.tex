@@ -37,7 +37,7 @@ A group $\group{}$ is defined in much the same way, with a \texttt{Validity\-Map
    \label{ex:simple-plan}
 \end{figure}
 
-The example in Figure~\vref{ex:simple-plan} is formalized below in our previously defined representation, with only one feature (ID feature:root) and one group (ID group:A).
+The example in Figure~\ref{ex:simple-plan} is formalized below in our previously defined representation, with only one feature (ID feature:root) and one group (ID group:A).
 
 \begin{align*}
  ( \{ \; & \mapping{\text{Root}}{\intervalmapping{1}{\forever}{\text{feature:root}}} \} \\
@@ -122,5 +122,5 @@ If we call \texttt{validateAndApply op simplePlan}, where \texttt{op} and \textt
 Left [ParentNotExists] 
    :: Either [ValidationError] IntervalBasedFeatureModel
 \end{minted}
-The list of errors, containing \texttt{Parent\-Not\-Exists}, is wrapped in a \texttt{Left} to show that the type is a \texttt{Validation\-Error}. If the operation did not result in an error, we would get a result on the form \texttt{Right ibfm}, where \texttt{ibfm} is an \texttt{Interval\-Based\-Feature\-Model}. The error here means that we are trying to add a feature, but the feature's parent does not exist at some point during the specified interval. In the eample, the parent group \texttt{group:A} is removed at 5, so the feature will be without a parent at that time. The paradox is visualised in Figure~\vref{ex:simple-plan2}.
+The list of errors, containing \texttt{Parent\-Not\-Exists}, is wrapped in a \texttt{Left} to show that the type is a \texttt{Validation\-Error}. If the operation did not result in an error, we would get a result on the form \texttt{Right ibfm}, where \texttt{ibfm} is an \texttt{Interval\-Based\-Feature\-Model}. The error here means that we are trying to add a feature, but the feature's parent does not exist at some point during the specified interval. In the eample, the parent group \texttt{group:A} is removed at 5, so the feature will be without a parent at that time. The paradox is visualised in Figure~\ref{ex:simple-plan2}.
 

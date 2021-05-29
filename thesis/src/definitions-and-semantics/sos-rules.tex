@@ -10,9 +10,9 @@ $$\sossize\begin{array}{c}
     \text{Premises}}
     { S \transition S'}
   \end{array}$$
-  where $S$ is the initial state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In the rules, the initial state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
+  where $S$ is the initial state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In the rules, the initial state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. In all of the rules, we assume that the initial plan (\names{}, \features{}, \groups{}) is sound, meaning that it contains no paradoxes. This lets us verify only the parts of the plan that are affected by the change, as the only paradoxes that can occur are the ones caused by the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
 
-\section{Add Feature Rule}
+\section{Analysis Rule for Adding a Feature}
 \label{sec:add-feature-rule}
 
 \begin{figure}
@@ -50,7 +50,7 @@ Recall from Section~\ref{sec:operations} that the \textbf{addFeature} operation 
 When adding a feature during the interval $\interval{t_n}{t_m}$, its ID cannot be in use during the interval ($\interval{t_n}{t_m} \not \innr F_e$). The parent group must exist ($\interval{t_n}{t_m} \inn G_e$), and the types it has during the interval must be compatible with the type of the 
 added feature ($\forall \var{gt} \in \lookup{G_t}{\interval{t_n}{t_m}} (\var{compatibleTypes}(\var{gt}, \var{type}))$). The name of the feature must not be in use during the interval ($\lookup{\lookup{\names{}}{\var{name}}}{\interval{t_n}{t_m}} = \emptyset$), and the interval must start before it ends ($t_n < t_m$). Notice that the default value in the $\features{}$ map lets us treat a failed lookup as a feature, thus allowing us to express the semantics of adding a feature using only one rule. When adding a feature, it may already exist in the plan during a different interval. In that case, we want to modify the existing feature entry. However, a feature being added is often completely new, and in that case it is useful that looking up the feature's ID in the \features{} map returns an empty feature entry $(\emptyset, \emptyset, \emptyset, \emptyset, \emptyset)$ instead of some undefined value, for instance $\bot$. This lets us treat both cases in the same way.
 
-To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (in Figure~\ref{fun:compatible-types}), $\var{setFeatureAttributes}$ (in Figure \ref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (in Figure~\vref{fun:add-child-feature}). The $\var{compatibleTypes}$ function takes a group type (\andtype{}, \ortype{} or \xortype{}) and a feature type (\mandatory{} or \optional{}) and checks whether they are compatible. The types should belong to a parent group and its child feature. The only combination which is not allowed is a \mandatory{} feature with an \xortype{} or \ortype{} parent group.
+To make the rule tidier, we use three helper functions: $\var{compatibleTypes}$ (in Figure~\ref{fun:compatible-types}), $\var{setFeatureAttributes}$ (in Figure \ref{fun:set-feature-attributes}), and $\var{addChildFeature}$ (in Figure~\ref{fun:add-child-feature}). The $\var{compatibleTypes}$ function takes a group type (\andtype{}, \ortype{} or \xortype{}) and a feature type (\mandatory{} or \optional{}) and checks whether they are compatible. The types should belong to a parent group and its child feature. The only combination which is not allowed is a \mandatory{} feature with an \xortype{} or \ortype{} parent group.
 
 The $\var{setFeatureAttributes}$ function takes a feature entry, an interval, a name, a type, and a group ID, and returns the feature entry with the information included. It modifies the existence set by adding the interval, maps the interval to the name in the names map, to the type in the types map, and to the parent group ID in the parent groups map.
 
@@ -89,27 +89,29 @@ addChildFeature|$(\group, \interval{t_{start}}{t_{end}}, \var{fid})$|
   \label{fun:add-child-feature}
 \end{figure}
 
-\subsubsection{Applying the \rulefont{Add-Feature} rule to an example}
+\subsection{Example \textemdash{} Application of the \rulefont{Add-Feature} Rule}
 
-We show how to use a rule by applying the \rulefont{Add-Feature} rule to a simple example. Following is a simple interval-based feature model, containing one feature and one group. The module is visualised in a simplified version in Figure~\vref{ex:add-feature-original-plan}. The visualisation shows only the structure of the feature model, not the feature or groups' types or other attributes.
+We show how to use a rule by applying the \rulefont{Add-Feature} rule to a simple example. Following is a simple interval-based feature model, containing one feature and one group. The module is visualised in a simplified version in Figure~\ref{ex:add-feature-original-plan}. The visualisation shows only the structure of the feature model, not the feature or groups' types or other attributes.
 
 \begin{align*}
   (&\; \{  \mapping{\text{Root}}{\set{\intervalmapping{1}{\forever}{\text{feature:root}}}} \\
    &\; \}\\
-    ,&\; \{  \text{feature:root} \mapsto \left( \begin{aligned}
+    ,&\; \{  [\text{feature:root} \mapsto \\
+     & \hspace{30mm} \begin{aligned} \big(
           \, & \set{\interval{1}{\forever}} \\
        ,  \, & \set{\intervalmapping{1}{\forever}{\text{Root}}} \\
        ,  \, & \set{\intervalmapping{1}{\forever}{\mandatory}} \\
        ,  \, & \emptyset \\
-       ,  \, & \set{\intervalmapping{1}{\forever}{\set{\text{group:A}}}} \\
-  \end{aligned}\right) \\
+     ,  \, & \set{\intervalmapping{1}{\forever}{\set{\text{group:A}}}} \big)]\\
+  \end{aligned} \\
    &\; \}\\ 
-          ,&\; \{ \text{group:A} \mapsto \left( \begin{aligned}
+          ,&\; \{ [\text{group:A} \mapsto \\
+           & \hspace{30mm} \begin{aligned} \big(
                 & \set{\interval{1}{5}} \\
                 , \, & \set{\intervalmapping{1}{5}{\andtype}} \\
                 , \, & \set{\intervalmapping{1}{5}{\text{feature:Root}}} \\
-                , \, & \emptyset \\
-            \end{aligned} \right) \\
+              , \, & \emptyset \big)] \\
+            \end{aligned}  \\
    &\; \})
 \end{align*}
 
@@ -228,30 +230,34 @@ We then end up with the following interval-based feature model:
   (&\; \{  \mapping{\text{Root}}{\set{\intervalmapping{1}{\forever}{\text{feature:root}}}} \\
     &\; ,  \mapping{\text{B}}{\set{\intervalmapping{3}{5}{\text{feature:B}}}} \\
     &\; \}\\
-    ,&\; \{  \text{feature:root} \mapsto \left( \begin{aligned}
+    ,&\; \{  [\text{feature:root} \mapsto \\
+     & \hspace{3cm} \begin{aligned} \big(
           \, & \set{\interval{1}{\forever}} \\
        ,  \, & \set{\intervalmapping{1}{\forever}{\text{Root}}} \\
        ,  \, & \set{\intervalmapping{1}{\forever}{\mandatory}} \\
        ,  \, & \emptyset \\
-       ,  \, & \set{\intervalmapping{1}{\forever}{\set{\text{group:A}}}} \\
-  \end{aligned}\right) \\
-    &\; , \text{feature:B} \mapsto \left( \begin{aligned}
+     ,  \, & \set{\intervalmapping{1}{\forever}{\set{\text{group:A}}}} \big)] \\
+   \end{aligned} \\
+     &\\
+    &\; \, , [\text{feature:B} \mapsto \\
+    & \hspace{3cm} \begin{aligned} \big( 
           \, & \set{\interval{3}{5}} \\
        ,  \, & \set{\intervalmapping{3}{5}{\text{B}}} \\
        ,  \, & \set{\intervalmapping{3}{5}{\optional}} \\
        ,  \, & \set{\intervalmapping{3}{5}{\text{group:A}}} \\
-       ,  \, & \emptyset \\
-  \end{aligned}\right) \\
+     ,  \, & \emptyset \big)] \\
+  \end{aligned}\\
    &\; \}\\ 
-          ,& \; \{ \text{group:A} \mapsto \left( \begin{aligned}
+          ,& \; \{ [\text{group:A} \mapsto \\
+            & \hspace{3cm} \begin{aligned} \big( 
                 & \set{\interval{1}{5}} \\
                 , \, & \set{\intervalmapping{1}{5}{\andtype}} \\
                 , \, & \set{\intervalmapping{1}{5}{\text{feature:Root}}} \\
-                , \, & \set{\intervalmapping{3}{5}{\set{\text{feature:B}}}} \\
-            \end{aligned} \right) \\
+              , \, & \set{\intervalmapping{3}{5}{\set{\text{feature:B}}}} \big)] \\
+            \end{aligned} \\
    &\; \})
 \end{align*}
-This plan is visualised in Figure~\vref{ex:add-feature-modified-plan}.
+This plan is visualised in Figure~\ref{ex:add-feature-modified-plan}.
 
 \begin{figure}[hpbt]
   \centering
@@ -315,7 +321,7 @@ setGroupAttributes|$\big(\group, \, \interval{t_{start}}{t_{end}}, \, \var{type}
 \end{figure}
 
 \newpage
-\section{Add Group Rule}
+\section{Analysis Rule for Adding a Group}
 \label{sec:add-group-rule}
 In Section~\ref{sec:operations} we have defined the \textbf{addGroup} operation, which adds a group to a feature model evolution plan during a given interval. The rule in Figure~\ref{rule:add-group} describes the conditions which must be in place to add a group to the FMEP during an interval ($\interval{t_n}{t_m}$), as well as how to update the model if all the premises are true.
 
@@ -323,7 +329,7 @@ The group must not already exist in the plan during the interval ($\interval{t_n
 
 If all the premises hold, the model is updated according to the semantics of the \textbf{addGroup} operation. The group ID is added to the parent feature's map of child groups with the interval as key, and the attributes specified are added to the group entry in the $\groups$ map. This is achieved by using the $\var{add\-Child\-Group}$ function (in Figure~\ref{fun:add-child-group}), which is extremely similar to $\var{add\-Child\-Feature}$, and adds the group to its new parent feature, and the $\var{set\-Group\-Attributes}$ function (in Figure~\ref{fun:set-group-attributes}), which is similar to $\var{set\-Feature\-Attributes}$ and updates the group entry with the attributes given in the operation.
 
-\section{Remove Feature Rule}
+\section{Analysis Rule for Removing a Feature}
 \label{sec:remove-feature-rule}
 
 Recall that the \textbf{removeFeature} operation removes a feature at a given time, as defined in Section~\ref{sec:operations}. Figure \ref{rule:remove-feature} shows the semantics of removing a feature with ID $\var{feature\-ID}$ at time $t_n$. We find the time point when the feature was to be removed in the original plan by looking up the interval containing $t_n$ in the feature's $\map{existence}$ set $\interval{t_{e_1}}{t_{e_2}}$. The interval in which the new plan is different from the original is then $\interval{t_n}{t_{e_2}}$. We verify that the feature does not have any child groups during the affected interval ($\lookup{F_c}{\interval{t_{n}}{t_{e_2}}} = \emptyset$). We furthermore check that the feature has only a single name, type, and parent during the interval. This means that the original plan did not change the feature's name, type, or parent during this time. If these conditions all hold, we update the interval-based feature model by clamping all the relevant intervals to $t_n$, i.e. shortening them to end at $t_n$. To achieve this, we use helper functions. The $\var{clamp\-Interval}$ function (in Figure~\ref{fun:clamp-interval}) takes an interval map and a time point $t_n$, and shortens the key containing $t_n$ to end at $t_n$. Note that it assumes that the interval map contains exactly one key containing the time point. The premises in the rule ensure that this is true. We use the $\var{clamp\-Feature}$ function (in Figure~\ref{fun:clamp-feature}) to update the feature entry, ending all its interval map keys containing $t_n$ at $t_n$ by using $\var{clamp\-Interval}$ and $\var{clamp\-Set\-Interval}$ (in Figure~\ref{fun:clamp-set-interval}). The helper function $\var{clamp\-Set\-Interval}$ does the same as $\var{clamp\-Interval}$, but shortens a member of an interval set instead of a key in an interval map. To remove the feature from its parent group's child feature map, we use the helper function $\var{remove\-Feature\-At}$ (in Figure~\ref{fun:remove-feature-at}). This function applies $\var{clamp\-Interval\-Value}$ (in Figure~\ref{fun:clamp-interval-value}) to the group's child feature map. The $\var{clamp\-Interval\-Value}$ function removes the feature from the mapping containing the time point given, and adds it to the set at the key which ends at the same time point.
@@ -469,11 +475,11 @@ removeGroupAt|$\left(\feature, \var{groupID}, t_c \right)$|
 \end{figure}
 
 
-\section{Remove Group Rule}
+\section{Analysis Rule for Removing a Group}
 \label{sec:remove-group-rule}
 We defined the operation \textbf{removeGroup} in Section~\ref{sec:operations}. The operation removes a group at a given time point, similarly to \textbf{removeFeature}.
 
-The $\rulefont{Remove-Group}$ rule in Figure~\vref{rule:remove-group} describes the semantics of removing a group in an interval-based feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group should not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
+The $\rulefont{Remove-Group}$ rule in Figure~\ref{rule:remove-group} describes the semantics of removing a group in an interval-based feature model. The temporal scope is identified as the existence interval containing the time point for removal. In that interval, the group should not have any children, and there cannot be plans to change the type or move the group within the interval. We check the latter by looking up the type and parent feature during the interval; if the set contains only one type/parent feature then the type and parent feature do not change. 
 
 We use the helper functions $\var{remove\-Group\-At}$ (in Figure~\ref{fun:remove-group-at}) and $\var{clamp\-Group}$ (in Figure~\ref{fun:clamp-group}) to update the interval-based feature model.  The $\var{remove\-Group\-At}$ function, similar to $\var{remove\-Feature\-At}$, takes the parent feature entry, the group ID, and a time point $t_c$, and applies \var{clampIntervalValue} to the parent feature's child group map. The $\var{clamp\-Group}$ function does the same as $\var{clamp\-Feature}$, but to a group entry. After applying these to the interval-based feature model, the group is removed from the model during the temporal scope.
 
@@ -516,10 +522,10 @@ We use the helper functions $\var{remove\-Group\-At}$ (in Figure~\ref{fun:remove
   \label{rule:move-feature}
 \end{figure}
 
-\section{Move Feature Rule}
+\section{Analysis Rule for Moving a Feature}
 \label{sec:move-feature-rule}
 
-In Section~\ref{sec:operations}, we defined the \textbf{moveFeature} operation to move a feature from a group to a new group at a given time. See Figure~\vref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the cycle detection algorithm described in Section~\vref{sub:move-algorithm}. A concrete implementation of the algorithm can be found on GitHub\footnote{\url{https://github.com/idamotz/Master/blob/master/soundness-checker/}}. 
+In Section~\ref{sec:operations}, we defined the \textbf{moveFeature} operation to move a feature from a group to a new group at a given time. See Figure~\ref{rule:move-feature} for the semantics of the \textbf{moveFeature} operation. The premise $\neg \var{createsCycle}$ refers to the cycle detection algorithm described in Section~\vref{sub:move-algorithm}. A concrete implementation of the algorithm can be found on GitHub\footnote{\url{https://github.com/idamotz/Master/blob/master/soundness-checker/}}. 
 
 The premise $\containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}}$ locates the scope of the operation, namely $\interval{t_n}{t_{p_2}}$. The ID of the feature's former parent group is identified in the premise $\lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}}$ for the purpose of updating the $\groups{}$ map. The premise $\interval{t_n}{t_{p_2}} \inn G_e$ ensures that the new parent exists during the entire temporal scope.
 
@@ -537,6 +543,14 @@ If all the premises hold, then the interval-based feature model is updated to re
 
 The feature is removed from the previous parent's ($\var{oldParentID}$) set of child features during the temporal scope, and the feature is added to the new parent's set of child features during the same interval. 
 
+
+\subsection{Algorithm for Detecting Cycles Resulting from \textbf{Move} Operations}
+\label{sub:move-algorithm}
+
+Compared with the other operations, \textbf{moveFeature} and \textbf{moveGroup} require extensive verification, as moving a feature or a group may cause cycles at the time of the move or at some later point. Since cycles violate only the tree structure of the feature model evolution plan, we abstract away from groups and features, viewing both as nodes.  
+
+In Figure~\ref{ex:illustration-move-algo}, we show an example of a cycle arising from a move operation. In the original plan, the marked node $E$ is moved to $C$ at time 2, and to \emph{some node} in node $D$'s subtree $s$. In the modified plan, $D$ (and its subtree $s$) has been moved to node $F$. There is no cycle at time $1$ or $2$, but at time 3, when $E$ is moved to $s$, it causes a cycle. At time $1$, the new ancestors of $D$ are $F$, $G$, and $E$. At time $2$, the new ancestors are still $F$, $G$, and $E$, but $C$ is added to the list, since $C$ was not an ancestor of $D$ in the original plan. When $E$ is then moved to $D$'s subtree $s$, it causes a cycle, since $E$ now has $F$ as an ancestor.
+
 \begin{figure}[htpb]
   \centering
   \textbf{Original plan}
@@ -552,17 +566,9 @@ The feature is removed from the previous parent's ($\var{oldParentID}$) set of c
   \label{ex:illustration-move-algo}
 \end{figure}
 
-
-\subsection{Algorithm for Detecting Cycles Resulting from \textbf{Move} Operations}
-\label{sub:move-algorithm}
-
-Compared with the other operations, \textbf{moveFeature} and \textbf{moveGroup} require extensive verification, as moving a feature or a group may cause cycles at the time of the move or at some later point. Since cycles violate only the tree structure of the feature model evolution plan, we abstract away from groups and features, viewing both as nodes.  
-
-In Figure~\vref{ex:illustration-move-algo}, we show an example of a cycle arising from a move operation. In the original plan, the marked node $E$ is moved to $C$ at time 2, and to \emph{some node} in node $D$'s subtree $s$. In the modified plan, $D$ (and its subtree $s$) has been moved to node $F$. There is no cycle at time $1$ or $2$, but at time 3, when $E$ is moved to $s$, it causes a cycle. At time $1$, the new ancestors of $D$ are $F$, $G$, and $E$. At time $2$, the new ancestors are still $F$, $G$, and $E$, but $C$ is added to the list, since $C$ was not an ancestor of $D$ in the original plan. When $E$ is then moved to $D$'s subtree $s$, it causes a cycle, since $E$ now has $F$ as an ancestor.
-
 Following is a description of an algorithm intended to ensure that adding a \textbf{moveFeature} or \textbf{moveGroup} operation does not cause a cycle.
 
-Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ (see Figure~\vref{fun:ancestors}), written in Haskell-like syntax, which takes the interval-based feature model, a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $\var{time}$.
+Let $n$ be the node to be moved and $c_1$ the target node, i.e. $n$'s new parent node. Furthermore, let $t_1$ be the time point at which this operation is inserted, and $t_e$ the time point where $n$ is moved next or removed, or $\forever$. We use the function $\var{ancestors}(IBFM, \var{node}, \var{time})$ (see Figure~\ref{fun:ancestors}), written in Haskell-like syntax, which takes the interval-based feature model (IBFM), a node, and a time point and returns a list of $\var{node}$'s ancestors at time point $t_n$. It does this by following the parentGroup and parentFeature reference upwards at the time point $t_n$, alternating between features and groups. It stops when it reaches the root feature, which has no parent node.
 
 First, check whether $n \in \texttt{ancestors}(IBFM, c_1, t_1)$. If this is the case, report that the move causes a cycle and terminate. 
 
@@ -628,11 +634,11 @@ ancestors|$\left((\names{}, \features{}, \groups{}), \, \var{groupID}, t_n \righ
 \end{figure}
 
 
-\section{Move Group Rule}
+\section{Analysis Rule for Moving a Group}
 \label{sec:move-group-rule}
 The \textbf{moveGroup} operation moves a group from its parent feature to a new parent, as explained in Section~\ref{sec:operations}.
 
-See Figure~\vref{rule:move-group} for the semantics of the \textbf{moveGroup} operation. The rule is similar to the \rulefont{Move-Feature} rule, but it differs in that it does not have a check for types. This is because there can only be a conflict between a parent group and a child feature, not a parent feature and a child group. Since only the latter relation changes in this rule, it is not necessary to check that the types are compatible. The model is updated similarly to the way it is done in the \rulefont{Move-Feature} rule. 
+See Figure~\ref{rule:move-group} for the semantics of the \textbf{moveGroup} operation. The rule is similar to the \rulefont{Move-Feature} rule, but it differs in that it does not have a check for types. This is because there can only be a conflict between a parent group and a child feature, not a parent feature and a child group. Since only the latter relation changes in this rule, it is not necessary to check that the types are compatible. The model is updated similarly to the way it is done in the \rulefont{Move-Feature} rule. Here as well, the premise $\neg \var{createsCycle}$ refers to the algorithm in Section~\ref{sub:move-algorithm}. The reason this algorithm can be applied to both features and groups is that cycles break the \emph{tree structure} of the feature model, which consists of both feature and group nodes. Hence, when checking for cycles, features and groups are treated the same.
 
 \begin{figure}[htbp]
     \renewcommand{\arraystretch}{1.1}
@@ -675,11 +681,11 @@ getTypes|$\left(\feature, \, \interval{t_n}{t_m} \right) = \lookup{G_t}{\interva
   \label{fun:get-types}
 \end{figure}
 
-\section{Change Feature Variation Type Rule}
+\section{Analysis Rule for Changing the Variation Type of a Feature}
 \label{sec:change-feature-variation-type-rule}
 The operation \textbf{changeFeatureVariationType} is defined in Section~\ref{sec:operations} to update a feature's type at some time point in the evolution plan.
 
-The rule in Figure~\vref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{feature\-ID}$ at time $t_n$. The first premise $\var{feature\-ID} \neq Root\-ID$ ensures that we are not attempting to modify the type of the root feature, which should always be \mandatory{}. The second premise ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. If there is no such planned change, then $t_{t_2} = \forever$. The temporal scope is then $\interval{t_n}{t_{t_2}}$ as defined in the \nameref{sec:scope} section (Section~\ref{sec:scope}). %TODO: maybe re-add vref
+The rule in Figure~\ref{rule:change-feature-varation-type} shows the semantics of changing the feature variation type of the feature with ID $\var{feature\-ID}$ at time $t_n$. The first premise $\var{feature\-ID} \neq Root\-ID$ ensures that we are not attempting to modify the type of the root feature, which should always be \mandatory{}. The second premise ($\containing{F_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}$) identifies the upper bound of the temporal scope, $t_{t_2}$. This is when the feature type was originally planned to change. If there is no such planned change, then $t_{t_2} = \forever$. The temporal scope is then $\interval{t_n}{t_{t_2}}$ as defined in the \nameref{sec:scope} section (Section~\ref{sec:scope}). %TODO: maybe re-add vref
 The next premise is a little convoluted, but its intent is easier to understand:
 \begin{align*}
    \forall \interval{t_{p_1}}{t_{p_2}} & \in \overlapping{F_p}{t_n}{t_{t_2}}  \\ % for all parent intervals overlapping the temporal scope
@@ -721,9 +727,9 @@ If all the premises are true, then the $\features{}$ map is updated at $\var{fea
   \label{rule:change-group-varation-type}
 \end{figure}
 
-\section{Change Group Variation Type Rule}
+\section{Analysis Rule for Changing the Variation Type of a Group}
 \label{sec:change-group-variation-type-rule}
-The operation \textbf{changeGroupVariationType} changes the type of a group at a given time point, as defined in Section~\ref{sec:operations}. The rule in Figure~\vref{rule:change-group-varation-type} is similar to the \textbf{changeFeatureVariationType} rule in Figure~\vref{rule:change-feature-varation-type}, and shows the semantics of changing the type of a group. In a similar way to the aforementioned \rulefont{Change-Feature-Variation-Type} rule, it verifies that the types of all the child groups during the affected interval are compatible with the new group type. If they are compatible, the group entry is updated with the new type during the temporal scope.
+The operation \textbf{changeGroupVariationType} changes the type of a group at a given time point, as defined in Section~\ref{sec:operations}. The rule in Figure~\ref{rule:change-group-varation-type} is similar to the \textbf{changeFeatureVariationType} rule in Figure~\ref{rule:change-feature-varation-type}, and shows the semantics of changing the type of a group. In a similar way to the aforementioned \rulefont{Change-Feature-Variation-Type} rule, it verifies that the types of all the child groups during the affected interval are compatible with the new group type. If they are compatible, the group entry is updated with the new type during the temporal scope.
 
 \begin{figure}[htbp]
     \renewcommand{\arraystretch}{1.1}
@@ -748,9 +754,9 @@ The operation \textbf{changeGroupVariationType} changes the type of a group at a
   \label{rule:change-feature-name}
 \end{figure}
 
-\section{Change Feature Name}
+\section{Analysis Rule for Changing the Name of a Feature}
 \label{sec:change-feature-name}
 
-As defined in Section~\ref{sec:operations}, the \textbf{changeFeatureName} operation changes the name of a feature at a given time point. The semantics of changing the name of a feature are shown in the \rulefont{Change-Feature-Name} rule in Figure~\vref{rule:change-feature-name}. The old name and the next planned name change are identified on the first line ($\lookup{F_n}{t_n} = \set{\var{oldName}}$ and $\containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}$ respectively). Since the name must not be in use during the temporal scope, we verify that looking up the new name in the $\names{}$ map returns an empty set. The $\names{}$ map is updated by shortening the interval for the old name to end at $t_n$, and assigning the feature ID to the new name during the temporal scope. Furthermore, the $\features{}$ map is updated at the feature ID, shortening the interval for the old name and assigning the new name to the temporal scope. 
+As defined in Section~\ref{sec:operations}, the \textbf{changeFeatureName} operation changes the name of a feature at a given time point. The semantics of changing the name of a feature are shown in the \rulefont{Change-Feature-Name} rule in Figure~\ref{rule:change-feature-name}. The old name and the next planned name change are identified on the first line ($\lookup{F_n}{t_n} = \set{\var{oldName}}$ and $\containing{F_n}{t_n} = \set{\interval{t_{n_1}}{t_{n_2}}}$ respectively). Since the name must not be in use during the temporal scope, we verify that looking up the new name in the $\names{}$ map returns an empty set. The $\names{}$ map is updated by shortening the interval for the old name to end at $t_n$, and assigning the feature ID to the new name during the temporal scope. Furthermore, the $\features{}$ map is updated at the feature ID, shortening the interval for the old name and assigning the new name to the temporal scope. 
 
 

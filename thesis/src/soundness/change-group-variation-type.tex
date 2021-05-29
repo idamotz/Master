@@ -14,7 +14,7 @@ be the initial state, and
 \]
 be the result state after applying the \rulefont{Change-Group-Variation-Type} rule. Recall that this operation changes the type of the group with ID $\var{groupID}$ to $\var{type}$.
 
-\paragraph{Scope}
+\paragraph{Modularity}
 Recall that the temporal scope of the \rulefont{Change-Group-Variation-Type} rule is $\interval{t_n}{t_k}$ (Section~\vref{sec:scope}), where $t_k$ is the time point at which the type is originally planned to be changed or the group is removed. In the rule, this scope is identified by 
    \[
       \containing{G_t}{t_n} = \set{\interval{t_{t_1}}{t_{t_2}}}
@@ -35,7 +35,7 @@ Otherwise, the only feature or group looked up or assigned to in the rule is $\l
 \\
 
 \begin{lemma}
-   The \rulefont{Change-Group-Variation-Type} rule operates strictly within the scope of the \textbf{changeGroupVariationType} operation.
+   The \rulefont{Change-Group-Variation-Type} rule operates strictly within the temporal and spatial scopes of the \textbf{changeGroupVariationType} operation.
    \label{lemma:change-group-variation-type-scope}
 \end{lemma}
 
