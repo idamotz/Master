@@ -5,16 +5,21 @@ In Section~\ref{sec:soundness-of-the-rules} and Appendix~\ref{cha:remaining-soun
 \\
 \begin{theorem}
   The rule system supports local modification and verification of interval-based feature models.
+  \label{theorem:scope}
 \end{theorem}
 
 We have shown that each of the analysis rules preserves well-formedness of the interval-based feature model (Section~\ref{sec:soundness-of-the-rules} and Appendix~\ref{cha:remaining-soundness-proofs}). The following theorem follows directly from lemmas\footnote{See lemmas \ref{lemma:add-feature-well-formed}, \ref{lemma:move-feature-well-formed}, \ref{lemma:add-group-well-formed}, \ref{lemma:remove-feature-well-formed}, \ref{lemma:remove-group-well-formed}, \ref{lemma:move-group-well-formed}, \ref{lemma:change-feature-variation-type-well-formed}, \ref{lemma:change-group-variation-type-well-formed}, \ref{lemma:change-feature-name-well-formed}}.
 \\
 \begin{theorem}
   The rule system for local modification of interval-based feature models is well-formed.
+  \label{theorem:well-formed}
 \end{theorem}
 
 In Section~\vref{sec:soundness-of-the-rules} and Appendix~\ref{cha:remaining-soundness-proofs}, we have shown that each of the analysis rules behaves according to the semantics of the operation in question.\footnote{See lemmas \ref{lemma:add-feature-mod}, \ref{lemma:move-feature-mod}, \ref{lemma:add-group-mod}, \ref{lemma:remove-feature-mod}, \ref{lemma:remove-group-mod}, \ref{lemma:move-group-mod}, \ref{lemma:change-feature-variation-type-mod}, \ref{lemma:change-group-variation-type-mod}, \ref{lemma:change-feature-name-mod}} Using the lemmas proven there, we conclude that this holds for the rule system.
 \\
 \begin{theorem}
   The rule system for local modification of interval-based feature models modifies the model correctly.
+  \label{theorem:modification}
 \end{theorem}
+
+The three theorems given here show that the rule system is sound. If applied to a sound interval-based feature model and an operation, they will update the model correctly if the operation does not cause a paradox (Theorem~\ref{theorem:modification}), and the resulting model will be well-formed (Theorem~\ref{theorem:well-formed}). The rules will only check the parts of the plan that may be structurally violated due to the change (Theorem~\ref{theorem:scope}).

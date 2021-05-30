@@ -69,7 +69,7 @@ After adding the feature to the interval-based feature model, looking up the nam
 \[
    \lookup{\lookup{\names}{\var{name}}}{\interval{t_n}{t_m}} \assign \var{featureID}
 \]
-, then due to the semantics of map assignment (Definition~\vref{def:map}), and lookup in interval maps (Definition~\vref{def:interval-map}),
+then due to the semantics of map assignment (Definition~\vref{def:map}), and lookup in interval maps (Definition~\vref{def:interval-map}),
 \[
    \lookup{\lookup{\names'}{\var{name}}}{\interval{t_n}{t_m}} = \set{\var{featureID}}
 \]
@@ -100,7 +100,7 @@ The child features of the group must also be updated according to the semantics 
 \[
    \var{featureID} \in \bigcup \lookup{G'_c}{\interval{t_n}{t_m}}
 \]
-, meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see Figure~\vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
+meaning that the feature is in the parent group's set of child features in the updated model. This holds because $\lookup{\groups}{\var{parentGroupID}}$ is assigned $\var{addChildFeature}(\lookup{\groups}{\var{parentGroupID}}, \interval{t_n}{t_m}, \var{featureID})$ (see Figure~\vref{fun:add-child-feature}), which modifies $G_c$ by adding $\var{featureID}$ to the set of child features at interval key $\interval{t_n}{t_m}$.
 
 The above proof shows the following lemma:
 \\

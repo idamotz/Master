@@ -1,15 +1,14 @@
 \section{Soundness for Interval-Based Feature \break Models}
 \label{sec:soundness-for-interval-based-feature-models}
-The interval-based feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e. all resulting feature models fulfil the structural requirements. 
+The interval-based feature model can be viewed as a sequence of feature models associated with time points. A feature model has strict structural requirements, and the definition of a paradox is a feature model that violates these requirements. In this context, soundness means that if a rule accepts a modification, realising the modified plan results in a sequence of feature models where each is structurally sound. The soundness analysis in this chapter assumes that the original plan is sound; i.e., containing no paradoxes. 
 
-We must first define what it means for an interval-based feature model to be sound. Essentially, it means that if we converted the interval-based feature model into a sequence of time points associated with feature models, each feature model would be sound.
-
+We must first define what it means for an interval-based feature model to be sound. Essentially, it means that if we converted the interval-based feature model into a sequence of time points associated with feature models, each feature model would be well-formed.
 
 The well-formedness requirements listed in Section~\vref{wf-requirements} can be translated into rules for interval-based feature models $(\names,\allowbreak \features, \allowbreak \groups)$. We assume that the first time point in the plan is $t_0$.
 
 \begin{enumerate}[\wf{\arabic*}, itemsep=0mm]
    \item An interval-based feature model has exactly one root feature. We assume that the constant $RootID$ refers to the root of the interval-based feature model, and that $\lookup{\features}{RootID} = \featurevar{R}$. This also means that $R_e=\set{\interval{t_0}{\forever}}$ \textemdash{} the root always exists, and that $R_p = \emptyset$ \textemdash{} the root never has a parent group.
-\item The root feature must be mandatory. This means that $$R_t  = \set{\intervalmapping{t_0}{\forever}{\mandatory}}$$ where $R_t$ is the types map of the root feature. 
+   \item The root feature must be \mandatory{}. This means that $$R_t  = \set{\intervalmapping{t_0}{\forever}{\mandatory}}$$ where $R_t$ is the types map of the root feature. 
 \item At any time $t_n \geq t_0$, each feature has exactly one unique name, variation type and (potentially empty) collection of child groups. Given a feature ID $\var{featureID}$, this means that if $\lookup{\features}{\var{featureID}} = \feature$ and $t_n \inn F_e$ , then
    \begin{enumerate}[(i)]
       \item $\lookup{F_n}{t_n} = \set{\var{name}}$ \textemdash{} the feature has exactly one name,

@@ -1,4 +1,4 @@
-To achieve our goal of a modular analysis of modification for feature model evolution plans, we first need a representation that supports local lookup and modification. Using the representation we defined in the paper~\cite{art:consistency-preserving-evolution-planning}, with an initial model followed by a list of operations associated with time points, would not serve us, as the operations have to be applied in order to retrieve the state (current feature model) at any point in time. We present a representation for feature model evolution plans \textemdash{} the interval-based feature model \textemdash{} enabling lookup of information about specific parts of the feature models at specific times, as well as the data structures needed to define it. Furthermore, we formalise evolution plan change in terms of operations, and present the scope of each operation. 
+To achieve our goal of a modular analysis of modification for feature model evolution plans, we first need a representation that supports local lookup and modification. Using the representation we defined in the paper~\cite{art:consistency-preserving-evolution-planning}, with an initial model followed by a list of operations associated with time points, would not serve us, as the operations have to be applied in order to retrieve the state (current feature model) at any point in time. We present a representation for feature model evolution plans \textemdash{} the \emph{interval-based feature model} \textemdash{} enabling lookup of information about specific parts of the feature models at specific times, as well as the data structures needed to define it. Furthermore, we formalise evolution plan change in terms of operations, and present the scope of each operation. 
 
 \section{Interval-Based Feature Model}
 \label{sec:interval-based-feature-model}
@@ -62,13 +62,13 @@ We define \emph{time points} as the points in time used in a feature model evolu
 We choose to express the temporal dimension of the feature model evolution plan using \emph{intervals}. An interval denotes a range in time, for instance, from Monday to Friday. This interval contains Tuesday, but not Sunday.
 \\
 \begin{definition}[Interval]
-  We define an interval as a set of time points between a lower bound and an upper bound, where the lower and upper bounds are time points. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound, and $t_\text{start} < t_\text{end}$. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
+  We define an interval as a set of time points between a lower bound and an upper bound, where the lower and upper bounds are time points. We denote the interval using the familiar mathematical notation $\interval{t_\text{start}}{t_\text{end}}$, where $t_\text{start}$ is the lower bound, and $t_\text{end}$ is the upper bound. These intervals are left-closed and right-open, meaning that $t_\text{start}$ is contained in the interval, and all time points until but not including $t_\text{end}$.
   \label{def:interval}
 \end{definition}
 
 To allow us to use intervals that have no end, we define the time point $\forever$, such that $\interval{1}{\forever}$ is an interval that starts at $1$ and never ends. For all time points $t_n \neq \forever$, we have that $t_n < \forever$. 
 
-We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains} the time point $t_k$ if $t_\text{start} \leq t_k < t_\text{end}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ \emph{overlap} if there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e. a time point contained in both intervals. For instance, $\interval{2}{4}$ overlaps $\interval{3}{\forever}$, since they both contain the time point 3.
+We say that an interval $\interval{t_\text{start}}{t_\text{end}}$ \emph{contains} the time point $t_k$ if $t_\text{start} \leq t_k < t_\text{end}$. Two intervals $\interval{t_n}{t_m}$ and $\interval{t_i}{t_j}$ \emph{overlap} if there exists a time point $t_k$ with $t_n \leq t_k < t_m$ and $t_i \leq t_k < t_j$, i.e., a time point contained in both intervals. For instance, $\interval{2}{4}$ overlaps $\interval{3}{\forever}$, since they both contain the time point 3. Any interval $\interval{t_n}{t_m}$ with $n \geq m$ is \emph{empty}, meaning that it contains no time points.
 
 For intervals $\interval{t_{start}}{t_{end}}$ with unknown bounds, we may restrict the bounds to $t_l$ and $t_r$ by writing $\clamp{\interval{t_{start}}{t_{end}}}{t_l}{t_r}$. We then get the interval $\interval{\textbf{max}(t_{start}, t_l)}{\textbf{min}(t_{end}, t_r)}$. For instance, $\clamp{\interval{3}{\forever}}{2}{5} = \interval{3}{5}$, which is the overlap between $\interval{3}{\forever}$ and $\interval{2}{5}$.
 
@@ -115,7 +115,7 @@ In addition to interval maps, we use \emph{interval sets} to express the tempora
   An interval set is a set of intervals (Definition~\vref{def:interval}). 
 \end{definition}
 
-Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ iff there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
+Given an interval set $\map{IS}$, $\interval{t_n}{t_m} \in \map{IS}$ if $\interval{t_n}{t_m}$ is a member of the set, which is the expected semantics of $\in$. We define a similar predicate $\inn$ such that $\interval{t_n}{t_m} \inn \map{IS}$ if there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $t_i \leq t_n \leq t_m \leq t_j$, i.e. an interval in $\map{IS}$ which contains $\interval{t_n}{t_m}$. We further define the predicate $\innr$ such that $\interval{t_n}{t_m} \innr \map{IS}$ if there exists some interval $\interval{t_i}{t_j} \in \map{IS}$ with $\interval{t_n}{t_m}$ overlapping $\interval{t_i}{t_j}$. 
 
 Notice that if $\interval{t_n}{t_m} \in \map{IS}$ then also $\interval{t_n}{t_m} \inn \map{IS}$, and $\interval{t_n}{t_m} \innr \map{IS}$. Thus $\in$ is the most restrictive, and $\innr$ the least restrictive.
 For instance, given the interval set 
@@ -133,11 +133,11 @@ To describe an entire feature model evolution plan, we define the \emph{interval
 \\
 
 \begin{definition}[Interval-based feature model]
-  An \emph{interval-based feature model} (IBFM) is defined as a triple $(\names, \features, \groups)$ where \names{} is a \emph{map} from names to interval maps with feature ID values, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from group IDs to \emph{group entries}. 
+  An interval-based feature model (IBFM) is defined as a triple $(\names, \features, \groups)$ where \names{} is a map from names to interval maps with feature ID values, \features{} is a map from feature IDs to \emph{feature entries}, and \groups{} is a map from group IDs to \emph{group entries}. 
   \label{def:interval-based-feature-model}
 \end{definition}
 
-The reason for this choice is mainly modularity. As previously mentioned, the goal of this thesis is to minimize the scope of the plan to check for paradoxes, as a change rarely affects more than a small part of the plan. It would then be suboptimal to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID and name are unique at all times.
+The reason for this choice is mainly modularity. As previously mentioned, the goal of this thesis is to minimize which parts of the plan are checked for paradoxes, as a change rarely affects more than a small part of the plan. It would then be suboptimal to represent a plan as a sequence of trees associated with time points, or an initial model followed by a sequence of operations. To add a new feature to the plan, both representations would require us to look through the entire plan to check that the feature ID and name are unique at all times.
 
 To add or rename a feature, a soundness checker must verify that no other feature is using the name during the affected part of the plan. We therefore include the \names{} map in the representation for efficient verification of aforementioned issue. A feature or group ID may not already be in use when we add it, so the \features{} and \groups{} maps support efficient lookup for IDs. The rest of this section gives more detailed explanations of interval-based feature models.
 
@@ -189,7 +189,7 @@ Although a feature always has exactly one parent group if it exists, it may have
 \]
 If we did not take the union, we would get something like
 \[
-  \lookup{F_c}{t_5} = \set{\set{\var{childGroup1}, \var{childGroup2}, \var{childGroup3},} \set{\var{childGroup4}}}
+  \lookup{F_c}{t_5} = \set{\set{\var{childGroup1}, \var{childGroup2}, \var{childGroup3}},  \set{\var{childGroup4}}}
 \]
 This is why, later in the thesis, we see expressions like
 \[
@@ -270,26 +270,26 @@ The same plan can be viewed in Figure~\ref{ex:washing-machine-visual}, where the
 \section{Operations}
 \label{sec:operations}
 
-We define \emph{update operations} to alter the interval-based feature model. The choice of operations is in large part based on the edit operations defined in our earlier work~\cite{art:consistency-preserving-evolution-planning}. We adapt them by adding a temporal dimension, letting us specify both \emph{where} an operation should be applied in the feature model, and \emph{when}, i.e. at which stage of the plan. We give a brief summary of the requirements a plan must fulfil for the operations to be applied.
+We define \emph{update operations} to alter the interval-based feature model. The choice of operations is largely based on the edit operations defined in our earlier work~\cite{art:consistency-preserving-evolution-planning}. We adapt them by adding a temporal dimension, letting us specify both \emph{where} an operation should be applied in the feature model, and \emph{when}, i.e. at which stage of the plan. We give a brief summary of the requirements a plan must fulfil for the operations to be applied.
 
 \begin{itemize}
   \item \textbf{addFeature}(\var{featureID}, \var{name}, \var{featureType}, \var{parentGroupID}) from $t_n$ to $t_m$\\
       Adds feature with ID \var{featureID}, name \var{name}, and feature variation type \var{featureType} to the group with ID \var{parentGroupID} in the interval $\interval{t_n}{t_m}$. No feature with ID \var{featureID} can exist during the interval, and the name cannot belong to any other feature in the model during the interval. The parent group must exists during the interval, and the types of the feature and the parent group must be compatible, i.e., if the feature has type \mandatory{}, then the parent group must have type \andtype{}. We choose to let this operation affect the plan only within an interval so as to enable the adding of features to groups that are planned to be removed, and to add flexibility.
   \item \textbf{addGroup}(\var{groupID}, \var{groupType}, \var{parentFeatureID}) from $t_n$ to $t_m$\\
       Adds group with ID \var{groupID} and type \var{groupType} to the feature with ID \var{parentFeatureID} during the interval $\interval{t_n}{t_m}$. The group ID cannot be in use during the interval, and the parent feature must exist during the entire interval. 
-  \item \textbf{removeFeature}(\var{featureID}) at time $t_n$\\
-      Removes the feature with ID \var{featureID} from the feature model at $t_n$. If the plan contains a removal of the feature and a subsequent reintroduction, removing the feature at an earlier stage does not affect the reintroduction. The feature must exist at $t_n$ in the original plan for the modification to be valid. The feature must not have any child groups that are left orphaned after removal. 
-  \item \textbf{removeGroup}(\var{groupID}) at time $t_n$\\
+  \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\
+      Removes the feature with ID \var{featureID} from the feature model at $t_n$. If the plan contains a removal of the feature and a subsequent reintroduction, removing the feature at an earlier stage does not affect the reintroduction, but rather moves the point of removal to an earlier point in time. The feature must exist at $t_n$ in the original plan for the modification to be valid. The feature must not have any child groups that are left orphaned after removal. 
+  \item \textbf{removeGroup}(\var{groupID}) at $t_n$\\
       This operation is very similar to \textbf{removeFeature}. Removes the group with ID \var{groupID} from the feature model at $t_n$, not affecting potential later reintroductions. The group must exist at $t_n$ in the original plan, and the group must not have any child features that are left orphaned after removal. 
   \item \textbf{moveFeature}(\var{featureID}, \var{targetGroupID}) at $t_n$\\
       Moves the feature with ID \var{featureID} to the group with ID $\var{targetGroupID}$ at $t_n$. The operation does not affect future moves planned for the feature. The feature's subtree is moved along with the feature. The move cannot be done if it introduces a cycle; that is, if the target group is in the feature's subtree at some point in the plan. Furthermore, the target group's type must be compatible with the feature's type, i.e. if the feature is \mandatory{} and the group is \optional{}, the move cannot be done.
-  \item \textbf{moveGroup}(\var{groupID}, \var{targetFeatureID}) \\
+  \item \textbf{moveGroup}(\var{groupID}, \var{targetFeatureID}) at $t_n$ \\
     This operation is very similar to \textbf{moveFeature}. It moves the group with ID \var{groupID} to the feature with ID $\var{targetFeatureID}$ at $t_n$. The operation does not affect future moves planned for the group. The group's subtree is moved along with the group. If the move causes a cycle, then the modification should not be applied.
-  \item \textbf{changeFeatureVariationType}(\var{featureID}, \var{newType}) \\
-    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType}. The change does not affect planned type changes to the feature. If the new type is \mandatory{}, the parent group type must be \andtype{}, or else the operation cannot be applied.
-  \item \textbf{changeGroupVariationType}(\var{groupID}, \var{newType})\\
+  \item \textbf{changeFeatureVariationType}(\var{featureID}, \var{newType}) at $t_n$ \\
+    Changes the feature variation type of the feature with ID \var{featureID} to \var{newType} at time $t_n$. The change does not affect planned type changes to the feature. If the new type is \mandatory{}, the parent group type must be \andtype{}, or else the operation cannot be applied.
+  \item \textbf{changeGroupVariationType}(\var{groupID}, \var{newType}) at $t_n$\\
     Changes the group variation type of the group with ID \var{groupID} to \var{newType}. If the new type is \ortype{} or \xortype{}, and a child feature has type \mandatory{}, then the operation cannot be applied. 
-  \item \textbf{changeFeatureName}(\var{featureID}, \var{name})\\
+  \item \textbf{changeFeatureName}(\var{featureID}, \var{name}) at $t_n$\\
     Changes the name of the feature with ID \var{featureID} to \var{name}. It does not affect future renaming operations to the feature. No other feature may have the same name.
 \end{itemize}
 

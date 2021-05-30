@@ -24,9 +24,11 @@ As defined in Section~\vref{sec:scope}, the \textbf{removeFeature} operation's t
 
    The $\features{}$ map is modified at key $\var{featureID}$ by assigning 
    $$\var{clampFeature}(\lookup{\features}{\var{featureID}}, t_n)$$
-   . In $\var{clampFeature}$ (Figure~\vref{fun:clamp-feature}), the intervals of the feature's name, type, and parent are clamped to end at $t_n$. These modifications, too, stay within the temporal scope, for the reason explained in the above paragraph. The existence interval is clamped in a similar way, and so stays within the temporal scope as well.
+   In $\var{clampFeature}$ (Figure~\vref{fun:clamp-feature}), the intervals of the feature's name, type, and parent are clamped to end at $t_n$. These modifications, too, stay within the temporal scope, for the reason explained in the above paragraph. The existence interval is clamped in a similar way, and so stays within the temporal scope as well.
 
-   Also, the $\groups{}$ map is assigned $$\var{removeFeatureAt}(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n)$$ at key $\var{parentGroupID}$. This helper function (Figure~\vref{fun:remove-feature-at}) modifies the parent group's set of child features by calling $$\var{clampIntervalValue}(G_c, t_c, \var{featureID})$$, which behaves similarly to $\var{clampInterval}$ by clamping the interval containing $t_n$. The difference is that it removes only $\var{featureID}$ from the set of child features, and adds the feature to the set of child features at the shortened interval. We conclude that this modification, too, happens within the temporal scope of the operation, as looking up any time point outside of the temporal scope will return the same results as the original plan.
+   Also, the $\groups{}$ map is assigned $$\var{removeFeatureAt}(\lookup{\groups}{\var{parentGroupID}}, \var{featureID}, t_n)$$ at key $\var{parentGroupID}$. This helper function (Figure~\vref{fun:remove-feature-at}) modifies the parent group's set of child features by calling 
+   $$\var{clampIntervalValue}(G_c, t_c, \var{featureID})$$
+   which behaves similarly to $\var{clampInterval}$ by clamping the interval containing $t_n$. The difference is that it removes only $\var{featureID}$ from the set of child features, and adds the feature to the set of child features at the shortened interval. We conclude that this modification, too, happens within the temporal scope of the operation, as looking up any time point outside of the temporal scope will return the same results as the original plan.
 
    Recall that the spatial scope of the rule is the feature itself, its parent group, and its child groups. The premise
 \begin{equation*}
@@ -53,7 +55,7 @@ The \rulefont{Remove-Feature} rule contains the premise
 \begin{equation*}
    \lookup{F_p}{\interval{t_n}{t_{e_2}}} = \set{\var{parentGroupID}}
 \end{equation*}
-, ensuring that the feature has \emph{exactly} one parent group during the temporal scope of the rule. Under the assumption that \wf{1} holds in the original model, the feature being removed cannot be the root feature, since the root has no parent group. Furthermore, it means that the feature does not move during the temporal scope, which would be a conflict. Therefore, both \wf{1} and \wf{2} hold in the modified model.
+ensuring that the feature has \emph{exactly} one parent group during the temporal scope of the rule. Under the assumption that \wf{1} holds in the original model, the feature being removed cannot be the root feature, since the root has no parent group. Furthermore, it means that the feature does not move during the temporal scope, which would be a conflict. Therefore, both \wf{1} and \wf{2} hold in the modified model.
 
 For any time point $t_n$ in the temporal scope of the rule, $t_n \notinn F'_e$ due to the semantics of $\var{clampFeature}$ (Figure~\vref{fun:clamp-feature}), so \wf{3} holds trivially for the updated model.  The only change made to a group is by the function $\var{removeFeatureAt}$ (Figure~\vref{fun:remove-feature-at}), which removes the feature from the parent group's map of child groups during $\interval{t_n}{t_j}$. Hence \wf{5} holds, and since that function does not modify the types map $G_t$ of the group, \wf{4} holds given that it is true for the original model. 
 

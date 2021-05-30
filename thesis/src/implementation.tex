@@ -2,7 +2,7 @@
 \label{cha:implementation}
 
 % Say something about implementation without showing the code, maybe giving pseudocode. Talk about distance between formalization and implementation. Describe examples, error messages, practical applications, how it can be used, how it detects paradoxes, how warnings can be given to users.
-In this chapter, we present the implementation. We first give an overview of the types to display the structure of the implementation. An example is presented to show how it looks in practice. We also briefly present the translation of the analysis rules, and give an example of an application.
+In this chapter, we present our implementation of the data structures and analysis rules. We first give an overview of the types to display the structure of the implementation. An example is presented to show how it looks in practice. We also briefly present the translation of the analysis rules, and give an example of an application.
 
 
 \section{Overview}
@@ -37,24 +37,28 @@ A group $\group{}$ is defined in much the same way, with a \texttt{Validity\-Map
    \label{ex:simple-plan}
 \end{figure}
 
+\subsection{Example \textemdash{} Encoding the Interval-Based Feature Model}
+
 The example in Figure~\ref{ex:simple-plan} is formalized below in our previously defined representation, with only one feature (ID feature:root) and one group (ID group:A).
 
 \begin{align*}
  ( \{ \; & \mapping{\text{Root}}{\intervalmapping{1}{\forever}{\text{feature:root}}} \} \\
     \\
-    ,\{\; & \mapping{\text{feature:root}}{( \\
-          & \{ \interval{1}{\forever}\} ,\, \\
-          & \{\intervalmapping{1}{\forever}{\text{Root}}\} ,\, \\
-          & \{\intervalmapping{1}{\forever}{\mandatory{}}\} ,\, \\
-          &  \emptyset ,\, \\ 
-          & \{\intervalmapping{1}{5}{\text{group:A}}\} ) } \\
+ ,\{\; & \big[\text{feature:root} \mapsto \\
+       & \hspace{3cm} \begin{aligned} \big( & \{ \interval{1}{\forever}\} ,\, \\
+       & \{\intervalmapping{1}{\forever}{\text{Root}}\} ,\, \\
+       & \{\intervalmapping{1}{\forever}{\mandatory{}}\} ,\, \\
+       &  \emptyset ,\, \\ 
+       & \{\intervalmapping{1}{5}{\text{group:A}}\} \big)\big] \\
+         \end{aligned} \\
        \} &\\
           \\
-            ,\; \{ \; & [ \text{group:A} \mapsto ( \\
-                      & \{\interval{1}{5}\} ,\, \\
+            ,\; \{ \; & \big[ \text{group:A} \mapsto \\
+                      & \hspace{3cm} \begin{aligned} \big( & \{\interval{1}{5}\} ,\, \\
                       & \{\intervalmapping{1}{5}{\andtype{}}\} ,\, \\
                       & \{\intervalmapping{1}{5}{\text{feature:root}}\} ,\, \\
-                      & \emptyset ) ]\\
+                      & \emptyset \big) \big]\\
+                        \end{aligned}\\
  \}&)\\
 \end{align*}
 

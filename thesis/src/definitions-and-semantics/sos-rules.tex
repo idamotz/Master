@@ -10,7 +10,7 @@ $$\sossize\begin{array}{c}
     \text{Premises}}
     { S \transition S'}
   \end{array}$$
-  where $S$ is the initial state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In the rules, the initial state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. In all of the rules, we assume that the initial plan (\names{}, \features{}, \groups{}) is sound, meaning that it contains no paradoxes. This lets us verify only the parts of the plan that are affected by the change, as the only paradoxes that can occur are the ones caused by the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule \ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
+  where $S$ is the initial state, and $S'$ is the new state after the rule is applied. The rule can only be applied if all the premises hold. In the rules, the initial state is always on the form $\textbf{operation} \shove (\names{}, \features{}, \groups{})$, where \textbf{operation} denotes the change we intend to make to the interval-based feature model $(\names{}, \features{}, \groups{})$. The new state is always on the form $(\names{}', \features{}', \groups{}')$, where the maps have been updated according to the semantics of the operation. In all of the rules, we assume that the initial plan (\names{}, \features{}, \groups{}) is sound, meaning that it contains no paradoxes. This lets us verify only the parts of the plan that are affected by the change, as the only paradoxes that can occur are the ones caused by the operation. The premises ensure that an operation can only be applied if some conditions hold; for instance the $\rulefont{Add-Feature}$ rule in Figure~\ref{rule:add-feature} contains premises verifying that the feature does not already exist when we wish to add it. The rules give us all the information we need to validate a modification, and to apply it.
 
 \section{Analysis Rule for Adding a Feature}
 \label{sec:add-feature-rule}
@@ -159,7 +159,7 @@ Lastly, we check that the types of the new feature and its parent group are comp
 \[
   \forall \var{gt} \in \lookup{\set{\intervalmapping{1}{5}{\andtype}}}{\interval{3}{5}}(\var{compatibleTypes}(\var{gt}, \optional{}))
 \]
-The only value in $\set{\intervalmapping{1}{5}{\andtype}}$ during the interval $\interval{3}{5}$ is \andtype, so we instatiate $\var{gt}$ with that value.
+The only value in $\set{\intervalmapping{1}{5}{\andtype}}$ during the interval $\interval{3}{5}$ is \andtype, so we instantiate $\var{gt}$ with that value.
 \[
   \var{compatibleTypes}(\andtype{}, \optional{})
 \]
@@ -193,7 +193,7 @@ We apply \var{setFeatureAttributes}:
 setFeatureAttributes|$((\emptyset, \emptyset, \emptyset, \emptyset, \emptyset), \interval{3}{5}, \text{B}, \optional{}, \text{group:A})$|
   = |$($| |$\emptyset \cup \set{\interval{3}{5}}$|
     , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |$\text{B}$|
-    , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |\optional{}|
+    , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |$\optional{}$|
     , |$\lookup{\emptyset}{\interval{3}{5}}$| |$\assign$| |$\text{group:A}$|
     , |$\emptyset \ )$|
  \end{minted}
@@ -266,7 +266,7 @@ This plan is visualised in Figure~\ref{ex:add-feature-modified-plan}.
   \label{ex:add-feature-modified-plan}
 \end{figure}
 
-If we tried to add the from 3 to 6 instead, the premise $\interval{t_n}{t_m} \inn F_e$ would fail, since the parent group only exists until 5. If a premise is false, the rule cannot be applied. 
+If we tried to add the feature from 3 to 6 instead, the premise $\interval{t_n}{t_m} \inn F_e$ would fail, since the parent group only exists until 5. If a premise is false, the rule cannot be applied. 
 
 \begin{figure}[hpbt]
     \renewcommand{\arraystretch}{1.1}
@@ -529,7 +529,7 @@ In Section~\ref{sec:operations}, we defined the \textbf{moveFeature} operation t
 
 The premise $\containing{F_p}{t_n} = \set{\interval{t_{p_1}}{t_{p_2}}}$ locates the scope of the operation, namely $\interval{t_n}{t_{p_2}}$. The ID of the feature's former parent group is identified in the premise $\lookup{F_p}{\interval{t_n}{t_{p_2}}} = \set{\var{oldParentID}}$ for the purpose of updating the $\groups{}$ map. The premise $\interval{t_n}{t_{p_2}} \inn G_e$ ensures that the new parent exists during the entire temporal scope.
 
-As the plan may contain several type changes for both the feature being moved and its new parent, we must check that the types they have at the same time are compatible. This is achieved by the following premise
+As the plan may contain several type changes for both the feature being moved and its new parent, we must check that the types they have at the same time are compatible. This is achieved by the following premise:
 \begin{align*}
   \forall \interval{t_{f_1}}{t_{f_2}} & \in \overlapping{F_t}{t_n}{t_{p_2}}
   \forall \interval{t_{g_1}}{t_{g_2}} \in \lookup{G_t}{\clamp{\interval{t_{f_1}}{t_{f_2}}}{t_n}{t_{p_2}}}_{\overlap{}} \\
