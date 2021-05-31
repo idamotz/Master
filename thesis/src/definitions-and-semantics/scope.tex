@@ -5,7 +5,7 @@
 The scope of an operation consists of the parts of the plan that \emph{may} be affected by the operation. 
 
 In this section, we define the scope for each of the operations defined in Section~\vref{sec:operations}. The scope is later used when creating the analysis rules for modification of the interval-based feature model. We describe the \emph{spatial} and \emph{temporal} scopes for each operation. The spatial scope consists of the parts of a feature model that may be affected by change. For instance, adding a group affects the group being added and its parent feature, as the operation does not modify any other part of the plan. We must also take into account the \emph{temporal} aspect, since the plan also has a dimension of time. The temporal scope then consists of the time points that may be affected by applying an operation. In Figure~\ref{ex:add-feature-scope}\footnote{Notice that the plan differentiates between groups and features, but does not display types or names} 
-, we visualise the spatial and temporal scopes. In the original plan, a group $D$ is added to feature $B$ at time 2. In time 3, it is moved to feature $C$. We modify the plan by adding a feature $E$ to group $D$ from time 2 to time 4. In the modified plan, the spatial and temporal scopes are shown, with the spatial scope containing group $D$ and feature $E$, and the temporal scope containing times 2 and 3. Notice that $Root$, $A$, and $B$ are not in the scope, nor are the time points 1 and 4.
+, we visualise the spatial and temporal scopes. In the original plan, a group $D$ is added to feature $B$ at time 2. In time 3, it is moved to feature $C$. We modify the plan by adding a feature $E$ to group $D$ from time 2 to time 4. In the modified plan, the spatial and temporal scopes are shown, with the spatial scope containing group $D$ and feature $E$, and the temporal scope containing times 2 and 3. Notice that $Root$, $A$, $B$, and $C$ are not in the scope, nor are the time points 1 and 4.
 \begin{figure}[h]
   \centering
       \textbf{Original plan}
@@ -29,12 +29,12 @@ For each of the operations defined in Section~\vref{sec:operations}, we define t
 We define the temporal and spatial scopes for each operation.
 \begin{itemize}
 
-  \item \textbf{addFeature}(\var{featureID}, \var{parentGroupID}, \var{name}, \var{featureType}) from $t_n$ to $t_m$\\
+  \item \textbf{addFeature}(\var{featureID}, \var{name}, \var{featureType}, \var{parentGroupID}) from $t_n$ to $t_m$\\
      We argue that the temporal scope is $\interval{t_n}{t_m}$, since this is the only interval in which the plan is affected by the change. In other words, if we look at the plan as a sequence of feature models, the only feature models that may become invalid as a result of this modification, are the ones associated with time points between $t_n$ and (but not including) $t_m$. The spatial scope must be only the feature itself, the parent group and the name. If the group type of the parent changes to a conflicting one, the operation is unsound. If the parent group is removed, we have an orphaned feature, which is also illegal. The name is unique, so we must also verify that no other feature is using the name during the temporal scope. 
  
 
-  \item \textbf{addGroup}(\var{groupID}, \var{parentFeatureID}, \var{groupType}) from $t_n$ to $t_m$\\
-    The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the group with id $\var{groupID}$ and the parent feature with ID $\var{parentFeatureID}$, for which the only conflicting event is removal -- the types of a group and its parent never conflict. The scope for this operation is visualised in Figure~\vref{ex:add-feature-scope}
+  \item \textbf{addGroup}(\var{groupID}, \var{groupType}, \var{parentFeatureID}) from $t_n$ to $t_m$\\
+    The scopes are very similar in this and the preceding rule. The scope in time is $\interval{t_n}{t_m}$, and the scope in space is the group with id $\var{groupID}$ and the parent feature with ID $\var{parentFeatureID}$, for which the only conflicting event is removal \textemdash{} the types of a group and its parent never conflict. 
   \item \textbf{removeFeature}(\var{featureID}) at $t_n$\\
     If the original interval containing $t_n$ in which the feature exists inside the feature model is $\interval{t_m}{t_k}$, then the temporal scope is $\interval{t_n}{t_k}$, where $t_n$ is the time at which we specify that the feature be removed, and $t_k$ is the time at which the feature was \emph{originally} planned to be removed. In some cases, $t_k$ will be $\forever$, meaning that the feature was never originally planned to be removed. Since the feature is removed at $t_k$ in the original plan, and the original plan is sound as we assume, removing the feature earlier may only affect the plan in the interval between these two time points.
 
@@ -42,7 +42,7 @@ We define the temporal and spatial scopes for each operation.
   \item \textbf{removeGroup}(\var{groupID}) at $t_n$\\
     This is similar to the scope for \textbf{removeFeature}, but without consideration for names, as groups do not have names.  Thus the temporal scope is $\interval{t_n}{t_k}$, where $t_k$ is the time at which the group was originally planned to be removed. The spatial scope includes the group itself, its parent feature, and its child features. As with features, a group cannot be removed if it has or will have child features during the temporal scope.
   \item \textbf{moveFeature}(\var{featureID}, \var{targetGroupID}) at $t_n$ \\
-    If $t_m$ is the time at which the feature is next moved or removed in the original plan, the temporal scope is $\interval{t_n}{t_m}$, since this operation only affects the plan within this interval. If the feature is \emph{not} moved or removed, then $t_m = \forever$.
+    If $t_m$ is the time at which the feature is next moved or removed in the original plan, the temporal scope is $\interval{t_n}{t_m}$, since this operation only affects the plan within this interval. If the feature is \emph{not} moved or removed in the original plan, then $t_m = \forever$.
   \begin{figure}[h]
     \centering
 

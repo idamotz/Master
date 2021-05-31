@@ -99,7 +99,7 @@ simplePlan =
 
 \end{minted}
 
-The operations are interpreted quite directly, in two categories: The \texttt{Add\-Operation}s, which take a \texttt{Validity} (interval) and an operation, and the \texttt{Change\-Operation}s, which take a \texttt{TimePoint} and an operation. An operation in general is called a \texttt{Time\-Operation}. To express $\textbf{addFeature}(\text{feature:B}, \text{B}, \mandatory{}, \text{group:A}) \text{ from } 3 \text{ to } \forever$, we write
+The operations are interpreted quite directly, in two categories: The \texttt{Add\-Operation}s, which take a \texttt{Validity} (interval) and an operation, and the \texttt{Change\-Operation}s, which take a \texttt{TimePoint} and an operation. An update operation is simply called an \texttt{Update\-Operation}. To express $\textbf{addFeature}(\text{feature:B}, \text{B}, \mandatory{}, \text{group:A}) \text{ from } 3 \text{ to } \forever$, we write
 \begin{minted}[escapeinside=,breaklines]{haskell}
 op =
    AddOperation (Validity (TP 3) Forever)
@@ -110,9 +110,9 @@ op =
 \subsection{Interpreting the Rules as Code}
 Each rule consists of a set of premises, and a conclusion which takes a state and returns a new state. In the implementation, we have chosen to split these up, with one function for verifying the premises, and one for applying the operations.
 
-The \texttt{Validate} module exports only the function \texttt{validate}, which takes a \texttt{Time\-Operation} and an \texttt{Interval\-Based\-Feature\-Model}. The most important difference between this function and the rules is that the function returns a list of errors if paradoxes occur. These errors belong to the type \texttt{Validation\-Error}, and consists of errors like \texttt{Incompatible\-Types}, to be returned if a feature and its parent group have incompatible types, \texttt{Name\-In\-Use}, if a feature is trying to use a name which already belongs to another feature, etc. This is done to show that the cause of a paradox can be located quite precisely.
+The \texttt{Validate} module exports only the function \texttt{validate}, which takes a \texttt{Update\-Operation} and an \texttt{Interval\-Based\-Feature\-Model}. The most important difference between this function and the rules is that the function returns a list of errors if paradoxes occur. These errors belong to the type \texttt{Validation\-Error}, and consists of errors like \texttt{Incompatible\-Types}, to be returned if a feature and its parent group have incompatible types, \texttt{Name\-In\-Use}, if a feature is trying to use a name which already belongs to another feature, etc. This is done to show that the cause of a paradox can be identified quite precisely.
 
-To apply the operations, the \texttt{Apply} module exports the function \texttt{apply}, which takes a \texttt{Time\-Operation} and an \texttt{Interval\-Based\-Feature\-Model} and applies the operation to the model. This function works similarly to how it is defined in the rules.
+To apply the operations, the \texttt{Apply} module exports the function \texttt{apply}, which takes a \texttt{Update\-Operation} and an \texttt{Interval\-Based\-Feature\-Model} and applies the operation to the model. This function works similarly to how it is defined in the rules.
 
 The functions are combined in \texttt{validate\-And\-Apply}, which has the return type \texttt{Either [Validation\-Error] Interval\-Based\-Feature\-Model}. If validation fails, it returns a list of errors, and if it succeeds, it applies the operation and returns the modified model.
 \begin{figure}
@@ -126,5 +126,5 @@ If we call \texttt{validateAndApply op simplePlan}, where \texttt{op} and \textt
 Left [ParentNotExists] 
    :: Either [ValidationError] IntervalBasedFeatureModel
 \end{minted}
-The list of errors, containing \texttt{Parent\-Not\-Exists}, is wrapped in a \texttt{Left} to show that the type is a \texttt{Validation\-Error}. If the operation did not result in an error, we would get a result on the form \texttt{Right ibfm}, where \texttt{ibfm} is an \texttt{Interval\-Based\-Feature\-Model}. The error here means that we are trying to add a feature, but the feature's parent does not exist at some point during the specified interval. In the eample, the parent group \texttt{group:A} is removed at 5, so the feature will be without a parent at that time. The paradox is visualised in Figure~\ref{ex:simple-plan2}.
+The list of errors, containing \texttt{Parent\-Not\-Exists}, is wrapped in a \texttt{Left} to show that the type is a \texttt{Validation\-Error}. If the operation does not result in an error, we will get a result on the form \texttt{Right ibfm}, where \texttt{ibfm} is an \texttt{Interval\-Based\-Feature\-Model}. The error here means that we are trying to add a feature, but the feature's parent does not exist at some point during the specified interval. In the example, the parent group \texttt{group:A} is removed at 5, so the feature will be without a parent at that time. The paradox is visualised in Figure~\ref{ex:simple-plan2}.
 
