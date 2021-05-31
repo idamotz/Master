@@ -20,7 +20,7 @@ Software product lines (SPLs) are an engineering methodology used for developing
    \caption[Example feature model for a coffee machine]{Example feature model for a coffee machine \protect\footnotemark}
    \label{ex:fm-coffee1}
 \end{figure}
-\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
+\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} 
 
 \emph{Variability management} is the process of deciding which variants should be allowed, i.e. which combinations of features can be combined into a variant~\cite{art:variability-management-with-feature-models}. Formerly this was done as an informal process, often using spreadsheets and the engineers' intuition. To simplify and formalize this process we use \emph{feature models} to model the relations between the features (which combinations are allowed, which are common to all variants, etc.). Feature models are also useful as documentation for an SPL, providing a common language between stakeholders~\cite{book:introduction-to-spl}. A feature model is a tree-like structure where the nodes are features and groups of features. A feature cannot be selected in a variant unless its parent feature is also selected~\cite{art:feature-models-grammars-and-propositional-formulas}. See Figure~\vref{ex:fm-coffee1} for an example of a feature model. 
 
@@ -57,7 +57,7 @@ There exist tools for evolution planning, such as DarwinSPL~\cite{art:darwinspl-
    \label{ex:fm-coffee2}
 \end{figure}
 
-\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} %TODO: Move this to the correct page
+\footnotetext{Created using DarwinSPL: \url{https://gitlab.com/DarwinSPL/DarwinSPL}} 
 
 In the LTEP research project, we have formalized evolution plans as an initial model combined with a list of \emph{time points}, which are defined as points in time, associated with edit operations, e.g. change type of ``Beverages" to \optional{}. In the formalized feature model, each feature and group has a unique ID, and the edit operations use these IDs to uniquely identify the features and groups to be added, removed, or modified. To illustrate the idea, a simplified formalization of the evolution plan is shown in Figure~\vref{ex:formal-evolution-plan}. The initial model associated with time $t_0$ is the one shown in Figure~\vref{ex:fm-coffee1}. Applying the operations at $t_1$ results in the feature model shown in Figure~\vref{ex:fm-coffee2}. In the example, names are used in place of IDs to improve readability, but in the formal definitions, IDs are used to identify features and groups uniquely. 
 
@@ -126,15 +126,6 @@ Here, $\Gamma$ is the context treated as a map from variable names to values, an
 
 The syntax-driven, unambiguous, and compact nature of such rules make them popular for formally defining type systems and analysis tools~\cite{book:principles-of-program-analysis}. Here, they give both the behaviour of the \textbf{if}-statement (semantics) using the syntax of the language, and, implicitly, they provide a method for checking correctness of an \textbf{if}-statement. If the expression is neither true nor false, then the program is incorrect. In this thesis, we largely exploit this property of only defining the correct cases when giving rules for soundness analysis of modifying feature model evolution plans.
 
-% Give static analysis \emph{way of thinking} as background, not the exact methods used to analyse programs, but the principles such as may/must analysis etc. Explain how it is communicated (rules), how scope is a factor and discuss soundness in static analysis context (this is the same as the soundness I talk about). 
-
-
-% Static analysis is semantic-based analysis. Syntax-driven, but semantic-based, but also of the meaning. If we have x := 5, then it means that 5 is the value which you put into x
-% Say that I'm doing semantic-based analysis in the thesis, _analysis_, not just semantics.Can I add it or not? How much of the scope is affected? Emphasize modularity; analysis is modular. Focus on the analytical parts of the work, combined with the semantics of a feature model
-% Don't call the rules SOS rules, but "Rules for semantics-based analysis". Stop downplaying
-% Give the structure of the rules in the background. Static analysis has an environment and an effect. I'm making a calculus
-% Analysis is formalized through a set of rules, which often have this kind of structure... which also looks very much like SOS rules.
-% Emphasize that I've made an implementation as well as the theory.
 \subsection{Soundness}
 A feature model evolution plan may be viewed as a sequence of feature models associated with time points. 
 In this context, soundness of a feature model evolution plan means that all of the feature models in the plan uphold the structural requirements \itbf{WF1\textendash WF7} given in Section~\vref{wf-requirements}. In a sound plan, no paradoxes occur; for instance, no two features have the same name at the same time, no groups with type \xortype{} or \ortype{} contain features of type \mandatory{}, etc. This can be verified automatically, as we did in \cite{art:consistency-preserving-evolution-planning}.

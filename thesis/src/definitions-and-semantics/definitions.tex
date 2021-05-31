@@ -207,12 +207,6 @@ The result set means that the feature is added at $t_2$, and is never removed. T
 \]
 The feature was moved to its current parent group at $t_3$, and will be moved next at $t_6$.
 
-We often want to know what is true for an \emph{interval}, not just a time point. In particular, we may want to check that the feature does not exist during some interval, for instance $\interval{t_0}{t_2}$. We then use the negated overlapping member operator $\notinnr$:
-\[
-  \interval{t_0}{t_2} \notinnr F_e
-\]
-This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}{t_2}$. If we had that $\interval{t_1}{t_3} \in F_e$, the above predicate would be false, since both intervals contain the time point $t_1$.
-
 \begin{figure}[htpb]
   \begin{align*}
     ( \{ \; & \mapping{\text{Washing Machine}}{\intervalmapping{t_0}{\forever}{0}} \\
@@ -254,6 +248,13 @@ This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}
   \label{ex:washing-machine}
 \end{figure}
 
+
+
+We often want to know what is true for an \emph{interval}, not just a time point. In particular, we may want to check that the feature does not exist during some interval, for instance $\interval{t_0}{t_2}$. We then use the negated overlapping member operator $\notinnr$:
+\[
+  \interval{t_0}{t_2} \notinnr F_e
+\]
+This predicate is true if no intervals in the set $F_e$ overlaps $\interval{t_0}{t_2}$. If we had that $\interval{t_1}{t_3} \in F_e$, the above predicate would be false, since both intervals contain the time point $t_1$.
 
 \subsection{Example \textemdash{} Interval-Based Feature Model}
 A small example of an interval-based feature model can be found in Figure~\ref{ex:washing-machine}. It contains three features and one group, and describes an interval-based feature model for a washing machine. The washing machine always has a washer, and a dryer is added at $t_5$. 

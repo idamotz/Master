@@ -1,4 +1,16 @@
-\begin{abstract}
+# Modular Soundness Checking for Feature Model Evolution Plans
+
+A master thesis by Ida Sandberg Motzfeldt
+
+## Overview
+
+This repository contains my thesis and the source code relevant to it.
+
+- [The thesis](https://github.com/idamotz/Master/blob/master/thesis/thesis.pdf)
+- [A soundness checker written in Haskell](https://github.com/idamotz/Master/tree/master/soundness-checker)
+
+## Abstract
+
 A software product line (SPL) is a family of closely related software systems which capitalizes on the reusability and variability of the software products.
 An SPL can be modelled using a feature model, a tree-like structure from which all the configurations of the SPL can be derived.
 Large projects such as an SPL require long-term planning, and plans for SPLs may also be defined in terms of feature models, called feature model evolution plans (FMEP). An FMEP gives information about what a feature model looks like at each stage of the plan.
@@ -9,4 +21,3 @@ In this thesis, we present a representation for FMEPs, called an interval-based 
 
 Using these methods, it is possible to create an efficient verification tool for modification of FMEPs. This may be used as basis for a productive SPL planning tool.
 
-\end{abstract}

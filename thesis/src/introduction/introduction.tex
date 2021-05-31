@@ -1,33 +1,9 @@
-% Giving the thesis a purpose (not how, but why)
-%   Mention problems in industry practice (mention software product lines)
-%   Say what software product lines are for, not technicalities, why they exist
-%   Talk about why planning is difficult, when the project size is increasing
-%   -> Changing the plan is even more difficult, and there is a lack of automated tools for checking that the changes don't break anything
-%   Drawing a picture of the domain and the problem
-%   My thesis is addressing these challenges by looking at these research questions or goals
-% Last part of introduction: research questions/goals (base structure of thesis on this) - 3 is a good number
-% They are general. What, how, (never why)
-% In this thesis, I will address these questions through these activities ...(will not tackle everything, so make the purpose clear)
-% Start broader, chunk down to more detail
-% Can take the goals up again in the following sections (mention the research questions when tackling them)
-% How the sensor should read my master's thesis. How will she know what my contribution is, where it comes in. "In chapter 2 I will give the background, limited to the scope of my thesis". Make it clear that I'm not trying to cover everything, and give the logic/structure of the thesis.
-
-% Storyline: SPLs -> planning -> existing solution (LTEP) -> problem with that solution -> goal
-
-% High-level introduction to software product lines
-
-% Can talk about static analysis in terms of related work or background.
-% -> Semantic-based analysis
-% -> Forward analysis and scope (live variable analysis etc)
-% - Bring up research questions after this
-
-% Reference previous work clearly, talk about how my work builds upon it.
 \chapter{Introduction}
 \label{cha:introduction}
 
 A software product line (SPL) capitalizes on the similarity and variability of closely related software products~\cite{book:introduction-to-spl}. The similarities and variability are captured by features, which are customer-visible characteristics of a system~\cite{book:introduction-to-spl}. Each product in the product line (called a \textit{variant}) comprises a selection of these features, resulting in a flexible and customizable set of variants available to customers. To model an SPL it is common to use a feature model, a tree-like structure with nodes representing features. From this model, a variant can be derived by selecting features. The feature model's structure creates restrictions for which variants are allowed, while also making it possible to model all possible variants at once~\cite{art:feature-models-grammars-and-propositional-formulas}.
 
-SPLs grow large as they are more profitable the more variants they originate~\cite{book:introduction-to-spl}, % page 10 (34 absolute)
+SPLs grow large as they are more profitable the more variants they originate~\cite{book:introduction-to-spl}, 
 and evolve over time as requirements change~\cite{art:context-aware-reconfiguration-in-evolving-software-product-lines, art:darwinspl-an-integrated-tool-suite-for-modeling-evolving-context-aware-software-product-lines}. Complex projects require planning~\cite{art:evofm-feature-driven-planning-of-product-line-evolution}. Intuitively, this means describing how the feature model should look at a future point in time. For instance, new technology may emerge that the manager wishes to incorporate in the product line, but which she believes will take a year to implement. One can then plan how the feature model will look at that point, as well as at some earlier stages where the new technology is partly included. However, as requirements change, plans must adapt, and it may be necessary to change an existing plan, for instance by removing or adding features. These retroactive changes can affect later parts of the plan, causing \emph{paradoxes} that make the plan impossible to realise~\cite{art:anomaly-detection-and-explanation-in-context-aware-software-product-lines}. 
 
 \begin{figure}
@@ -59,7 +35,6 @@ Notice also the difference between \emph{feature model change}, i.e. planning to
 
 \section{The LTEP Project}
 \label{sec:the-ltep-project}
-% Se prosjektbeskrivelsen, kanskje i søknaden til NFR og DAAD. (project proposal)
 This thesis is part of the LTEP research project, which was initiated in 2019 to address the lack of methodology and tooling for planning the long-term evolution of software product lines. It is a collaboration between the University of Oslo and the German university Technische Universität Braunschweig. The overarching goal of the project is to create methodology for the long-term evolution planning of SPLs, and we have published a paper~\cite{art:consistency-preserving-evolution-planning} giving methods for verifying soundness of \emph{feature model evolution plans} (FMEPs), as well as a framework for expressing and verifying logical relationships and dependencies between the spatial and temporal components of the plan.
 
 This soundness verification method lets us detect paradoxes in a feature model evolution plan, and has been integrated into the SPL planning tool DarwinSPL\footnote{\url{https://gitlab.com/DarwinSPL/DarwinSPL}} to make intermediate plan change possible; that is, modifying an earlier stage of the plan instead of adding to the latest stage. Such a change is exemplified in Figure~\ref{ex:simple-paradox}, where the plan is changed by adding $B$ at time $3$. In the method created in \cite{art:consistency-preserving-evolution-planning}, the process of changing the plan and verifying the change happens in the following way:
@@ -71,21 +46,9 @@ This soundness verification method lets us detect paradoxes in a feature model e
 \end{enumerate}
 This method requires us to analyse the entire plan each time a change to the plan is made, even though much of the plan will often not be affected by a change. In this example, only $A$ is affected by the modification, and only between times 3 and 5. This thesis aims to remedy this by analysing \emph{plan change} instead of entire plans, leveraging the knowledge that a change may only affect a small part of the plan, in both dimensions. One is the \emph{spatial} dimension, i.e., which parts of the feature model a change affects, and the other is the temporal dimension, i.e., which points in time in the plan are affected by change.  We can then exploit that adding $B$ only affects its parent parent feature $A$ during the time between 3 and 5, ignoring the $Root$ feature and time $1$. The added benefit in this example is negligible, but for larger plans, ignoring hundreds of features and points in time will likely improve the performance significantly.
 
-% Overordnet om prosjektet;
-% Når det begynte
-% hvem som er med og , noe om NFR og tysk ekvivalent (DAAD).
-% Hva målet er og hva vi har gjort med det 
-   % 
-% Forskerlinjen, Eirik og sommerprosjektet (sommeren 2019). Planla, gjennomførte og skrev en rapport med forskning som senere ble bearbeidet videre til en publisert artikkel (referanse). Vi lagde en formell semantikk for endring av feature models og implementerte den i Maude. I tillegg lagde vi et query language for å beskrive temporale egenskaper ved feature models, samt en modellsjekker som kan verfisere at disse egenskapene eksisterer. \footnote{\url{githubgreier}}
-% I artikkelen er dette integrert i DarwinSPL slik at man kan gjøre planendringer. 
-% Mitt bidrag skal oppfylle M3, som er en measure i prosjektbeskrivelsen til LTEP. Få fram at dette er en konkret del i et fundet forskningsprosjekt
-
 \section{Research Questions}
 \label{sec:research-questions}
-% \todo{Pinpoint the challenge. Then the overall goal of the thesis. In order to achieve this goal, the thesis will address the following questions}
-% Challenge
 Although we have formalized the feature model evolution plan in our previous work~\cite{art:consistency-preserving-evolution-planning}, change to such a plan has not been addressed formally. 
-% Goal
 The goal of this thesis is to formalize plan change and create an analysis method which verifies it, leveraging the knowledge that a change affects only parts of the plan.
 In order to achieve this goal, the thesis will address the following research questions.
 

@@ -1,7 +1,6 @@
 \chapter{Implementation}  
 \label{cha:implementation}
 
-% Say something about implementation without showing the code, maybe giving pseudocode. Talk about distance between formalization and implementation. Describe examples, error messages, practical applications, how it can be used, how it detects paradoxes, how warnings can be given to users.
 In this chapter, we present our implementation of the data structures and analysis rules. We first give an overview of the types to display the structure of the implementation. An example is presented to show how it looks in practice. We also briefly present the translation of the analysis rules, and give an example of an application.
 
 
@@ -11,9 +10,7 @@ We have created a prototype for an implementation of the analysis rules. The imp
 
 The prototype is implemented in Haskell\footnote{\url{https://www.haskell.org/}}, which is a strongly typed, purely functional programming language. We chose the language since a functional language corresponds closely to the mathematical nature of our analysis rules. Moreover, Haskell has an implementation of interval maps\footnote{\url{https://hackage.haskell.org/package/IntervalMap}} which are easily adapted to our purposes. 
 
-The most important modules are \texttt{Types},
-% \texttt{Helpers}, TODO: review if there should be a section on this or just mention it in passing
-\texttt{Validate}, and \texttt{Apply}. We give brief introductions to these modules in the following sections. 
+The most important modules are \texttt{Types}, \texttt{Validate}, and \texttt{Apply}. We give brief introductions to these modules in the following sections. 
 
 \subsection{Translation from Definitions to Types}
 \label{sub:the-types-module}

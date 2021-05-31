@@ -80,10 +80,6 @@ We conclude that the \rulefont{Remove-Group} rule preserves well-formedness for 
 \end{lemma}
 
 \paragraph{Correctness of model modification}
-% Vis: NAMES=NAMES' er uendret
-% Vis: \var{groupID} \notin \bicup \lookup{F'_c}{\interval{t_n}{t_j}}
-% Vis: \interval{t_n}{t_j} \notinnr G'_e
-% \lookup{G_t}{\interval{t_n}{t_j}} = \lookup{G_p}{\interval{t_n}{t_j}} = \lookup{G_c}{\interval{t_n}{t_j}}
 The semantics of the \textbf{removeGroup} operation dictate that the group should not exist, have a type, a parent, or child features after being removed. A proof for this can be found in the previous paragraph. Moreover, the parent feature's map of child features should not contain $\var{groupID}$ during the temporal scope. This is also proven in the previous paragraph. The $\names{}$ map should not be modified. It is clear from the rule that $\names{} = \names{}'$, so this condition, too, is true.
 
 The above proof shows the following lemma:
