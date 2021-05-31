@@ -62,20 +62,21 @@ However, the operation does naturally add information to the $\groups{}$ map, as
 \end{equation*}
 to $\lookup{\groups}{\var{groupID}}$.
 
-Looking up the added group's ID in the modified model should return the information we put in the operation, and given $\lookup{\groups'}{\var{groupID}} = \groupvar{G'}$, the following statements hold:
+Looking up the added group's ID in the modified model during the temporal scope should return the information we put in the operation. Given $\lookup{\groups'}{\var{groupID}} = \groupvar{G'}$, then for all time points $t_k$ with $t_n \leq t_k < t_m$, the following statements hold:
 \begin{align}
-   \interval{t_n}{t_m} &\in G'_e && \text{the group exists} \tag{1} \label{add-group1}\\
-   \lookup{G'_t}{\interval{t_n}{t_m}} &= \set{\var{type}}  && \text{the group has the expected type} \tag{2} \label{add-group2}\\
-   \lookup{G'_p}{\interval{t_n}{t_m}} &= \set{\var{parentFeatureID}}  && \text{the group has the expected parent feature} \tag{3} \label{add-group3}\\
-   \lookup{G'_c}{\interval{t_n}{t_m}} &= \emptyset && \text{the group has no children} \tag{4} \label{add-group4}
+   t_k &\inn G'_e && \text{the group exists} \tag{1} \label{add-group1}\\
+   \lookup{G'_t}{t_k} &= \set{\var{type}}  && \text{the group has the expected type} \tag{2} \label{add-group2}\\
+   \lookup{G'_p}{t_k} &= \set{\var{parentFeatureID}}  && \text{the group has the expected parent feature} \tag{3} \label{add-group3}\\
+   \lookup{G'_c}{t_k} &= \emptyset && \text{the group has no children} \tag{4} \label{add-group4}
 \end{align}
 
 Statement (\ref{add-group1}) holds due to the line $G_e \cup \set{\interval{t_n}{t_m}}$ in $\var{setGroupAttributes}$ (Figure~\vref{fun:set-group-attributes}). Given the semantics of assignment, also statement (\ref{add-group2}) and (\ref{add-group3}) hold, as the type and parent feature ID are assigned to $\lookup{G_t}{\interval{t_n}{t_m}}$ and $\lookup{G_p}{\interval{t_n}{t_m}}$ respectively in $\var{setGroupAttributes}$. Given that \wf{8} is true for the original model, and since $\var{setGroupAttributes}$ does not modify $G_c$, statement (\ref{add-group4}) is also true.
 
 Furthermore, we would expect the group to be listed as a child group of the parent feature in the modified model, so given that $\lookup{\features'{}}{\var{parentFeatureID}} = \featurevar{F'}$, then
 \begin{equation*}
-   \var{groupID} \in \bigcup \lookup{F'_p}{\interval{t_n}{t_m}}
+   \var{groupID} \in \bigcup \lookup{F'_p}{t_k}
 \end{equation*}
+for all $t_k$ with $t_n \leq t_k < t_m$.
 In the \rulefont{Add-Group} rule, 
 \[\var{addChildGroup}(\lookup{\features}{\var{parentFeatureID}}, \interval{t_n}{t_m}, \var{groupID})\]
 is assigned to $\lookup{\features}{\var{parentFeatureID}}$. The function $\var{addChildGroup}$ (Figure~\vref{fun:add-child-group}) adds $\var{groupID}$ to the set of child features at key $\interval{t_n}{t_m}$, so according to the semantics of $\addassign$, it is indeed true that the group is in the parent feature's set of child group during the temporal scope.
