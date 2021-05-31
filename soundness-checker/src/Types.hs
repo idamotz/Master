@@ -95,7 +95,7 @@ type TreeSequence = [(TimePoint, FeatureModel)]
 data EvolutionPlan = EvolutionPlan
   { _initialModel :: FeatureModel
   , _initialTime :: TimePoint
-  , _operations :: [TimeOperation]
+  , _operations :: [UpdateOperation]
   }
   deriving (Show)
 
@@ -114,7 +114,7 @@ data Group = Group
   }
   deriving (Show, Eq)
 
-data TimeOperation
+data UpdateOperation
   = AddOperation Validity AddOperation
   | ChangeOperation TimePoint ChangeOperation
   deriving (Show, Eq)
@@ -160,4 +160,4 @@ makeFieldsNoPrefix ''Feature
 makeFieldsNoPrefix ''Group
 makeFieldsNoPrefix ''FeatureModel
 makeFieldsNoPrefix ''EvolutionPlan
-makePrisms ''TimeOperation
+makePrisms ''UpdateOperation

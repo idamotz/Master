@@ -5,7 +5,7 @@ import qualified Data.IntervalMap.Generic.Strict as IM
 import Helpers
 import Types
 
-apply :: TimeOperation -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
+apply :: UpdateOperation -> IntervalBasedFeatureModel -> IntervalBasedFeatureModel
 apply (AddOperation validity (AddFeature fid name fType parentID)) =
   insertName name validity fid
     . over

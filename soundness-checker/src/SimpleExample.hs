@@ -37,12 +37,12 @@ simplePlan =
       )
     ]
 
-paradoxOp :: TimeOperation
+paradoxOp :: UpdateOperation
 paradoxOp =
   AddOperation (Validity (TP 3) Forever) $
     AddFeature (FeatureID "feature:B") "B" Mandatory (GroupID "group:A")
 
-soundOp :: TimeOperation
+soundOp :: UpdateOperation
 soundOp =
   AddOperation (Validity (TP 3) (TP 5)) $
     AddFeature (FeatureID "feature:B") "B" Mandatory (GroupID "group:A")

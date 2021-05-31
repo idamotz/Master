@@ -39,16 +39,16 @@ model =
         ]
     )
 
-to :: TimePoint -> ChangeOperation -> TimeOperation
+to :: TimePoint -> ChangeOperation -> UpdateOperation
 to = ChangeOperation
 
-ao :: Validity -> AddOperation -> TimeOperation
+ao :: Validity -> AddOperation -> UpdateOperation
 ao = AddOperation
 
 v :: TimePoint -> TimePoint -> Validity
 v = Validity
 
-ops :: [TimeOperation]
+ops :: [UpdateOperation]
 ops =
   (ao (v (TP 1) Forever) <$> tp1) ++ (ao (v (TP 2) Forever) <$> tp2) ++ tp5 ++ tp6 ++ tp7
   where

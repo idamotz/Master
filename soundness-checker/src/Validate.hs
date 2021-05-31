@@ -63,7 +63,7 @@ checkGroupCycles v gid fid ibfm
   | hasCycles (Right gid) (Left fid) v ibfm = Just CreatesCycle
   | otherwise = Nothing
 
-validate :: TimeOperation -> IntervalBasedFeatureModel -> [ValidationError]
+validate :: UpdateOperation -> IntervalBasedFeatureModel -> [ValidationError]
 validate (AddOperation v (AddFeature fid name ftype gid)) ibfm =
   let (FeatureValidity existence _ _ _ _) = lookupFeatureDefault fid ibfm
       (GroupValidity groupExistence groupTypes _ _) = lookupGroupDefault gid ibfm
